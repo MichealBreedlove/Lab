@@ -1,0 +1,80 @@
+{
+  "enabled": true,
+  "mode": "supervised",
+  "triggers": {
+    "slo_high_burn": {
+      "enabled": true,
+      "min_burn_rate": 6.0,
+      "window": "rolling_1h",
+      "severity": "SEV1"
+    },
+    "slo_budget_exhausted": {
+      "enabled": true,
+      "severity": "SEV1"
+    },
+    "gatekeeper_deny": {
+      "enabled": true,
+      "severity": "SEV2"
+    },
+    "chaos_failure": {
+      "enabled": true,
+      "min_failure_rate": 0.3,
+      "severity": "SEV2"
+    },
+    "planner_red": {
+      "enabled": true,
+      "severity": "SEV1"
+    },
+    "regression_gate": {
+      "enabled": true,
+      "severity": "SEV2"
+    }
+  },
+  "severity_levels": {
+    "SEV0": {
+      "name": "Critical",
+      "description": "Total service outage or data loss risk",
+      "auto_close_hours": null,
+      "cooldown_minutes": 60
+    },
+    "SEV1": {
+      "name": "Major",
+      "description": "Significant degradation affecting multiple services",
+      "auto_close_hours": 24,
+      "cooldown_minutes": 30
+    },
+    "SEV2": {
+      "name": "Minor",
+      "description": "Limited impact, single service or non-critical",
+      "auto_close_hours": 12,
+      "cooldown_minutes": 15
+    },
+    "SEV3": {
+      "name": "Informational",
+      "description": "Observed anomaly, no user impact",
+      "auto_close_hours": 6,
+      "cooldown_minutes": 5
+    }
+  },
+  "evidence_attach": {
+    "enabled": true,
+    "paths": {
+      "snapshots": "artifacts/snapshots",
+      "evidence_packs": "artifacts/evidence",
+      "slo_current": "artifacts/slo/current.json",
+      "gatekeeper_log": "artifacts/gatekeeper/decisions.jsonl"
+    }
+  },
+  "retention": {
+    "keep_incidents": 100,
+    "keep_postmortems": 50,
+    "archive_after_days": 90
+  },
+  "publish": {
+    "dashboard": true,
+    "telegram": {
+      "enabled": false,
+      "channel_id": ""
+    }
+  }
+}

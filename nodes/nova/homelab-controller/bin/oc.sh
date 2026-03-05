@@ -22,6 +22,15 @@ Commands:
   slo budget            Show error budgets
   slo publish           Publish SLO data to dashboard/telegram
   slo test              Run P27 SLO tests
+  incident              Show active incident status
+  incident open         Open a new incident
+  incident note         Add a note to active incident
+  incident close        Close an incident
+  incident timeline     Show incident timeline
+  incident list         List all incidents
+  incident postmortem   Generate postmortem for latest resolved
+  incident tick         Run incident trigger check
+  incident test         Run P28 incident tests
   changelog             Run changelog generation (P26)
   gate <action> <tier>  Evaluate gatekeeper for an action
   test <priority>       Run tests for a priority (e.g., test p27)
@@ -154,6 +163,51 @@ case "${1:-help}" in
         shift
         cmd_slo "$@"
         ;;
+    incident)
+        shift
+        subcmd="${1:-status}"
+        shift 2>/dev/null || true
+        case "$subcmd" in
+            status)
+                cd "$ROOT_DIR/scripts/incident"
+                python3 incident_manager.py status
+                ;;
+            open)
+                cd "$ROOT_DIR/scripts/incident"
+                python3 incident_manager.py open "$@"
+                ;;
+            note)
+                cd "$ROOT_DIR/scripts/incident"
+                python3 incident_manager.py note "$@"
+                ;;
+            close)
+                cd "$ROOT_DIR/scripts/incident"
+                python3 incident_manager.py close "$@"
+                ;;
+            timeline)
+                cd "$ROOT_DIR/scripts/incident"
+                python3 incident_manager.py timeline "$@"
+                ;;
+            list)
+                cd "$ROOT_DIR/scripts/incident"
+                python3 incident_manager.py list "$@"
+                ;;
+            postmortem)
+                cd "$ROOT_DIR/scripts/incident"
+                python3 incident_render.py "$@"
+                ;;
+            tick)
+                bash "$ROOT_DIR/scripts/incident/incident_tick.sh"
+                ;;
+            test)
+                bash "$ROOT_DIR/scripts/incident/test_priority28_incidents.sh"
+                ;;
+            *)
+                echo "Unknown incident subcommand: $subcmd"
+                echo "Try: oc incident [status|open|note|close|timeline|list|postmortem|tick|test]"
+                ;;
+        esac
+        ;;
     gate)
         shift
         cd "$ROOT_DIR"
@@ -174,6 +228,7 @@ case "${1:-help}" in
         priority="${1:-all}"
         case "$priority" in
             p27|slo) bash "$ROOT_DIR/scripts/test_priority27_slo.sh" ;;
+            p28|incident) bash "$ROOT_DIR/scripts/incident/test_priority28_incidents.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do
