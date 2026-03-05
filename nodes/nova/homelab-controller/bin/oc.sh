@@ -38,6 +38,11 @@ Commands:
   portfolio test        Run P29 portfolio tests
   changelog             Run changelog generation (P26)
   gate <action> <tier>  Evaluate gatekeeper for an action
+  controlplane tick      Quick inventory tick (nodes + BIOS)
+  controlplane full      Full inventory tick (all devices)
+  controlplane status    Show last tick results
+  controlplane connectivity  Scan all device ports
+  controlplane test      Run P43 control plane tests
   supply status          Supply chain health overview
   supply sbom            Generate SBOM
   supply provenance      Record build provenance
@@ -333,6 +338,22 @@ print(f'Site: {d.get(\"site_url\", \"N/A\")}')
                 ;;
         esac
         ;;
+    controlplane|cp)
+        shift
+        subcmd="${1:-status}"
+        shift 2>/dev/null || true
+        case "$subcmd" in
+            tick) bash "$ROOT_DIR/scripts/controlplane/homelab_tick.sh" quick ;;
+            full) bash "$ROOT_DIR/scripts/controlplane/homelab_tick.sh" full push ;;
+            status)
+                echo "Control Plane Status"
+                ls -lt "$ROOT_DIR/artifacts/controlplane/" 2>/dev/null | head -10 || echo "No artifacts yet. Run: oc controlplane tick"
+                ;;
+            connectivity) cd "$ROOT_DIR"; python3 scripts/controlplane/device_connectivity.py "$@" ;;
+            test) bash "$ROOT_DIR/scripts/controlplane/test_controlplane.sh" ;;
+            *) echo "Unknown controlplane subcommand: $subcmd"; echo "Try: oc controlplane [tick|full|status|connectivity|test]" ;;
+        esac
+        ;;
     supply)
         shift
         subcmd="${1:-status}"
@@ -616,6 +637,7 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             p40|verify) bash "$ROOT_DIR/scripts/verify/test_priority40_verify.sh" ;;
             p41|supply) bash "$ROOT_DIR/scripts/supply/test_priority41_supply.sh" ;;
             p42|freeze) bash "$ROOT_DIR/scripts/release/test_priority42_freeze.sh" ;;
+            p43|controlplane|cp) bash "$ROOT_DIR/scripts/controlplane/test_controlplane.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do

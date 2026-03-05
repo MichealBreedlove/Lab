@@ -1,0 +1,21 @@
+---
+# Global variables for all hosts
+ansible_ssh_private_key_file: "~/.ssh/id_ed25519"
+ansible_ssh_common_args: "-o StrictHostKeyChecking=accept-new -o ConnectTimeout=10"
+
+# Artifact output
+artifacts_root: "{{ playbook_dir }}/../artifacts/controlplane"
+timestamp: "{{ ansible_date_time.date }}"
+
+# Secrets env file (loaded at runtime, never committed)
+secrets_env_file: "~/.config/homelab/secrets.env"
+
+# Sanitization
+sanitize_patterns:
+  - "password"
+  - "token"
+  - "secret"
+  - "cookie"
+  - "Authorization"
+  - "api_key"
+  - "PRIVATE KEY"

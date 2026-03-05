@@ -1,0 +1,47 @@
+---
+# P43 — Switch Inventory: collect running configs from managed switches
+- name: "Switch Inventory"
+  hosts: switches
+  gather_facts: false
+  become: false
+  vars:
+    local_output: "{{ playbook_dir }}/../artifacts/controlplane/switches/{{ switch_vendor }}_{{ switch_model }}/{{ lookup('pipe', 'date +%Y-%m-%d') }}"
+
+  tasks:
+    - name: Skip unmanaged switches
+      meta: end_host
+      when: not (managed | default(false))
+
+    - name: Create local output directory
+      file:
+        path: "{{ local_output }}"
+        state: directory
+        mode: "0750"
+      delegate_to: localhost
+
+    - name: Collect switch commands
+      raw: "{{ item.cmd }}"
+      register: sw_cmds
+      loop: "{{ switch_commands[switch_vendor] | default([]) }}"
+      ignore_errors: true
+      changed_when: false
+
+    - name: Save command outputs
+      copy:
+        content: "{{ item.stdout | default('command failed') }}"
+        dest: "{{ local_output }}/{{ item.item.name }}.txt"
+      delegate_to: localhost
+      loop: "{{ sw_cmds.results }}"
+      when: item is not skipped
+
+    - name: Write inventory summary
+      copy:
+        content: |
+          # Switch Inventory — {{ switch_vendor }} {{ switch_model }}
+          # {{ lookup('pipe', 'date -u +%Y-%m-%dT%H:%M:%SZ') }}
+          Host: {{ ansible_host }}
+          Vendor: {{ switch_vendor }}
+          Model: {{ switch_model }}
+          Managed: {{ managed | default(false) }}
+        dest: "{{ local_output }}/SUMMARY.md"
+      delegate_to: localhost

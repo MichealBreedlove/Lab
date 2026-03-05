@@ -1,0 +1,69 @@
+---
+# P43 — Proxmox Inventory: export cluster configs and status
+- name: "Proxmox Inventory"
+  hosts: proxmox
+  gather_facts: false
+  become: false
+  vars:
+    local_output: "{{ playbook_dir }}/../artifacts/controlplane/proxmox/{{ pve_name }}/{{ lookup('pipe', 'date +%Y-%m-%d') }}"
+
+  tasks:
+    - name: Create local output directory
+      file:
+        path: "{{ local_output }}"
+        state: directory
+        mode: "0750"
+      delegate_to: localhost
+
+    - name: Collect PVE commands
+      raw: "{{ item.cmd }}"
+      register: pve_cmds
+      loop: "{{ pve_commands }}"
+      ignore_errors: true
+      changed_when: false
+
+    - name: Save command outputs
+      copy:
+        content: "{{ item.stdout | default('command failed or not available') }}"
+        dest: "{{ local_output }}/{{ item.item.name }}.txt"
+      delegate_to: localhost
+      loop: "{{ pve_cmds.results }}"
+      when: item is not skipped
+
+    - name: Fetch config files
+      raw: "cat {{ item }} 2>/dev/null || echo 'FILE NOT FOUND: {{ item }}'"
+      register: pve_configs
+      loop: "{{ pve_config_paths }}"
+      ignore_errors: true
+      changed_when: false
+
+    - name: Save config files
+      copy:
+        content: "{{ item.stdout | default('') }}"
+        dest: "{{ local_output }}/{{ item.item | basename }}"
+      delegate_to: localhost
+      loop: "{{ pve_configs.results }}"
+      when: item.stdout is defined and item.stdout != ''
+
+    - name: Collect network info
+      raw: "ip addr show 2>/dev/null"
+      register: pve_network
+      ignore_errors: true
+      changed_when: false
+
+    - name: Save network info
+      copy:
+        content: "{{ pve_network.stdout | default('') }}"
+        dest: "{{ local_output }}/ip_addr.txt"
+      delegate_to: localhost
+
+    - name: Write inventory summary
+      copy:
+        content: |
+          # Proxmox Inventory — {{ pve_name }} — {{ lookup('pipe', 'date -u +%Y-%m-%dT%H:%M:%SZ') }}
+          Host: {{ ansible_host }}
+          PVE Name: {{ pve_name }}
+          Commands collected: {{ pve_cmds.results | selectattr('rc', 'defined') | selectattr('rc', 'eq', 0) | list | length }}/{{ pve_commands | length }}
+          Config files: {{ pve_config_paths | length }}
+        dest: "{{ local_output }}/SUMMARY.md"
+      delegate_to: localhost

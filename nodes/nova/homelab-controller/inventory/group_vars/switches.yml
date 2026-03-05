@@ -1,0 +1,13 @@
+---
+# Switch-specific variables
+# Most switches are manual-managed until IPs are confirmed
+switch_commands:
+  cisco:
+    - { name: "running_config", cmd: "show running-config" }
+    - { name: "version", cmd: "show version" }
+    - { name: "interfaces", cmd: "show interface brief" }
+  brocade:
+    - { name: "config", cmd: "configshow" }
+    - { name: "version", cmd: "firmwareshow" }
+  nicgiga:
+    - { name: "config", cmd: "show running-config" }

@@ -1,0 +1,85 @@
+---
+# P43 — BIOS/Firmware Inventory: dmidecode + IPMI where available
+- name: "BIOS/Firmware Inventory"
+  hosts: nodes
+  gather_facts: true
+  become: true
+  vars:
+    local_output: "{{ playbook_dir }}/../artifacts/controlplane/bios/{{ inventory_hostname }}/{{ lookup('pipe', 'date +%Y-%m-%d') }}"
+
+  tasks:
+    - name: Create local output directory
+      file:
+        path: "{{ local_output }}"
+        state: directory
+        mode: "0750"
+      delegate_to: localhost
+      become: false
+
+    - name: Collect dmidecode (system info)
+      command: dmidecode -t system
+      register: dmi_system
+      ignore_errors: true
+      changed_when: false
+
+    - name: Collect dmidecode (BIOS)
+      command: dmidecode -t bios
+      register: dmi_bios
+      ignore_errors: true
+      changed_when: false
+
+    - name: Collect dmidecode (memory)
+      command: dmidecode -t memory
+      register: dmi_memory
+      ignore_errors: true
+      changed_when: false
+
+    - name: Collect dmidecode (processor)
+      command: dmidecode -t processor
+      register: dmi_processor
+      ignore_errors: true
+      changed_when: false
+
+    - name: Save dmidecode outputs
+      copy:
+        content: "{{ item.stdout | default('not available') }}"
+        dest: "{{ local_output }}/{{ item.item }}.txt"
+      delegate_to: localhost
+      become: false
+      loop:
+        - { item: "system", stdout: "{{ dmi_system.stdout | default('') }}" }
+        - { item: "bios", stdout: "{{ dmi_bios.stdout | default('') }}" }
+        - { item: "memory", stdout: "{{ dmi_memory.stdout | default('') }}" }
+        - { item: "processor", stdout: "{{ dmi_processor.stdout | default('') }}" }
+
+    - name: Check for IPMI tools
+      command: which ipmitool
+      register: ipmi_check
+      changed_when: false
+      failed_when: false
+
+    - name: Collect IPMI sensor data
+      command: ipmitool sensor list
+      register: ipmi_sensors
+      when: ipmi_check.rc == 0
+      ignore_errors: true
+      changed_when: false
+
+    - name: Save IPMI data
+      copy:
+        content: "{{ ipmi_sensors.stdout | default('IPMI not available') }}"
+        dest: "{{ local_output }}/ipmi_sensors.txt"
+      delegate_to: localhost
+      become: false
+      when: ipmi_check.rc == 0
+
+    - name: Write summary
+      copy:
+        content: |
+          # BIOS/Firmware Inventory — {{ inventory_hostname }}
+          # {{ lookup('pipe', 'date -u +%Y-%m-%dT%H:%M:%SZ') }}
+          Host: {{ ansible_host }}
+          IPMI available: {{ 'yes' if ipmi_check.rc == 0 else 'no' }}
+        dest: "{{ local_output }}/SUMMARY.md"
+      delegate_to: localhost
+      become: false

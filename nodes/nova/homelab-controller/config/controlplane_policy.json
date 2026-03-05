@@ -1,0 +1,27 @@
+{
+  "enabled": true,
+  "controller_node": "nova",
+  "controller_ip": "10.1.1.21",
+  "schedule": {
+    "quick_tick": "daily",
+    "full_tick": "weekly",
+    "quick_cron": "0 6 * * *",
+    "full_cron": "0 3 * * 0"
+  },
+  "managed_domains": {
+    "nodes": ["nova", "mira", "orin"],
+    "proxmox": ["pve1", "pve2", "pve3"],
+    "opnsense": ["firewall"],
+    "switches": ["cisco_nexus", "brocade_6610", "nicgiga_s25"]
+  },
+  "safety": {
+    "read_only_default": true,
+    "require_break_glass": true,
+    "break_glass_max_age_minutes": 30
+  },
+  "github": {
+    "repo": "MichealBreedlove/Lab",
+    "push_on_tick": false,
+    "push_on_full": true
+  }
+}
