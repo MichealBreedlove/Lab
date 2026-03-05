@@ -156,7 +156,8 @@ def main():
         for name, check in result["checks"].items():
             if name == "git":
                 gi = "✅" if check.get("clean") else "⚠️"
-                print(f"  {gi} git: {'clean' if check.get('clean') else f'{len(check.get(\"dirty_files\", []))} uncommitted files'}")
+                dirty_count = len(check.get("dirty_files", []))
+                print(f"  {gi} git: {'clean' if check.get('clean') else str(dirty_count) + ' uncommitted files'}")
             elif name == "secrets":
                 si = "✅" if check["pass"] else "🚨"
                 print(f"  {si} secrets: {check['violations']} violations")
