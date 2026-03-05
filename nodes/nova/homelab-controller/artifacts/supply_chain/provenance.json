@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-03-05T19:09:17Z",
+  "build_environment": {
+    "os": "Linux",
+    "os_release": "6.17.0-14-generic",
+    "os_version": "#14-Ubuntu SMP PREEMPT_DYNAMIC Fri Jan  9 17:01:16 UTC 2026",
+    "machine": "x86_64",
+    "python_version": "3.13.7",
+    "hostname": "nova"
+  },
+  "git": {
+    "commit": "a29d2c0d376c504549042d4836f5565abdf81b7a",
+    "branch": "main",
+    "dirty": true,
+    "remote": "https://github.com/MichealBreedlove/Lab.git",
+    "tag": "a29d2c0"
+  },
+  "controller": {
+    "root": "/home/nova/Lab/nodes/nova/homelab-controller",
+    "config_files": 16,
+    "script_dirs": [
+      "sec",
+      "release",
+      "slo",
+      "supply",
+      "capacity",
+      "verify",
+      "dr",
+      "docs",
+      "incident",
+      "portfolio",
+      "obs",
+      "infra",
+      "aiops",
+      "bootstrap"
+    ]
+  }
+}

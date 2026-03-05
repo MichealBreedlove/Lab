@@ -1,0 +1,1353 @@
+{
+  "format": "cyclonedx-lite",
+  "version": "1.0",
+  "timestamp": "2026-03-05T19:09:16Z",
+  "metadata": {
+    "tool": "homelab-controller/supply_sbom.py",
+    "component_count": 131
+  },
+  "components": [
+    {
+      "name": "scripts/aiops/__init__.py",
+      "type": "py",
+      "size_bytes": 45,
+      "sha256": "e7c6b87ebf93e56d7ba35bb103337cbcf85f9c11ca9aa66036a4304b04ba117e",
+      "imports": []
+    },
+    {
+      "name": "scripts/aiops/aiops_analyze.py",
+      "type": "py",
+      "size_bytes": 5955,
+      "sha256": "8fded0848c7c32345dedaed8569a890fb101c58732a1b52a5e00776056ecc4ee",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "requests",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/aiops/aiops_anomaly.py",
+      "type": "py",
+      "size_bytes": 4772,
+      "sha256": "05603940fcc0f7811837657fb97fa9f725f425a9b0c1e8d4d015f0555112e902",
+      "imports": [
+        "argparse",
+        "json",
+        "math",
+        "pathlib",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/aiops/aiops_correlate.py",
+      "type": "py",
+      "size_bytes": 5895,
+      "sha256": "8ca429b42b4b7cfd4e516c607fedbaa5cc3fd4267d521b6a24ab94d7ddfc591b",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/aiops/aiops_report.py",
+      "type": "py",
+      "size_bytes": 4990,
+      "sha256": "0bd64ebdbee5d1b1c050c91eb64dbc283bcd1994b6c5503460363e5124e1b153",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/aiops/aiops_tick.sh",
+      "type": "sh",
+      "size_bytes": 575,
+      "sha256": "40d8296996ed0eabb109b1a704d683b2827b9a2d53ef93682d83dbf227eb4a42"
+    },
+    {
+      "name": "scripts/aiops/test_priority34_aiops.sh",
+      "type": "sh",
+      "size_bytes": 3287,
+      "sha256": "5ea3696fe683e782152d603320347be66baf40aba98fa39e2f48170cb3e059ae"
+    },
+    {
+      "name": "scripts/bootstrap/__init__.py",
+      "type": "py",
+      "size_bytes": 55,
+      "sha256": "a65a1b7926ab352e4c5c7c2c652b8ac4b5929c6b6bea78c74bca1c30a5feaf23",
+      "imports": []
+    },
+    {
+      "name": "scripts/bootstrap/bootstrap_configure.py",
+      "type": "py",
+      "size_bytes": 6252,
+      "sha256": "324af18528344e0f33ff78facb55f2dee5156654fc45c36eaf2558fd00e7ea37",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "subprocess",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/bootstrap/bootstrap_export_portfolio.py",
+      "type": "py",
+      "size_bytes": 4293,
+      "sha256": "cd1d07a732aced556448fff8754dbdafd79e00356bd0aede320c6a87fb19f662",
+      "imports": [
+        "argparse",
+        "json",
+        "os",
+        "pathlib",
+        "re",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/bootstrap/bootstrap_install.py",
+      "type": "py",
+      "size_bytes": 5620,
+      "sha256": "b8e566c7aa76ba07470a2cf712bab7a19fd614dd6cc07de6a3e47e86d7f83327",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "subprocess",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/bootstrap/bootstrap_preflight.py",
+      "type": "py",
+      "size_bytes": 4713,
+      "sha256": "284e789f85e4fde2a26266014229d91ab7afb10e55dbaa10f17a0c257ed23151",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "socket",
+        "subprocess",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/bootstrap/bootstrap_register.py",
+      "type": "py",
+      "size_bytes": 5095,
+      "sha256": "746dabfad8e2eefa0bce40cd557bd939da460a082e6a22e81588ebbd8b699e83",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "sys",
+        "time",
+        "yaml"
+      ]
+    },
+    {
+      "name": "scripts/bootstrap/bootstrap_tick.sh",
+      "type": "sh",
+      "size_bytes": 1402,
+      "sha256": "e9f2346c3f75d22d65420de3caab8b6fd460b2a1b8cdbb20d0c0429e1b281c3e"
+    },
+    {
+      "name": "scripts/bootstrap/bootstrap_validate.py",
+      "type": "py",
+      "size_bytes": 5487,
+      "sha256": "834824c18c17e57a8715c4a69d087ae714609b2b4dc08873ed1307274d31c59a",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "socket",
+        "subprocess",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/bootstrap/test_priority31_bootstrap.sh",
+      "type": "sh",
+      "size_bytes": 3664,
+      "sha256": "698f14bbdb870f62eeb5670769f9addeb786893d6497dc03d47d84fed97ebbd0"
+    },
+    {
+      "name": "scripts/capacity/__init__.py",
+      "type": "py",
+      "size_bytes": 56,
+      "sha256": "8b65069ef059c0f306ac94e02c70d3368a9ede6d41fd363b7e0ab9f65585b893",
+      "imports": []
+    },
+    {
+      "name": "scripts/capacity/capacity_collect.py",
+      "type": "py",
+      "size_bytes": 8472,
+      "sha256": "48716eb7ddc6f53d4db32556d3db491bc031921940861080bf891e5b901a0b3b",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "subprocess",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/capacity/capacity_dashboard_export.py",
+      "type": "py",
+      "size_bytes": 3160,
+      "sha256": "c5d4e40a1bd900f625dc4d7312eae5068636991b590864f87cc42483d689dd60",
+      "imports": [
+        "json",
+        "pathlib",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/capacity/capacity_forecast.py",
+      "type": "py",
+      "size_bytes": 5159,
+      "sha256": "beedeb34bbfe493c1441d358d65834efc2b885b0ed2ee54ebfaa1f8818b6ba6f",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/capacity/capacity_recommend.py",
+      "type": "py",
+      "size_bytes": 6285,
+      "sha256": "35c168d1322eb47aacafab76ef1d6d07f38871e65dba9efa29c34d7a441ffe0b",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/capacity/capacity_tick.sh",
+      "type": "sh",
+      "size_bytes": 626,
+      "sha256": "7030f92b08e27ebf054d3dcaea7259fad172d18750116a5b3c57b5cadf799e76"
+    },
+    {
+      "name": "scripts/capacity/test_priority32_capacity.sh",
+      "type": "sh",
+      "size_bytes": 3753,
+      "sha256": "1689a9a9e33e4d43f29381eed66b2bfd2c5c48a073c68f7944fdedbeb0663c5f"
+    },
+    {
+      "name": "scripts/docs/__init__.py",
+      "type": "py",
+      "size_bytes": 54,
+      "sha256": "2fee504b25831e95bd8ab6dddacc792cd652832a512ce7425afeca9bbc0fbc2c",
+      "imports": []
+    },
+    {
+      "name": "scripts/docs/docs_changelog.py",
+      "type": "py",
+      "size_bytes": 3501,
+      "sha256": "7e8626a5741f9c109276bedde6fdfe6cb1bb4da6391d35a0e5e96299f13561f0",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "re",
+        "subprocess",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/docs/docs_dependencies.py",
+      "type": "py",
+      "size_bytes": 5185,
+      "sha256": "2b9702545cf3d49af82e4a9d0a0badcd85b42b1fd59d176e4f0d39714a63c1e6",
+      "imports": [
+        "argparse",
+        "ast",
+        "json",
+        "pathlib",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/docs/docs_diagrams.py",
+      "type": "py",
+      "size_bytes": 8704,
+      "sha256": "e4406824b3fc6aa0abb069a6985c5a7c4e1e52592b46de1acc7d79e5cabffdd9",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/docs/docs_generate_all.py",
+      "type": "py",
+      "size_bytes": 1548,
+      "sha256": "1e448b19fcdeeace75ad99be4cf7436a1cf9ba1867ce4c58dcc4895f7843ac38",
+      "imports": [
+        "json",
+        "pathlib",
+        "subprocess",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/docs/docs_portfolio.py",
+      "type": "py",
+      "size_bytes": 4922,
+      "sha256": "64c834fec4396e784b5fed835b2317b73c967b4aeaab0212a0ba0c99696a9cd6",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/docs/docs_services.py",
+      "type": "py",
+      "size_bytes": 4341,
+      "sha256": "8fb1602ae4ad6d3cad3df3c4e1b97d4c13bf4155223a8faed43e4a4e7fbe6b02",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "subprocess",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/docs/docs_topology.py",
+      "type": "py",
+      "size_bytes": 3591,
+      "sha256": "84faa92dccb05ee86bdf76a4851e719587100f0050262173354ddcb5922081dc",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/docs/test_priority33_docs.sh",
+      "type": "sh",
+      "size_bytes": 2848,
+      "sha256": "3a61ded22a8cd4c57f002a06950b1de64c7300afb9fb263d3fb209b939fb82bc"
+    },
+    {
+      "name": "scripts/dr/__init__.py",
+      "type": "py",
+      "size_bytes": 63,
+      "sha256": "aaa7934357cc84d812c57f7744b79e6108e83bb9c960666bbcef9ddfcf671772",
+      "imports": []
+    },
+    {
+      "name": "scripts/dr/dr_backup_inventory.py",
+      "type": "py",
+      "size_bytes": 5535,
+      "sha256": "ecef66db3fd600661c59f69baff6958ae9cd70ff9b113cf46ade00bd9e446ce5",
+      "imports": [
+        "argparse",
+        "hashlib",
+        "json",
+        "os",
+        "pathlib",
+        "platform",
+        "socket",
+        "subprocess",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/dr/dr_dashboard_export.py",
+      "type": "py",
+      "size_bytes": 5796,
+      "sha256": "5f6cdcc00bed65ae6b6bde6b93e0a7fc3dd2e28b25f47b96c39d3d7790596619",
+      "imports": [
+        "json",
+        "os",
+        "pathlib",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/dr/dr_drill.py",
+      "type": "py",
+      "size_bytes": 7489,
+      "sha256": "d7014dc7ed2e0faef79d109a15e219b1803d0aae1a9a219ff21f686e733192f0",
+      "imports": [
+        "argparse",
+        "dr_backup_inventory",
+        "dr_preflight",
+        "dr_restore",
+        "dr_validate",
+        "json",
+        "pathlib",
+        "subprocess",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/dr/dr_preflight.py",
+      "type": "py",
+      "size_bytes": 6113,
+      "sha256": "fb6bf4d2026b158f57f69a32f32dd50c76919944dbf93ad7f19ddfe05e752431",
+      "imports": [
+        "argparse",
+        "json",
+        "os",
+        "pathlib",
+        "platform",
+        "shutil",
+        "socket",
+        "subprocess",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/dr/dr_restore.py",
+      "type": "py",
+      "size_bytes": 8706,
+      "sha256": "28d76b1a781b711daf82e64536ab948cfe923d2e36215b531fba163fb311d63c",
+      "imports": [
+        "argparse",
+        "json",
+        "os",
+        "pathlib",
+        "shutil",
+        "subprocess",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/dr/dr_tick.sh",
+      "type": "sh",
+      "size_bytes": 1791,
+      "sha256": "2867939a4967fc24541dfc0c882e98ae82b65844b9e1738cdd9dbfcaf1a3a43b"
+    },
+    {
+      "name": "scripts/dr/dr_validate.py",
+      "type": "py",
+      "size_bytes": 5566,
+      "sha256": "add571a8fe0027c974c87556d3f98311d0cb5007a980ec8b9dcda3c481ea37f1",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "socket",
+        "subprocess",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/dr/test_priority30_dr.sh",
+      "type": "sh",
+      "size_bytes": 3355,
+      "sha256": "715348b3d75d55d1424f2af8de60dd4575a91b249e995b143c705268c2892582"
+    },
+    {
+      "name": "scripts/incident/__init__.py",
+      "type": "py",
+      "size_bytes": 30,
+      "sha256": "8aa1da479405781dfb1d3cd8fe38b93ff95230c1d6fd7420b3cf5c0dcaceef7d",
+      "imports": []
+    },
+    {
+      "name": "scripts/incident/incident_manager.py",
+      "type": "py",
+      "size_bytes": 11304,
+      "sha256": "7a67cbc11221658dbc132b74684cd1d073451b4de25d8803b117b84a34035a00",
+      "imports": [
+        "argparse",
+        "datetime",
+        "incident_state",
+        "json",
+        "pathlib",
+        "sys",
+        "typing"
+      ]
+    },
+    {
+      "name": "scripts/incident/incident_render.py",
+      "type": "py",
+      "size_bytes": 7522,
+      "sha256": "ec1c54e1e6d0cb9ef374b5b8e1ad56adf415750267e9e0c683f8c9304921b73e",
+      "imports": [
+        "datetime",
+        "incident_state",
+        "pathlib",
+        "sys",
+        "typing"
+      ]
+    },
+    {
+      "name": "scripts/incident/incident_state.py",
+      "type": "py",
+      "size_bytes": 6292,
+      "sha256": "9caf6fa52c520b2d1a1979ab1016d46e8fd4ff2ebe9c5eb32766f2c6b2fae828",
+      "imports": [
+        "datetime",
+        "json",
+        "os",
+        "pathlib",
+        "typing",
+        "uuid"
+      ]
+    },
+    {
+      "name": "scripts/incident/incident_tick.sh",
+      "type": "sh",
+      "size_bytes": 1022,
+      "sha256": "fe36d4dfcf1055bf13c1508d6db20955dbd22cfcc79cfa5e407eded1b484346e"
+    },
+    {
+      "name": "scripts/incident/test_priority28_incidents.sh",
+      "type": "sh",
+      "size_bytes": 7388,
+      "sha256": "883e91a59d1cff1f629aa94a43601374a8e369e39b9567a1f7332541b7848d68"
+    },
+    {
+      "name": "scripts/infra/__init__.py",
+      "type": "py",
+      "size_bytes": 54,
+      "sha256": "6e161cbed068131b007ae31f64c4400e8570132102628b72caf61db7af2f9e24",
+      "imports": []
+    },
+    {
+      "name": "scripts/infra/infra_inventory.py",
+      "type": "py",
+      "size_bytes": 4487,
+      "sha256": "9f54e837d6b6ca546786b665286bb435ab406f38d505f85768a73896a6f7c5fc",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "subprocess",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/infra/infra_publish.py",
+      "type": "py",
+      "size_bytes": 2532,
+      "sha256": "2c6a183827b795fd9431fcd430794076c4a6faa436f721648b04169dfbcbec9e",
+      "imports": [
+        "json",
+        "pathlib",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/infra/infra_tick.sh",
+      "type": "sh",
+      "size_bytes": 709,
+      "sha256": "4730a90afd70cdc223383df08a7b5559a7cc49950d12590d8207526a6479d453"
+    },
+    {
+      "name": "scripts/infra/opnsense_backup.py",
+      "type": "py",
+      "size_bytes": 2612,
+      "sha256": "6d5526f822e20d99c6c5bb1761147e01c2223e55ec87af32f30cfb9886673d20",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/infra/proxmox_export.py",
+      "type": "py",
+      "size_bytes": 3770,
+      "sha256": "96c9d0a57167fc01678b6c6170c4fdf7cc936a4529a4aec68d6cbf6e580819c6",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "re",
+        "subprocess",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/infra/test_priority37_infra.sh",
+      "type": "sh",
+      "size_bytes": 2190,
+      "sha256": "67c0ba7345294e0e6442ca2b5023ab6d40c5f89a7a35c0735fcc865040969b99"
+    },
+    {
+      "name": "scripts/obs/__init__.py",
+      "type": "py",
+      "size_bytes": 59,
+      "sha256": "c53bfd20f017a7d4be16240016b847df563ba97f4ce758583730894311b76270",
+      "imports": []
+    },
+    {
+      "name": "scripts/obs/obs_compose.yml",
+      "type": "yml",
+      "size_bytes": 2530,
+      "sha256": "222a82b5873984bc0a3c4c3e0f72a0aaf7ea494a139c7c6389a8c2acd136160a"
+    },
+    {
+      "name": "scripts/obs/obs_eventbus.py",
+      "type": "py",
+      "size_bytes": 4700,
+      "sha256": "5130ac7fe646e7c83d8658a15ef5feb9e56cc15763e17f5ca18814d7031d3bd7",
+      "imports": [
+        "argparse",
+        "json",
+        "os",
+        "pathlib",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/obs/obs_install.sh",
+      "type": "sh",
+      "size_bytes": 2124,
+      "sha256": "53cf39473c727a2c72a63887df2a53fdaba36543af5259f5ce21612eddeec4a6"
+    },
+    {
+      "name": "scripts/obs/obs_publish.py",
+      "type": "py",
+      "size_bytes": 3962,
+      "sha256": "b5808c145cb1d07264e6c9b7c5be886b6dadb60a3003801f435cc86168f7abc4",
+      "imports": [
+        "json",
+        "pathlib",
+        "requests",
+        "subprocess",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/obs/obs_rules.yml",
+      "type": "yml",
+      "size_bytes": 1846,
+      "sha256": "465cec34fb17a1b5ad75d7abd541b3b50701e945d5e1d396b04f486acce03ebb"
+    },
+    {
+      "name": "scripts/obs/obs_scrape.yml",
+      "type": "yml",
+      "size_bytes": 1255,
+      "sha256": "88252f0ad0dcba2d05d48a9581723460e324944dadd85de83ee7ebe17955e10b"
+    },
+    {
+      "name": "scripts/obs/obs_tick.sh",
+      "type": "sh",
+      "size_bytes": 543,
+      "sha256": "b2fcb3059ee11a69ecde6badbb91be95bd539f3d98fefb407f6f1010a97a74fe"
+    },
+    {
+      "name": "scripts/obs/test_priority36_obs.sh",
+      "type": "sh",
+      "size_bytes": 2769,
+      "sha256": "c8594d570ac8dd2063b43d911c46341b3f757f0f85c38a8ac476c61bc87c3f52"
+    },
+    {
+      "name": "scripts/portfolio/__init__.py",
+      "type": "py",
+      "size_bytes": 51,
+      "sha256": "34e15c0cbeee6714923c2189a66192dee54a10e5232a3d77e93c2558560b2030",
+      "imports": []
+    },
+    {
+      "name": "scripts/portfolio/portfolio_badges.py",
+      "type": "py",
+      "size_bytes": 2545,
+      "sha256": "19bd3e0ffa05953cc70c0f7573e6527ccb6cb89b76e14ac4663c0d1a53934c31",
+      "imports": [
+        "json",
+        "pathlib",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/portfolio/portfolio_build.py",
+      "type": "py",
+      "size_bytes": 10261,
+      "sha256": "d85a40f5edabbb415a4f6e2998d8c712278045cf8c168cac7e40add235ca838b",
+      "imports": [
+        "datetime",
+        "json",
+        "pathlib",
+        "shutil"
+      ]
+    },
+    {
+      "name": "scripts/portfolio/portfolio_index.py",
+      "type": "py",
+      "size_bytes": 5461,
+      "sha256": "388d9d04d8acfae83e6e8c03a5b1f77458f2afe7246cf3e805ff8a75466d74fd",
+      "imports": [
+        "datetime",
+        "json",
+        "pathlib",
+        "re"
+      ]
+    },
+    {
+      "name": "scripts/portfolio/portfolio_publish.py",
+      "type": "py",
+      "size_bytes": 907,
+      "sha256": "332ff855897633b113e30ad477ed55e6adee47286e8f4ff25676ec073b66a94f",
+      "imports": [
+        "json",
+        "pathlib",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/portfolio/portfolio_redact.py",
+      "type": "py",
+      "size_bytes": 3704,
+      "sha256": "638705ada235171a29efafb4d08cc8d8d58fcf0a49177414c5ec43af2797e89d",
+      "imports": [
+        "json",
+        "pathlib",
+        "re",
+        "sys",
+        "typing"
+      ]
+    },
+    {
+      "name": "scripts/portfolio/portfolio_render.py",
+      "type": "py",
+      "size_bytes": 7430,
+      "sha256": "89473e2665214eca012adcb594656312a209b52afabbd2716e648e315dcbb24f",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/portfolio/portfolio_tick.sh",
+      "type": "sh",
+      "size_bytes": 535,
+      "sha256": "04bd81ac199b99310fc3b8bc97282c88515c2a56e58af4b6a958101fab2fa9a8"
+    },
+    {
+      "name": "scripts/portfolio/test_priority29_portfolio.sh",
+      "type": "sh",
+      "size_bytes": 3613,
+      "sha256": "0237078952e70a8aac77c3ea52f4e3fbb2f291b9fdd7a77c9b9708b34577fae6"
+    },
+    {
+      "name": "scripts/portfolio/test_priority39_portfolio.sh",
+      "type": "sh",
+      "size_bytes": 2434,
+      "sha256": "2bdd8f5c99c969916a00f7a4be8695953eb6aa527a3148a7b422e05f946c284e"
+    },
+    {
+      "name": "scripts/release/__init__.py",
+      "type": "py",
+      "size_bytes": 51,
+      "sha256": "2bd031c9fabed17cf93475c24b29d8187c9655698894736bb407cd69b26ec528",
+      "imports": []
+    },
+    {
+      "name": "scripts/release/release_audit.py",
+      "type": "py",
+      "size_bytes": 5976,
+      "sha256": "66db6405d6abd9fdd681c5a72cd7d486d202c2022c6244c56c2d97cf4f8fc33f",
+      "imports": []
+    },
+    {
+      "name": "scripts/release/release_build_docs.py",
+      "type": "py",
+      "size_bytes": 8095,
+      "sha256": "a589a267dde2dff919702a982e507a07d1b2df46f5ed93debe3e10839ef0185b",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "subprocess",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/release/release_package.py",
+      "type": "py",
+      "size_bytes": 4957,
+      "sha256": "ec9dac09a2fbd14822495934af509b9651cd9bd07c690eb537453528d69224f5",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "subprocess",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/release/release_tag.sh",
+      "type": "sh",
+      "size_bytes": 1719,
+      "sha256": "716c766ff3bbc980733a2982ec17269f3520c4537ba2e0c2f855a6c2a455b1a4"
+    },
+    {
+      "name": "scripts/release/release_tag_v11.sh",
+      "type": "sh",
+      "size_bytes": 1918,
+      "sha256": "b1bdfa22abdcff1a365d78e24f001b1d931cd875cd888246596e361bc3e8773b"
+    },
+    {
+      "name": "scripts/release/test_priority35_release.sh",
+      "type": "sh",
+      "size_bytes": 2764,
+      "sha256": "b39fa9b5132b5bc7b01358f4d682fcccc5e699f225d4193f295702074143c598"
+    },
+    {
+      "name": "scripts/release/test_priority42_freeze.sh",
+      "type": "sh",
+      "size_bytes": 2644,
+      "sha256": "b02a5c2a9bd68494a67a632ce8fa9031775e20f8d4cd857a95ffa4eda195d20c"
+    },
+    {
+      "name": "scripts/sec/__init__.py",
+      "type": "py",
+      "size_bytes": 66,
+      "sha256": "ccf90bd2ef5125c598f5aaeb2a617f657080805af093144b7b2cd19eaab69a16",
+      "imports": []
+    },
+    {
+      "name": "scripts/sec/sec_baseline_audit.py",
+      "type": "py",
+      "size_bytes": 5595,
+      "sha256": "cdede8f170661c6e958befc8d924b05b6bec453f936e7b52e522093792c8fcf1",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "subprocess",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/sec/sec_publish.py",
+      "type": "py",
+      "size_bytes": 1855,
+      "sha256": "b241f3282961c638722ca16f5691b4e1e13d4e9eee52b5bec0aadd53f293f916",
+      "imports": [
+        "json",
+        "pathlib",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/sec/sec_redact.py",
+      "type": "py",
+      "size_bytes": 2221,
+      "sha256": "dc1b73dfa3d6f087c095860f26a7bbadae0feb40480f20c665584f13e3cdadf9",
+      "imports": [
+        "json",
+        "pathlib",
+        "re",
+        "sys"
+      ]
+    },
+    {
+      "name": "scripts/sec/sec_repo_guard.py",
+      "type": "py",
+      "size_bytes": 2410,
+      "sha256": "48af09604dc5e4eabd903d5a15c6febfa211d3b453ba95ca812434e8b2151c4e",
+      "imports": [
+        "json",
+        "pathlib",
+        "subprocess",
+        "sys"
+      ]
+    },
+    {
+      "name": "scripts/sec/sec_tick.sh",
+      "type": "sh",
+      "size_bytes": 540,
+      "sha256": "0a3614a625cdd207e1da05f0f56fd87b0548675188136ada429cd224d7f6be42"
+    },
+    {
+      "name": "scripts/sec/test_priority38_sec.sh",
+      "type": "sh",
+      "size_bytes": 2195,
+      "sha256": "effb1a54f3f78a4688c460ef90e6ef3cd51df95dd6f99899c0c1814b1a793c07"
+    },
+    {
+      "name": "scripts/slo/__init__.py",
+      "type": "py",
+      "size_bytes": 23,
+      "sha256": "54e021e1320bf9a32ae053d1f545cb70138816cba0b495f93299e45c58baff05",
+      "imports": []
+    },
+    {
+      "name": "scripts/slo/budget.py",
+      "type": "py",
+      "size_bytes": 3557,
+      "sha256": "5ad6b565629fd03bfc444aaf60caa27cf347fb5a2b3d66ddb8138e8488b16323",
+      "imports": [
+        "datetime",
+        "sli_sources",
+        "slo_utils",
+        "typing"
+      ]
+    },
+    {
+      "name": "scripts/slo/burn_rate.py",
+      "type": "py",
+      "size_bytes": 4022,
+      "sha256": "520fac66673f031a789efad2f726ba90e6397055f1b5a2a4e93e86e0be96bae0",
+      "imports": [
+        "datetime",
+        "sli_compute",
+        "sli_sources",
+        "slo_utils",
+        "typing"
+      ]
+    },
+    {
+      "name": "scripts/slo/sli_compute.py",
+      "type": "py",
+      "size_bytes": 2943,
+      "sha256": "8e1a1d791622931816d8794a03000584ee4470b17cc2d28299691444a1d43a13",
+      "imports": [
+        "datetime",
+        "json",
+        "sli_sources",
+        "slo_utils",
+        "typing"
+      ]
+    },
+    {
+      "name": "scripts/slo/sli_sources.py",
+      "type": "py",
+      "size_bytes": 3575,
+      "sha256": "d432350e362aa3be3ee5c2a622d4dd9ad09abffc120d6cd5fe48ef8114055dd6",
+      "imports": [
+        "datetime",
+        "glob",
+        "json",
+        "pathlib",
+        "slo_utils",
+        "typing"
+      ]
+    },
+    {
+      "name": "scripts/slo/slo_eval.py",
+      "type": "py",
+      "size_bytes": 4813,
+      "sha256": "85c1401bf3cb21485988fae6667f0e648f9ce7b987e89adb0bd0d3bb5fb4867f",
+      "imports": [
+        "budget",
+        "burn_rate",
+        "datetime",
+        "json",
+        "sli_compute",
+        "sli_sources",
+        "slo_utils",
+        "typing"
+      ]
+    },
+    {
+      "name": "scripts/slo/slo_gate.py",
+      "type": "py",
+      "size_bytes": 4554,
+      "sha256": "68f8a7a7a8341c9a7b4715498a947b9effc3e65316038d70482cb6f516852165",
+      "imports": [
+        "json",
+        "pathlib",
+        "slo_utils",
+        "sys",
+        "typing"
+      ]
+    },
+    {
+      "name": "scripts/slo/slo_publish.py",
+      "type": "py",
+      "size_bytes": 2903,
+      "sha256": "f9e62d5b1d19ee6f6cd3b6a26fb373cb9a9e77b035b5614d316d2508a5322dfa",
+      "imports": [
+        "json",
+        "pathlib",
+        "slo_render",
+        "slo_utils",
+        "subprocess",
+        "typing"
+      ]
+    },
+    {
+      "name": "scripts/slo/slo_render.py",
+      "type": "py",
+      "size_bytes": 5096,
+      "sha256": "013146ec59423a54e2203197149b0336370fc10ca8d3881d7a1b34281c9df4a5",
+      "imports": [
+        "datetime",
+        "pathlib",
+        "slo_utils",
+        "typing"
+      ]
+    },
+    {
+      "name": "scripts/slo/slo_utils.py",
+      "type": "py",
+      "size_bytes": 2366,
+      "sha256": "df34ee8e6ce404d9fe90b795e88031c0fa8a027f66a0a305eece11970bcb1326",
+      "imports": [
+        "datetime",
+        "json",
+        "os",
+        "pathlib"
+      ]
+    },
+    {
+      "name": "scripts/slo_runner.py",
+      "type": "py",
+      "size_bytes": 2458,
+      "sha256": "6d059cb1a998c8bf7e8bde68d99abf6779ac4c995e4f253878a413da357613c3",
+      "imports": [
+        "datetime",
+        "os",
+        "pathlib",
+        "slo_eval",
+        "slo_publish",
+        "slo_render",
+        "slo_utils",
+        "sys"
+      ]
+    },
+    {
+      "name": "scripts/slo_tick.sh",
+      "type": "sh",
+      "size_bytes": 494,
+      "sha256": "342d4613b186a658bc4d655fc7fc53280fdf54ad0414c88540b29eb87f697c56"
+    },
+    {
+      "name": "scripts/supply/__init__.py",
+      "type": "py",
+      "size_bytes": 51,
+      "sha256": "020a8fe4b89d353b0d058144ce3824725e49ed6daf2eebac996ed90c716e345e",
+      "imports": []
+    },
+    {
+      "name": "scripts/supply/supply_harden.py",
+      "type": "py",
+      "size_bytes": 3894,
+      "sha256": "5384ea5d0c25eac79f7cc195423fd88797560acf03c984239c4e536ec733605c",
+      "imports": [
+        "json",
+        "os",
+        "pathlib",
+        "re",
+        "stat",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/supply/supply_provenance.py",
+      "type": "py",
+      "size_bytes": 2144,
+      "sha256": "1bcaa0d522fbc1de53062738b9fde91485c43964a17a0100b9a2fbade414e216",
+      "imports": [
+        "json",
+        "pathlib",
+        "platform",
+        "subprocess",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/supply/supply_publish.py",
+      "type": "py",
+      "size_bytes": 2089,
+      "sha256": "43a4d36d0a978b133fe7e563c185aeed2f1dd4db0f3b7ffcc539dbba3030f2a3",
+      "imports": [
+        "json",
+        "pathlib",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/supply/supply_sbom.py",
+      "type": "py",
+      "size_bytes": 3731,
+      "sha256": "6835f3c69d2f66767cc02697385c68563b991e960e0cce77f551cbc74b87a511",
+      "imports": [
+        "ast",
+        "hashlib",
+        "json",
+        "pathlib",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/supply/supply_tick.sh",
+      "type": "sh",
+      "size_bytes": 710,
+      "sha256": "7a8af7b3699cbf3f90cb84851650570ac4e8e8ac3420e9e0c202a73fae35edde"
+    },
+    {
+      "name": "scripts/supply/test_priority41_supply.sh",
+      "type": "sh",
+      "size_bytes": 1752,
+      "sha256": "31aedc51cb00dfc86d498c7579f3a7d1dbbab6ebfa7755a5aca4c94d0dca11d0"
+    },
+    {
+      "name": "scripts/test_priority27_slo.sh",
+      "type": "sh",
+      "size_bytes": 5175,
+      "sha256": "ed4477a60eec25f58c6bb03f87bccf3019df98744f3a8fc1874d34b82f7f7ee8"
+    },
+    {
+      "name": "scripts/verify/__init__.py",
+      "type": "py",
+      "size_bytes": 50,
+      "sha256": "735c719adb47205670de525ebff010397722575930e29e7e68f36c4396d13c50",
+      "imports": []
+    },
+    {
+      "name": "scripts/verify/test_priority40_verify.sh",
+      "type": "sh",
+      "size_bytes": 2096,
+      "sha256": "1aea4dee6deb0ea95be15340d50ac6c4c61c6d86b1e23dabd256b509c7c6be09"
+    },
+    {
+      "name": "scripts/verify/verify_canary.py",
+      "type": "py",
+      "size_bytes": 2589,
+      "sha256": "b7092ebe1eca135897cf4ee08df1f760dafc53f66ec2c3850178aa7b5cad2154",
+      "imports": [
+        "json",
+        "pathlib",
+        "subprocess",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/verify/verify_gates.py",
+      "type": "py",
+      "size_bytes": 3643,
+      "sha256": "148a1951275927035d14e2e895476bbf58da04559115da1b614fff427d5789a8",
+      "imports": [
+        "json",
+        "pathlib",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/verify/verify_publish.py",
+      "type": "py",
+      "size_bytes": 1738,
+      "sha256": "64890d124ed108914dd1b10faeb7d7202dfdcf779f7b060c9c0abd4c185f65bc",
+      "imports": [
+        "json",
+        "pathlib",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/verify/verify_synthetic.py",
+      "type": "py",
+      "size_bytes": 4248,
+      "sha256": "bb9c37a1eaa600423903c73ed01d0775c4f5432b10816f1134ad7076e69c2a15",
+      "imports": [
+        "argparse",
+        "json",
+        "pathlib",
+        "subprocess",
+        "sys",
+        "time"
+      ]
+    },
+    {
+      "name": "scripts/verify/verify_tick.sh",
+      "type": "sh",
+      "size_bytes": 584,
+      "sha256": "954a343673dca50e3232268d5e737bc07b6659d588de7b223e178e1c298854d8"
+    },
+    {
+      "name": "config/aiops_policy.json",
+      "type": "json",
+      "size_bytes": 949,
+      "sha256": "5f697cb9734f42e9ed759b7a17b279b4454e6e5893041194865c47382dfa0fb5"
+    },
+    {
+      "name": "config/bootstrap_policy.json",
+      "type": "json",
+      "size_bytes": 824,
+      "sha256": "10588fcddbd0aff7ed77c180cb550594cbdc553598f48127eea0af090da5730c"
+    },
+    {
+      "name": "config/capacity_policy.json",
+      "type": "json",
+      "size_bytes": 739,
+      "sha256": "a9796ea4004ef78cea99e870a72a753544a29f395f40473889303b3191c668b1"
+    },
+    {
+      "name": "config/docs_policy.json",
+      "type": "json",
+      "size_bytes": 935,
+      "sha256": "0ea0481ca1e89ed5d64c4e0cc21aea00fdd5661bbf3676b526b09c5e4904e72b"
+    },
+    {
+      "name": "config/dr_policy.json",
+      "type": "json",
+      "size_bytes": 964,
+      "sha256": "c17281d6a72b9d7857cb491bc5617232879018ea155cde1a76344fa535dd62e9"
+    },
+    {
+      "name": "config/incidents_policy.json",
+      "type": "json",
+      "size_bytes": 1841,
+      "sha256": "6fe9afd9331c2b3b11f10cc719066bad34d236b6d588626a6b91112107e4b5ef"
+    },
+    {
+      "name": "config/infra_targets.json",
+      "type": "json",
+      "size_bytes": 1439,
+      "sha256": "aab4e3183b8b1fca9ccb22992ab76dced544e5f1f7fee883114cb68ec2481053"
+    },
+    {
+      "name": "config/node_profiles.json",
+      "type": "json",
+      "size_bytes": 1675,
+      "sha256": "bcae86abd29ece4e0ec75c59f581562b673a767bd53e34d734dda1efc65f7ceb"
+    },
+    {
+      "name": "config/observability_policy.json",
+      "type": "json",
+      "size_bytes": 839,
+      "sha256": "89807c9c1cbf3437642da7ceb274ad7f3c0d3ca994ee2575787664e131a41a81"
+    },
+    {
+      "name": "config/portfolio_policy.json",
+      "type": "json",
+      "size_bytes": 1263,
+      "sha256": "dd869d401fbce9469d0efa604cd360fa3ce841c5d760027626594428940a40cb"
+    },
+    {
+      "name": "config/restore_targets.json",
+      "type": "json",
+      "size_bytes": 4599,
+      "sha256": "91191b91d1280656f673e5bf7a8caa3dee8a9d7004345d229a553a633630613a"
+    },
+    {
+      "name": "config/security_policy.json",
+      "type": "json",
+      "size_bytes": 1027,
+      "sha256": "78405e87da42ea273b88728f07a3d6fcb52485668c5d7e9ddbf2dde71463f2dc"
+    },
+    {
+      "name": "config/slo_catalog.json",
+      "type": "json",
+      "size_bytes": 2719,
+      "sha256": "436ca400995df2df875d236c37c81a187180ffad293994b7674147c33266343f"
+    },
+    {
+      "name": "config/slo_policy.json",
+      "type": "json",
+      "size_bytes": 1332,
+      "sha256": "52ea0be8876c29ae68462e188ef264beefa4d7a7b47e3f349ca6575886494464"
+    },
+    {
+      "name": "config/supply_chain_policy.json",
+      "type": "json",
+      "size_bytes": 970,
+      "sha256": "8ab8570938d74dcdc09440df9e87ab89e5a5f52810673ba21e19bd6452c9482e"
+    },
+    {
+      "name": "config/verification_policy.json",
+      "type": "json",
+      "size_bytes": 1341,
+      "sha256": "929ca206c856dac09e35b91d4b07358f5bc1ec791ec041783da3514b5ff52ea3"
+    }
+  ],
+  "dependencies": {
+    "stdlib": [
+      "argparse",
+      "ast",
+      "datetime",
+      "glob",
+      "hashlib",
+      "json",
+      "math",
+      "os",
+      "pathlib",
+      "re",
+      "shutil",
+      "socket",
+      "stat",
+      "subprocess",
+      "sys",
+      "time",
+      "typing"
+    ],
+    "third_party": [
+      "budget",
+      "burn_rate",
+      "dr_backup_inventory",
+      "dr_preflight",
+      "dr_restore",
+      "dr_validate",
+      "incident_state",
+      "platform",
+      "requests",
+      "sli_compute",
+      "sli_sources",
+      "slo_eval",
+      "slo_publish",
+      "slo_render",
+      "slo_utils",
+      "uuid",
+      "yaml"
+    ],
+    "internal": []
+  },
+  "third_party_free": false
+}

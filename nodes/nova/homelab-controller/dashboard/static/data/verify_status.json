@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-03-05T19:09:16Z",
+  "status": "RED",
+  "synthetic": {
+    "pass": false,
+    "summary": null
+  },
+  "canary": {
+    "pass": false,
+    "summary": null
+  },
+  "gates": {
+    "pass": false,
+    "action": "BLOCK"
+  }
+}

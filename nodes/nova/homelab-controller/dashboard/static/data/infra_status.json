@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-03-05T19:09:16Z",
+  "status": "RED",
+  "inventory": {
+    "nodes_ok": 0,
+    "nodes_total": 0,
+    "last_scan": null
+  },
+  "proxmox": {
+    "files_exported": 0,
+    "last_export": null
+  },
+  "opnsense": {
+    "has_backup": false,
+    "fresh": false
+  }
+}

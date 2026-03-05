@@ -1,0 +1,55 @@
+{
+  "timestamp": "2026-03-05T19:09:15Z",
+  "status": "RED",
+  "stack": {
+    "running": 0,
+    "total": 7,
+    "containers": {
+      "obs-prometheus": {
+        "running": false,
+        "status": "not running"
+      },
+      "obs-grafana": {
+        "running": false,
+        "status": "not running"
+      },
+      "obs-alertmanager": {
+        "running": false,
+        "status": "not running"
+      },
+      "obs-loki": {
+        "running": false,
+        "status": "not running"
+      },
+      "obs-node-exporter": {
+        "running": false,
+        "status": "not running"
+      },
+      "obs-promtail": {
+        "running": false,
+        "status": "not running"
+      },
+      "obs-cadvisor": {
+        "running": false,
+        "status": "not running"
+      }
+    }
+  },
+  "events": {
+    "recent_count": 1,
+    "critical_count": 0,
+    "last_event": {
+      "timestamp": "2026-03-05T19:09:15Z",
+      "type": "obs.stack.up",
+      "severity": "info",
+      "node": null,
+      "component": null,
+      "message": "test event"
+    }
+  },
+  "endpoints": {
+    "prometheus": "http://10.1.1.21:9090",
+    "grafana": "http://10.1.1.21:3000",
+    "alertmanager": "http://10.1.1.21:9093"
+  }
+}
