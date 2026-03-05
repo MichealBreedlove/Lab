@@ -1,72 +1,33 @@
 #!/usr/bin/env python3
-"""portfolio_publish.py — Commit and publish site to GitHub Pages."""
+"""P39 — Portfolio Status Publisher."""
 
 import json
-import subprocess
-from datetime import datetime
+import time
 from pathlib import Path
 
-SCRIPT_DIR = Path(__file__).parent
-ROOT_DIR = SCRIPT_DIR.parent.parent
-LAB_ROOT = ROOT_DIR.parent.parent.parent
-CONFIG_DIR = ROOT_DIR / "config"
-
-
-def load_policy():
-    with open(CONFIG_DIR / "portfolio_policy.json") as f:
-        return json.load(f)
+ROOT = Path(__file__).resolve().parents[2]
+DASHBOARD_DATA = ROOT / "dashboard" / "static" / "data"
+META_DIR = ROOT.parents[2] / "_meta"
 
 
 def publish():
-    """Commit site changes and push."""
-    policy = load_policy()
-    now = datetime.now().isoformat()[:19]
+    timestamp = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    docs = list(META_DIR.glob("*.md")) if META_DIR.exists() else []
 
-    print("=== Portfolio Publish ===")
-
-    # Commit changes
-    subprocess.run(["git", "add", "-A"], cwd=str(LAB_ROOT), capture_output=True)
-
-    diff = subprocess.run(
-        ["git", "diff", "--cached", "--quiet"],
-        cwd=str(LAB_ROOT), capture_output=True
-    )
-
-    if diff.returncode == 0:
-        print("No changes to publish.")
-        return
-
-    subprocess.run(
-        ["git", "commit", "-m", f"portfolio: publish {now}", "--quiet"],
-        cwd=str(LAB_ROOT), capture_output=True
-    )
-
-    result = subprocess.run(
-        ["git", "push", "--quiet"],
-        cwd=str(LAB_ROOT), capture_output=True, text=True
-    )
-
-    if result.returncode == 0:
-        print(f"✅ Published at {now}")
-        site_url = policy.get("publish_target", {}).get("site_url", "")
-        if site_url:
-            print(f"   Site: {site_url}")
-    else:
-        print(f"❌ Push failed: {result.stderr}")
-
-    # Write status for dashboard
-    status = {
-        "last_publish": now,
-        "success": result.returncode == 0,
-        "site_url": policy.get("publish_target", {}).get("site_url", "")
+    result = {
+        "timestamp": timestamp,
+        "docs_count": len(docs),
+        "docs": [f.name for f in docs],
+        "status": "GREEN" if len(docs) >= 3 else "YELLOW" if len(docs) > 0 else "RED",
     }
-    status_dir = LAB_ROOT / "services" / "openclaw" / "portfolio"
-    status_dir.mkdir(parents=True, exist_ok=True)
-    with open(status_dir / "latest.json", "w") as f:
-        json.dump(status, f, indent=2)
 
-    print("=== Publish complete ===")
+    DASHBOARD_DATA.mkdir(parents=True, exist_ok=True)
+    with open(DASHBOARD_DATA / "portfolio_status.json", "w") as f:
+        json.dump(result, f, indent=2)
+
+    return result
 
 
 if __name__ == "__main__":
-    publish()
+    r = publish()
+    print(f"📦 Portfolio: {r['docs_count']} docs exported")
