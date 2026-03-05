@@ -121,6 +121,13 @@
         <p id="slo-timestamp" class="timestamp"></p>
     </div>
 
+    <div id="infra-section">
+        <h2>🏗️ Infrastructure</h2>
+        <div id="infra-summary" class="summary-row"></div>
+        <div id="infra-grid" class="grid"></div>
+        <p id="infra-timestamp" class="timestamp"></p>
+    </div>
+
     <div id="obs-section">
         <h2>🔭 Observability</h2>
         <div id="obs-summary" class="summary-row"></div>
@@ -150,6 +157,27 @@
     </div>
 
     <script>
+    async function loadInfra() {
+        try {
+            const resp = await fetch('data/infra_status.json');
+            if (!resp.ok) throw new Error('No data');
+            const d = await resp.json();
+            const s = d.status || 'RED';
+            const icon = s === 'GREEN' ? '🟢' : s === 'YELLOW' ? '🟡' : '🔴';
+            document.getElementById('infra-summary').innerHTML = `
+                <div class="summary-item"><div class="label">Status</div><div class="count">${icon} ${s}</div></div>
+                <div class="summary-item"><div class="label">Nodes</div><div class="count">${d.inventory?.nodes_ok||0}/${d.inventory?.nodes_total||0}</div></div>
+                <div class="summary-item"><div class="label">Proxmox Files</div><div class="count">${d.proxmox?.files_exported||0}</div></div>
+                <div class="summary-item"><div class="label">OPNsense</div><div class="count">${d.opnsense?.fresh ? '✅' : '⚠️'}</div></div>
+            `;
+            document.getElementById('infra-grid').innerHTML = '';
+            document.getElementById('infra-timestamp').textContent = `Infra data: ${d.timestamp || 'unknown'}`;
+        } catch (e) {
+            document.getElementById('infra-summary').innerHTML = '';
+            document.getElementById('infra-grid').innerHTML = '<div class="card"><p style="color:#484f58">No infra data. Run <code>oc infra tick</code>.</p></div>';
+        }
+    }
+
     async function loadObs() {
         try {
             const resp = await fetch('data/obs_status.json');
@@ -543,6 +571,7 @@
     loadBootstrap();
     loadCapacity();
     loadObs();
+    loadInfra();
     // Auto-refresh every 5 minutes
     setInterval(loadData, 300000);
     setInterval(loadIncidents, 300000);
@@ -550,6 +579,7 @@
     setInterval(loadBootstrap, 300000);
     setInterval(loadCapacity, 300000);
     setInterval(loadObs, 300000);
+    setInterval(loadInfra, 300000);
     </script>
 </body>
 </html>
