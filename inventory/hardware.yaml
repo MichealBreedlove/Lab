@@ -4,11 +4,14 @@
 nodes:
   jasper:
     role: gateway
-    os: Windows 11
-    cpu: # TODO: fill in
-    ram: # TODO: fill in
-    gpu: # TODO: fill in (RTX series)
-    storage: # TODO: fill in
+    os: Windows 11 Pro (Build 26200)
+    cpu: Intel Core i9-13900K (24 cores / 32 threads)
+    ram: 64 GB
+    gpu: NVIDIA GeForce RTX 4090
+    storage:
+      - C: 1.8TB (system)
+      - D: 7.6TB
+      - W/X/Y/Z: ~19.6TB each (storage array)
     notes: Primary workstation + OpenClaw gateway
 
   nova:
