@@ -38,6 +38,11 @@ Commands:
   portfolio test        Run P29 portfolio tests
   changelog             Run changelog generation (P26)
   gate <action> <tier>  Evaluate gatekeeper for an action
+  sec status             Security status overview
+  sec audit              Run baseline audit on all nodes
+  sec scan               Run secret scanner
+  sec tick               Full security pipeline
+  sec test               Run P38 security tests
   infra status           Infrastructure health status
   infra inventory        Collect node inventory
   infra backup           Export Proxmox + check OPNsense
@@ -306,6 +311,19 @@ print(f'Site: {d.get(\"site_url\", \"N/A\")}')
                 ;;
         esac
         ;;
+    sec)
+        shift
+        subcmd="${1:-status}"
+        shift 2>/dev/null || true
+        case "$subcmd" in
+            status) cd "$ROOT_DIR"; python3 scripts/sec/sec_publish.py ;;
+            audit) cd "$ROOT_DIR"; python3 scripts/sec/sec_baseline_audit.py "$@" ;;
+            scan) cd "$ROOT_DIR"; python3 scripts/sec/sec_secretscan.py "$@" ;;
+            tick) bash "$ROOT_DIR/scripts/sec/sec_tick.sh" ;;
+            test) bash "$ROOT_DIR/scripts/sec/test_priority38_sec.sh" ;;
+            *) echo "Unknown sec subcommand: $subcmd"; echo "Try: oc sec [status|audit|scan|tick|test]" ;;
+        esac
+        ;;
     infra)
         shift
         subcmd="${1:-status}"
@@ -543,6 +561,7 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             p35|release) bash "$ROOT_DIR/scripts/release/test_priority35_release.sh" ;;
             p36|obs) bash "$ROOT_DIR/scripts/obs/test_priority36_obs.sh" ;;
             p37|infra) bash "$ROOT_DIR/scripts/infra/test_priority37_infra.sh" ;;
+            p38|sec) bash "$ROOT_DIR/scripts/sec/test_priority38_sec.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do
