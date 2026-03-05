@@ -38,6 +38,10 @@ Commands:
   portfolio test        Run P29 portfolio tests
   changelog             Run changelog generation (P26)
   gate <action> <tier>  Evaluate gatekeeper for an action
+  bootstrap node <name> Bootstrap a node [--apply]
+  bootstrap status      Show bootstrap status for all nodes
+  bootstrap validate    Validate bootstrapped node [--node <name>]
+  bootstrap test        Run P31 bootstrap tests
   dr status             Show DR readiness status
   dr preflight          Run DR preflight checks
   dr restore [opts]     Run restore (--dry-run|--apply) [--node <name>]
@@ -267,6 +271,50 @@ print(f'Site: {d.get(\"site_url\", \"N/A\")}')
                 ;;
         esac
         ;;
+    bootstrap)
+        shift
+        subcmd="${1:-status}"
+        shift 2>/dev/null || true
+        case "$subcmd" in
+            node)
+                node_name="${1:?Usage: oc bootstrap node <name> [--apply]}"
+                shift 2>/dev/null || true
+                apply_flag=""
+                if [ "${1:-}" = "--apply" ]; then
+                    apply_flag="--apply"
+                fi
+                bash "$ROOT_DIR/scripts/bootstrap/bootstrap_tick.sh" "$node_name" $apply_flag
+                ;;
+            status)
+                echo "=== Bootstrap Status ==="
+                cd "$ROOT_DIR"
+                for node in nova mira orin jasper; do
+                    if [ -f "artifacts/bootstrap/validate_${node}.json" ]; then
+                        python3 -c "
+import json
+d = json.load(open('artifacts/bootstrap/validate_${node}.json'))
+s = d.get('summary', {})
+icon = '✅' if d.get('pass') else '❌'
+print(f'  {icon} ${node}: {s.get(\"passing\",0)}/{s.get(\"total\",0)} checks')
+" 2>/dev/null
+                    else
+                        echo "  ⏭️  ${node}: no data"
+                    fi
+                done
+                ;;
+            validate)
+                cd "$ROOT_DIR"
+                python3 scripts/bootstrap/bootstrap_validate.py "$@"
+                ;;
+            test)
+                bash "$ROOT_DIR/scripts/bootstrap/test_priority31_bootstrap.sh"
+                ;;
+            *)
+                echo "Unknown bootstrap subcommand: $subcmd"
+                echo "Try: oc bootstrap [node|status|validate|test]"
+                ;;
+        esac
+        ;;
     dr)
         shift
         subcmd="${1:-status}"
@@ -351,6 +399,7 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             p28|incident) bash "$ROOT_DIR/scripts/incident/test_priority28_incidents.sh" ;;
             p29|portfolio) bash "$ROOT_DIR/scripts/portfolio/test_priority29_portfolio.sh" ;;
             p30|dr) bash "$ROOT_DIR/scripts/dr/test_priority30_dr.sh" ;;
+            p31|bootstrap) bash "$ROOT_DIR/scripts/bootstrap/test_priority31_bootstrap.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do

@@ -1,0 +1,54 @@
+{
+  "profiles": {
+    "controller": {
+      "description": "Ansible controller, SRE automation, storage services",
+      "packages": ["python3", "python3-pip", "python3-yaml", "git", "ansible", "jq", "curl", "openssh-server"],
+      "pip_packages": ["pyyaml", "requests", "python-dateutil"],
+      "services": ["openclaw-node", "lab-backup.timer"],
+      "roles": ["controller", "storage", "sre"],
+      "openclaw_mode": "node",
+      "install_homelab_controller": true
+    },
+    "worker": {
+      "description": "Compute worker for agent execution and workloads",
+      "packages": ["python3", "git", "curl", "openssh-server"],
+      "pip_packages": [],
+      "services": ["openclaw-node", "lab-backup.timer"],
+      "roles": ["compute", "agent"],
+      "openclaw_mode": "node",
+      "install_homelab_controller": false
+    },
+    "gpu": {
+      "description": "GPU inference node with Ollama",
+      "packages": ["python3", "git", "curl", "openssh-server"],
+      "pip_packages": [],
+      "services": ["openclaw-node", "lab-backup.timer"],
+      "roles": ["inference", "gateway"],
+      "openclaw_mode": "gateway",
+      "install_homelab_controller": false,
+      "notes": "Windows nodes use manual bootstrap — see RESTORE_CHECKLIST.md"
+    }
+  },
+  "nodes": {
+    "nova": {
+      "profile": "controller",
+      "ip": "10.1.1.21",
+      "platform": "linux"
+    },
+    "mira": {
+      "profile": "worker",
+      "ip": "10.1.1.22",
+      "platform": "linux"
+    },
+    "orin": {
+      "profile": "worker",
+      "ip": "10.1.1.23",
+      "platform": "linux"
+    },
+    "jasper": {
+      "profile": "gpu",
+      "ip": "10.1.1.150",
+      "platform": "windows"
+    }
+  }
+}
