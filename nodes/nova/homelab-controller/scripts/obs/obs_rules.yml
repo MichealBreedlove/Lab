@@ -1,0 +1,53 @@
+# P36 — Prometheus alerting rules
+groups:
+  - name: homelab_alerts
+    rules:
+      # Node down (no scrape for 5 minutes)
+      - alert: NodeDown
+        expr: up == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Node {{ $labels.instance }} is down"
+          description: "{{ $labels.job }} on {{ $labels.node }} has been unreachable for 5 minutes."
+
+      # High CPU usage
+      - alert: HighCPU
+        expr: 100 - (avg by(node) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU on {{ $labels.node }}"
+          description: "CPU usage above 90% for 10 minutes on {{ $labels.node }}."
+
+      # High memory usage
+      - alert: HighMemory
+        expr: (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 > 90
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory on {{ $labels.node }}"
+          description: "Memory usage above 90% for 10 minutes."
+
+      # Disk space critical
+      - alert: DiskCritical
+        expr: (1 - node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 > 90
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Disk critical on {{ $labels.node }}"
+          description: "Root filesystem above 90% on {{ $labels.node }}."
+
+      # High load average
+      - alert: HighLoad
+        expr: node_load1 / count without(cpu) (node_cpu_seconds_total{mode="idle"}) > 3
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High load on {{ $labels.node }}"
+          description: "Load average ratio above 3x for 15 minutes."

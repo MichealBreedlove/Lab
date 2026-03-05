@@ -38,6 +38,14 @@ Commands:
   portfolio test        Run P29 portfolio tests
   changelog             Run changelog generation (P26)
   gate <action> <tier>  Evaluate gatekeeper for an action
+  obs status             Observability stack status
+  obs install            Install Docker + stack directories [--apply]
+  obs up                 Start observability stack
+  obs down               Stop observability stack
+  obs logs               View stack logs
+  obs tick               Run observability tick
+  obs event              Event bus (write|read|types)
+  obs test               Run P36 observability tests
   release audit          Run release audit (configs, scripts, secrets)
   release docs           Generate release documentation
   release package        Build release manifest
@@ -293,6 +301,23 @@ print(f'Site: {d.get(\"site_url\", \"N/A\")}')
                 ;;
         esac
         ;;
+    obs)
+        shift
+        subcmd="${1:-status}"
+        shift 2>/dev/null || true
+        OBS_DIR="${HOME}/obs-stack"
+        case "$subcmd" in
+            status) cd "$ROOT_DIR"; python3 scripts/obs/obs_publish.py ;;
+            install) bash "$ROOT_DIR/scripts/obs/obs_install.sh" "$@" ;;
+            up) cd "$OBS_DIR" 2>/dev/null && docker compose up -d || echo "Stack not installed. Run: oc obs install --apply" ;;
+            down) cd "$OBS_DIR" 2>/dev/null && docker compose down || echo "Stack not running" ;;
+            logs) cd "$OBS_DIR" 2>/dev/null && docker compose logs --tail=50 || echo "Stack not running" ;;
+            tick) bash "$ROOT_DIR/scripts/obs/obs_tick.sh" ;;
+            event) cd "$ROOT_DIR"; python3 scripts/obs/obs_eventbus.py "$@" ;;
+            test) bash "$ROOT_DIR/scripts/obs/test_priority36_obs.sh" ;;
+            *) echo "Unknown obs subcommand: $subcmd"; echo "Try: oc obs [status|install|up|down|logs|tick|event|test]" ;;
+        esac
+        ;;
     release)
         shift
         subcmd="${1:-audit}"
@@ -498,6 +523,7 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             p33|docs) bash "$ROOT_DIR/scripts/docs/test_priority33_docs.sh" ;;
             p34|aiops) bash "$ROOT_DIR/scripts/aiops/test_priority34_aiops.sh" ;;
             p35|release) bash "$ROOT_DIR/scripts/release/test_priority35_release.sh" ;;
+            p36|obs) bash "$ROOT_DIR/scripts/obs/test_priority36_obs.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do
