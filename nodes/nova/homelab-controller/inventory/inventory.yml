@@ -1,0 +1,66 @@
+---
+# Homelab Ansible Inventory
+# Nova is the controller; all connections via SSH
+
+all:
+  children:
+    nodes:
+      hosts:
+        nova:
+          ansible_host: 10.1.1.21
+          ansible_user: nova
+          ansible_connection: local
+          node_role: controller
+        mira:
+          ansible_host: 10.1.1.22
+          ansible_user: mira
+          node_role: worker
+        orin:
+          ansible_host: 10.1.1.23
+          ansible_user: orin
+          node_role: worker
+
+    proxmox:
+      hosts:
+        pve1:
+          ansible_host: 10.1.1.2
+          ansible_user: root
+          pve_name: proxmox-1
+        pve2:
+          ansible_host: 10.1.1.4
+          ansible_user: root
+          pve_name: proxmox-2
+        pve3:
+          ansible_host: 10.1.1.5
+          ansible_user: root
+          pve_name: proxmox-3
+
+    opnsense:
+      hosts:
+        firewall:
+          ansible_host: 10.1.1.1
+          ansible_user: root
+          ansible_port: 22
+          # API key/secret loaded from secrets.env if available
+
+    switches:
+      hosts:
+        cisco_nexus:
+          ansible_host: "{{ cisco_nexus_ip | default('0.0.0.0') }}"
+          ansible_user: admin
+          ansible_network_os: nxos
+          switch_vendor: cisco
+          switch_model: nexus_3064
+          managed: false  # Set true once IP is known
+        brocade_6610:
+          ansible_host: "{{ brocade_ip | default('0.0.0.0') }}"
+          ansible_user: admin
+          switch_vendor: brocade
+          switch_model: "6610"
+          managed: false
+        nicgiga_s25:
+          ansible_host: "{{ nicgiga_ip | default('0.0.0.0') }}"
+          ansible_user: admin
+          switch_vendor: nicgiga
+          switch_model: s25
+          managed: false

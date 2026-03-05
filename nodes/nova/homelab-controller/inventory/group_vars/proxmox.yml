@@ -1,0 +1,15 @@
+---
+# Proxmox-specific variables
+ansible_ssh_private_key_file: "~/.ssh/id_ed25519"
+pve_config_paths:
+  - /etc/pve/storage.cfg
+  - /etc/pve/datacenter.cfg
+  - /etc/pve/corosync.conf
+  - /etc/network/interfaces
+pve_commands:
+  - { name: "pveversion", cmd: "pveversion -v" }
+  - { name: "cluster_status", cmd: "pvecm status 2>/dev/null || echo 'not clustered'" }
+  - { name: "node_list", cmd: "pvecm nodes 2>/dev/null || echo 'standalone'" }
+  - { name: "storage_status", cmd: "pvesm status" }
+  - { name: "vm_list", cmd: "qm list 2>/dev/null || echo 'none'" }
+  - { name: "ct_list", cmd: "pct list 2>/dev/null || echo 'none'" }

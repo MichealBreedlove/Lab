@@ -1,0 +1,55 @@
+---
+# P43 — Preflight: verify connectivity, sudo, and gather facts
+- name: "Preflight — Node connectivity and facts"
+  hosts: nodes
+  gather_facts: true
+  become: false
+  tasks:
+    - name: Report connectivity
+      debug:
+        msg: "{{ inventory_hostname }} ({{ ansible_host }}): {{ ansible_distribution }} {{ ansible_distribution_version }} | {{ ansible_processor_vcpus }} vCPU | {{ ansible_memtotal_mb }}MB RAM"
+
+    - name: Check sudo access
+      command: sudo -n true
+      register: sudo_check
+      changed_when: false
+      failed_when: false
+
+    - name: Report sudo status
+      debug:
+        msg: "sudo: {{ 'OK' if sudo_check.rc == 0 else 'NEEDS PASSWORD' }}"
+
+- name: "Preflight — Proxmox connectivity"
+  hosts: proxmox
+  gather_facts: false
+  tasks:
+    - name: Test SSH connectivity
+      ping:
+      register: pve_ping
+      ignore_errors: true
+
+    - name: Report status
+      debug:
+        msg: "{{ inventory_hostname }} ({{ ansible_host }}): {{ 'REACHABLE' if pve_ping is succeeded else 'UNREACHABLE' }}"
+
+- name: "Preflight — OPNsense connectivity"
+  hosts: opnsense
+  gather_facts: false
+  tasks:
+    - name: Test SSH connectivity
+      ping:
+      register: opn_ping
+      ignore_errors: true
+
+    - name: Report status
+      debug:
+        msg: "OPNsense ({{ ansible_host }}): {{ 'REACHABLE' if opn_ping is succeeded else 'UNREACHABLE' }}"
+
+- name: "Preflight — Switch connectivity"
+  hosts: switches
+  gather_facts: false
+  tasks:
+    - name: Skip unmanaged switches
+      debug:
+        msg: "{{ inventory_hostname }}: SKIPPED (managed={{ managed | default(false) }})"
+      when: not (managed | default(false))

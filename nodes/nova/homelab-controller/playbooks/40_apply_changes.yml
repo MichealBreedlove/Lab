@@ -1,0 +1,54 @@
+---
+# P43 — Apply Changes: STUB — gated by break-glass approval
+# This playbook does NOTHING without explicit approval.
+# It exists as a framework for future controlled changes.
+
+- name: "Apply Changes — GATED STUB"
+  hosts: localhost
+  gather_facts: false
+  vars:
+    break_glass_token_file: "{{ playbook_dir }}/../config/break_glass.token"
+    max_token_age_minutes: 30
+
+  tasks:
+    - name: Check for break-glass token
+      stat:
+        path: "{{ break_glass_token_file }}"
+      register: token_file
+
+    - name: Verify token exists
+      fail:
+        msg: |
+          ⛔ No break-glass token found.
+          To authorize changes:
+            echo $(date +%s) > {{ break_glass_token_file }}
+          Token must be less than {{ max_token_age_minutes }} minutes old.
+      when: not token_file.stat.exists
+
+    - name: Verify token freshness
+      shell: |
+        token_time=$(cat {{ break_glass_token_file }})
+        now=$(date +%s)
+        age=$(( now - token_time ))
+        max_age=$(( {{ max_token_age_minutes }} * 60 ))
+        if [ "$age" -gt "$max_age" ]; then
+          echo "EXPIRED (${age}s old, max ${max_age}s)"
+          exit 1
+        fi
+        echo "VALID (${age}s old)"
+      register: token_check
+      changed_when: false
+
+    - name: Token status
+      debug:
+        msg: "Break-glass token: {{ token_check.stdout }}"
+
+    - name: PLACEHOLDER — No changes implemented yet
+      debug:
+        msg: |
+          ✅ Break-glass authorized, but no changes are defined.
+          Add change tasks below this point in future iterations.
+          Each change MUST:
+            1. Be idempotent
+            2. Log before/after state
+            3. Support --check (dry-run) mode
