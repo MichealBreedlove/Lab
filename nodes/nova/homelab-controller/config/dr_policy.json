@@ -1,0 +1,45 @@
+{
+  "enabled": true,
+  "mode": "supervised",
+  "require_cluster_green": true,
+  "require_snapshot_fresh_minutes": 30,
+  "cooldown_minutes": 1440,
+  "break_glass": {
+    "required_for_destructive": true,
+    "token_path": "config/break_glass.token",
+    "max_minutes_valid": 30
+  },
+  "drill": {
+    "enabled": true,
+    "interval_days": 7,
+    "safe_simulation_only": true,
+    "max_actions": 3
+  },
+  "git": {
+    "repo": "MichealBreedlove/Lab",
+    "branch": "main",
+    "remote": "origin"
+  },
+  "redaction": {
+    "patterns": [
+      "AKIA[0-9A-Z]{16}",
+      "ghp_[a-zA-Z0-9]{36}",
+      "-----BEGIN.*PRIVATE KEY-----",
+      "sk-[a-zA-Z0-9]{48}",
+      "token.*=.*[a-f0-9]{32,}",
+      "password\\s*[:=]\\s*\\S+",
+      "secret\\s*[:=]\\s*\\S+"
+    ],
+    "paths_denylist": [
+      ".ssh/",
+      ".gnupg/",
+      "*.key",
+      "*.pem",
+      "break_glass.token"
+    ]
+  },
+  "scoring": {
+    "readiness_green_min": 85,
+    "readiness_yellow_min": 70
+  }
+}

@@ -38,6 +38,12 @@ Commands:
   portfolio test        Run P29 portfolio tests
   changelog             Run changelog generation (P26)
   gate <action> <tier>  Evaluate gatekeeper for an action
+  dr status             Show DR readiness status
+  dr preflight          Run DR preflight checks
+  dr restore [opts]     Run restore (--dry-run|--apply) [--node <name>]
+  dr validate           Validate node restore state [--node <name>]
+  dr drill              Run DR drill [--node <name>] [--max-actions N]
+  dr tick               Run DR tick (timer wrapper)
   test <priority>       Run tests for a priority (e.g., test p27)
   backup                Run Lab backup for this node
   help                  Show this help
@@ -261,6 +267,67 @@ print(f'Site: {d.get(\"site_url\", \"N/A\")}')
                 ;;
         esac
         ;;
+    dr)
+        shift
+        subcmd="${1:-status}"
+        shift 2>/dev/null || true
+        case "$subcmd" in
+            status)
+                echo "=== DR Status ==="
+                cd "$ROOT_DIR"
+                if [ -f artifacts/dr/preflight.json ]; then
+                    python3 -c "
+import json
+p = json.load(open('artifacts/dr/preflight.json'))
+print(f'Preflight: {\"PASS ✅\" if p.get(\"preflight_pass\") else \"FAIL ❌\"}')
+print(f'Node: {p.get(\"node\",\"?\")} ({p.get(\"platform\",\"?\")})')
+print(f'Last check: {p.get(\"timestamp\",\"never\")}')
+" 2>/dev/null || echo "No preflight data"
+                fi
+                # Show latest drill
+                LATEST_DRILL=$(ls -t artifacts/dr/drill_report_*.json 2>/dev/null | head -1)
+                if [ -n "$LATEST_DRILL" ]; then
+                    python3 -c "
+import json
+d = json.load(open('$LATEST_DRILL'))
+mttr = d.get('mttr_seconds', '?')
+passed = d.get('overall_pass', False)
+print(f'Last drill: {d.get(\"timestamp\",\"never\")}')
+print(f'  MTTR: {mttr}s')
+print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
+" 2>/dev/null || echo "No drill data"
+                else
+                    echo "No drill reports yet. Run: oc dr drill --node <name>"
+                fi
+                ;;
+            preflight)
+                cd "$ROOT_DIR"
+                python3 scripts/dr/dr_preflight.py "$@"
+                ;;
+            restore)
+                cd "$ROOT_DIR"
+                python3 scripts/dr/dr_restore.py "$@"
+                ;;
+            validate)
+                cd "$ROOT_DIR"
+                python3 scripts/dr/dr_validate.py "$@"
+                ;;
+            drill)
+                cd "$ROOT_DIR"
+                python3 scripts/dr/dr_drill.py "$@"
+                ;;
+            tick)
+                bash "$ROOT_DIR/scripts/dr/dr_tick.sh" "$@"
+                ;;
+            test)
+                bash "$ROOT_DIR/scripts/dr/test_priority30_dr.sh"
+                ;;
+            *)
+                echo "Unknown dr subcommand: $subcmd"
+                echo "Try: oc dr [status|preflight|restore|validate|drill|tick|test]"
+                ;;
+        esac
+        ;;
     gate)
         shift
         cd "$ROOT_DIR"
@@ -283,6 +350,7 @@ print(f'Site: {d.get(\"site_url\", \"N/A\")}')
             p27|slo) bash "$ROOT_DIR/scripts/test_priority27_slo.sh" ;;
             p28|incident) bash "$ROOT_DIR/scripts/incident/test_priority28_incidents.sh" ;;
             p29|portfolio) bash "$ROOT_DIR/scripts/portfolio/test_priority29_portfolio.sh" ;;
+            p30|dr) bash "$ROOT_DIR/scripts/dr/test_priority30_dr.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do
