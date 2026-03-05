@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homelab Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            padding: 20px;
+        }
+        h1 { color: #58a6ff; margin-bottom: 20px; }
+        h2 { color: #8b949e; margin: 20px 0 10px; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+
+        .card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .card h3 { color: #c9d1d9; font-size: 0.95em; margin-bottom: 8px; }
+        .card .value { font-size: 2em; font-weight: bold; }
+
+        .status-ok { color: #3fb950; }
+        .status-warn { color: #d29922; }
+        .status-error { color: #f85149; }
+
+        .slo-bar {
+            height: 8px;
+            background: #21262d;
+            border-radius: 4px;
+            margin: 8px 0;
+            overflow: hidden;
+        }
+        .slo-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        .slo-bar-fill.ok { background: #3fb950; }
+        .slo-bar-fill.warn { background: #d29922; }
+        .slo-bar-fill.error { background: #f85149; }
+
+        .slo-detail { font-size: 0.85em; color: #8b949e; margin-top: 4px; }
+        .slo-objective { float: right; color: #58a6ff; }
+
+        .alert-list { list-style: none; }
+        .alert-list li {
+            padding: 8px 12px;
+            margin: 4px 0;
+            background: #1c1208;
+            border-left: 3px solid #d29922;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .alert-list li.critical {
+            background: #1c0808;
+            border-left-color: #f85149;
+        }
+
+        .summary-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .summary-item {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 12px 20px;
+            text-align: center;
+            flex: 1;
+        }
+        .summary-item .label { font-size: 0.8em; color: #8b949e; }
+        .summary-item .count { font-size: 1.8em; font-weight: bold; margin-top: 4px; }
+
+        .burn-table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
+        .burn-table th { text-align: left; color: #8b949e; padding: 4px 8px; border-bottom: 1px solid #30363d; }
+        .burn-table td { padding: 4px 8px; }
+        .burn-high { color: #f85149; font-weight: bold; }
+        .burn-med { color: #d29922; }
+        .burn-ok { color: #3fb950; }
+
+        .timestamp { color: #484f58; font-size: 0.8em; margin-top: 16px; }
+        .no-data { color: #484f58; font-style: italic; padding: 40px; text-align: center; }
+
+        #refresh-btn {
+            background: #21262d;
+            color: #58a6ff;
+            border: 1px solid #30363d;
+            padding: 6px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            float: right;
+        }
+        #refresh-btn:hover { background: #30363d; }
+    </style>
+</head>
+<body>
+    <h1>🏠 Homelab Dashboard <button id="refresh-btn" onclick="loadData()">↻ Refresh</button></h1>
+
+    <div id="slo-section">
+        <h2>📊 Service Level Objectives</h2>
+        <div id="slo-summary" class="summary-row"></div>
+        <div id="slo-alerts"></div>
+        <div id="slo-grid" class="grid"></div>
+        <div id="burn-section" style="margin-top: 20px;">
+            <h2>🔥 Burn Rates</h2>
+            <div id="burn-content"></div>
+        </div>
+        <p id="slo-timestamp" class="timestamp"></p>
+    </div>
+
+    <script>
+    async function loadData() {
+        try {
+            const resp = await fetch('data/slo_current.json');
+            if (!resp.ok) throw new Error('No data');
+            const data = await resp.json();
+            renderSLOs(data);
+        } catch (e) {
+            document.getElementById('slo-grid').innerHTML =
+                '<div class="no-data">No SLO data available. Run <code>oc slo eval</code> on Nova.</div>';
+        }
+    }
+
+    function renderSLOs(data) {
+        const s = data.summary || {};
+
+        // Summary row
+        document.getElementById('slo-summary').innerHTML = `
+            <div class="summary-item">
+                <div class="label">Total SLOs</div>
+                <div class="count">${s.total_slos || 0}</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Meeting Objective</div>
+                <div class="count status-ok">${s.slos_meeting_objective || 0}</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">At Risk</div>
+                <div class="count status-warn">${s.slos_at_risk || 0}</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Exhausted</div>
+                <div class="count status-error">${s.slos_exhausted || 0}</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Alerts</div>
+                <div class="count ${s.active_alerts > 0 ? 'status-warn' : 'status-ok'}">${s.active_alerts || 0}</div>
+            </div>
+        `;
+
+        // Alerts
+        const alerts = data.alerts || [];
+        if (alerts.length > 0) {
+            document.getElementById('slo-alerts').innerHTML = '<ul class="alert-list">' +
+                alerts.map(a => `<li class="${a.severity === 'fast' ? 'critical' : ''}">${a.message}</li>`).join('') +
+                '</ul>';
+        } else {
+            document.getElementById('slo-alerts').innerHTML = '';
+        }
+
+        // SLO cards
+        const slos = data.slos || {};
+        let html = '';
+        for (const [id, slo] of Object.entries(slos)) {
+            const b = slo.budget || {};
+            const remaining = b.remaining_budget_pct || 0;
+            const statusClass = b.budget_exhausted ? 'error' : b.budget_at_risk ? 'warn' : 'ok';
+            const statusIcon = b.budget_exhausted ? '🔴' : b.budget_at_risk ? '🟡' : '🟢';
+            const sli = b.sli_current != null ? (b.sli_current * 100).toFixed(2) + '%' : 'N/A';
+
+            html += `
+                <div class="card">
+                    <h3>${statusIcon} ${slo.name || id} <span class="slo-objective">Target: ${((slo.objective || 0) * 100).toFixed(1)}%</span></h3>
+                    <div class="value status-${statusClass}">${remaining.toFixed(1)}%</div>
+                    <div class="slo-detail">budget remaining</div>
+                    <div class="slo-bar"><div class="slo-bar-fill ${statusClass}" style="width: ${Math.min(remaining, 100)}%"></div></div>
+                    <div class="slo-detail">SLI: ${sli} | Bad: ${b.bad_events || 0}/${(b.allowed_bad_events || 0).toFixed(0)} allowed</div>
+                </div>
+            `;
+        }
+        document.getElementById('slo-grid').innerHTML = html;
+
+        // Burn rates table
+        let burnHtml = '<table class="burn-table"><tr><th>SLO</th><th>1h</th><th>6h</th><th>24h</th><th>7d</th><th>28d</th></tr>';
+        for (const [id, slo] of Object.entries(slos)) {
+            const br = slo.burn_rates || {};
+            burnHtml += `<tr><td>${slo.name || id}</td>`;
+            for (const w of ['rolling_1h', 'rolling_6h', 'rolling_24h', 'rolling_7d', 'rolling_28d']) {
+                const val = br[w]?.burn_rate;
+                if (val == null) {
+                    burnHtml += '<td>—</td>';
+                } else {
+                    const cls = val >= 6 ? 'burn-high' : val >= 2 ? 'burn-med' : 'burn-ok';
+                    burnHtml += `<td class="${cls}">${val.toFixed(1)}x</td>`;
+                }
+            }
+            burnHtml += '</tr>';
+        }
+        burnHtml += '</table>';
+        document.getElementById('burn-content').innerHTML = burnHtml;
+
+        // Timestamp
+        document.getElementById('slo-timestamp').textContent = `Last updated: ${data.timestamp || 'unknown'}`;
+    }
+
+    // Auto-load on page open
+    loadData();
+    // Auto-refresh every 5 minutes
+    setInterval(loadData, 300000);
+    </script>
+</body>
+</html>
