@@ -1,0 +1,593 @@
+{
+  "timestamp": "2026-03-05T19:10:22Z",
+  "pass": false,
+  "checks": {
+    "configs": {
+      "pass": true,
+      "total": 16,
+      "valid": 16,
+      "details": [
+        {
+          "file": "node_profiles.json",
+          "valid": true
+        },
+        {
+          "file": "security_policy.json",
+          "valid": true
+        },
+        {
+          "file": "infra_targets.json",
+          "valid": true
+        },
+        {
+          "file": "bootstrap_policy.json",
+          "valid": true
+        },
+        {
+          "file": "aiops_policy.json",
+          "valid": true
+        },
+        {
+          "file": "slo_policy.json",
+          "valid": true
+        },
+        {
+          "file": "verification_policy.json",
+          "valid": true
+        },
+        {
+          "file": "slo_catalog.json",
+          "valid": true
+        },
+        {
+          "file": "portfolio_policy.json",
+          "valid": true
+        },
+        {
+          "file": "supply_chain_policy.json",
+          "valid": true
+        },
+        {
+          "file": "observability_policy.json",
+          "valid": true
+        },
+        {
+          "file": "incidents_policy.json",
+          "valid": true
+        },
+        {
+          "file": "dr_policy.json",
+          "valid": true
+        },
+        {
+          "file": "capacity_policy.json",
+          "valid": true
+        },
+        {
+          "file": "docs_policy.json",
+          "valid": true
+        },
+        {
+          "file": "restore_targets.json",
+          "valid": true
+        }
+      ]
+    },
+    "scripts": {
+      "pass": true,
+      "total": 81,
+      "valid": 81,
+      "details": [
+        {
+          "file": "scripts/slo_runner.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/sec/sec_repo_guard.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/sec/sec_redact.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/sec/sec_publish.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/sec/__init__.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/sec/sec_baseline_audit.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/release/release_audit.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/release/release_build_docs.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/release/__init__.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/release/release_package.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/slo/slo_render.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/slo/slo_gate.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/slo/__init__.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/slo/sli_compute.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/slo/burn_rate.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/slo/slo_eval.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/slo/slo_utils.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/slo/budget.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/slo/slo_publish.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/slo/sli_sources.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/supply/supply_provenance.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/supply/supply_sbom.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/supply/__init__.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/supply/supply_harden.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/supply/supply_publish.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/capacity/capacity_dashboard_export.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/capacity/__init__.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/capacity/capacity_recommend.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/capacity/capacity_forecast.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/capacity/capacity_collect.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/verify/verify_gates.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/verify/verify_canary.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/verify/verify_synthetic.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/verify/__init__.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/verify/verify_publish.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/dr/dr_backup_inventory.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/dr/dr_dashboard_export.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/dr/dr_restore.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/dr/dr_validate.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/dr/dr_drill.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/dr/__init__.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/dr/dr_preflight.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/docs/docs_topology.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/docs/docs_changelog.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/docs/docs_portfolio.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/docs/docs_diagrams.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/docs/__init__.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/docs/docs_dependencies.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/docs/docs_services.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/docs/docs_generate_all.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/incident/incident_render.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/incident/incident_state.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/incident/incident_manager.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/incident/__init__.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/portfolio/portfolio_redact.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/portfolio/portfolio_index.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/portfolio/portfolio_publish.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/portfolio/portfolio_render.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/portfolio/portfolio_badges.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/portfolio/portfolio_build.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/portfolio/__init__.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/obs/obs_eventbus.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/obs/obs_publish.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/obs/__init__.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/infra/proxmox_export.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/infra/infra_publish.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/infra/__init__.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/infra/opnsense_backup.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/infra/infra_inventory.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/aiops/aiops_report.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/aiops/aiops_correlate.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/aiops/__init__.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/aiops/aiops_anomaly.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/aiops/aiops_analyze.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/bootstrap/bootstrap_register.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/bootstrap/bootstrap_configure.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/bootstrap/bootstrap_export_portfolio.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/bootstrap/bootstrap_install.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/bootstrap/bootstrap_validate.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/bootstrap/bootstrap_preflight.py",
+          "valid": true
+        },
+        {
+          "file": "scripts/bootstrap/__init__.py",
+          "valid": true
+        }
+      ]
+    },
+    "secrets": {
+      "pass": false,
+      "violations": 20,
+      "details": [
+        {
+          "file": "config/security_policy.json",
+          "pattern": "-----BEGIN.*PRIVATE KEY-----",
+          "count": 1
+        },
+        {
+          "file": "config/portfolio_policy.json",
+          "pattern": "-----BEGIN.*PRIVATE KEY-----",
+          "count": 1
+        },
+        {
+          "file": "config/dr_policy.json",
+          "pattern": "-----BEGIN.*PRIVATE KEY-----",
+          "count": 1
+        },
+        {
+          "file": "artifacts/release/audit.json",
+          "pattern": "-----BEGIN.*PRIVATE KEY-----",
+          "count": 19
+        },
+        {
+          "file": "scripts/sec/test_priority38_sec.sh",
+          "pattern": "-----BEGIN.*PRIVATE KEY-----",
+          "count": 1
+        },
+        {
+          "file": "scripts/sec/sec_redact.py",
+          "pattern": "-----BEGIN.*PRIVATE KEY-----",
+          "count": 1
+        },
+        {
+          "file": "scripts/release/release_audit.py",
+          "pattern": "-----BEGIN.*PRIVATE KEY-----",
+          "count": 1
+        },
+        {
+          "file": "scripts/release/test_priority42_freeze.sh",
+          "pattern": "-----BEGIN.*PRIVATE KEY-----",
+          "count": 1
+        },
+        {
+          "file": "scripts/supply/test_priority41_supply.sh",
+          "pattern": "-----BEGIN.*PRIVATE KEY-----",
+          "count": 1
+        },
+        {
+          "file": "scripts/capacity/test_priority32_capacity.sh",
+          "pattern": "-----BEGIN.*PRIVATE KEY-----",
+          "count": 1
+        },
+        {
+          "file": "scripts/verify/test_priority40_verify.sh",
+          "pattern": "-----BEGIN.*PRIVATE KEY-----",
+          "count": 1
+        },
+        {
+          "file": "scripts/dr/test_priority30_dr.sh",
+          "pattern": "-----BEGIN.*PRIVATE KEY-----",
+          "count": 1
+        },
+        {
+          "file": "scripts/docs/test_priority33_docs.sh",
+          "pattern": "-----BEGIN.*PRIVATE KEY-----",
+          "count": 1
+        },
+        {
+          "file": "scripts/portfolio/portfolio_redact.py",
+          "pattern": "-----BEGIN.*PRIVATE KEY-----",
+          "count": 1
+        },
+        {
+          "file": "scripts/portfolio/test_priority39_portfolio.sh",
+          "pattern": "-----BEGIN.*PRIVATE KEY-----",
+          "count": 1
+        },
+        {
+          "file": "scripts/obs/test_priority36_obs.sh",
+          "pattern": "-----BEGIN.*PRIVATE KEY-----",
+          "count": 1
+        },
+        {
+          "file": "scripts/infra/test_priority37_infra.sh",
+          "pattern": "-----BEGIN.*PRIVATE KEY-----",
+          "count": 1
+        },
+        {
+          "file": "scripts/aiops/test_priority34_aiops.sh",
+          "pattern": "-----BEGIN.*PRIVATE KEY-----",
+          "count": 1
+        },
+        {
+          "file": "scripts/bootstrap/bootstrap_export_portfolio.py",
+          "pattern": "-----BEGIN.*PRIVATE KEY-----",
+          "count": 1
+        },
+        {
+          "file": "scripts/bootstrap/test_priority31_bootstrap.sh",
+          "pattern": "-----BEGIN.*PRIVATE KEY-----",
+          "count": 1
+        }
+      ]
+    },
+    "subsystems": {
+      "pass": true,
+      "total": 6,
+      "present": 6,
+      "details": [
+        {
+          "config": "dr_policy.json",
+          "subsystem": "Disaster Recovery (P30)",
+          "exists": true
+        },
+        {
+          "config": "bootstrap_policy.json",
+          "subsystem": "Node Bootstrap (P31)",
+          "exists": true
+        },
+        {
+          "config": "node_profiles.json",
+          "subsystem": "Node Profiles (P31)",
+          "exists": true
+        },
+        {
+          "config": "capacity_policy.json",
+          "subsystem": "Capacity Manager (P32)",
+          "exists": true
+        },
+        {
+          "config": "docs_policy.json",
+          "subsystem": "Self-Documenting Arch (P33)",
+          "exists": true
+        },
+        {
+          "config": "aiops_policy.json",
+          "subsystem": "AI Operations (P34)",
+          "exists": true
+        }
+      ]
+    },
+    "git": {
+      "clean": false,
+      "dirty_files": [
+        "M nodes/nova/homelab-controller/bin/oc.sh",
+        "M nodes/nova/homelab-controller/scripts/aiops/aiops_tick.sh",
+        "M nodes/nova/homelab-controller/scripts/aiops/test_priority34_aiops.sh",
+        "M nodes/nova/homelab-controller/scripts/bootstrap/bootstrap_tick.sh",
+        "M nodes/nova/homelab-controller/scripts/bootstrap/test_priority31_bootstrap.sh",
+        "M nodes/nova/homelab-controller/scripts/capacity/capacity_tick.sh",
+        "M nodes/nova/homelab-controller/scripts/capacity/test_priority32_capacity.sh",
+        "M nodes/nova/homelab-controller/scripts/docs/test_priority33_docs.sh",
+        "M nodes/nova/homelab-controller/scripts/dr/dr_tick.sh",
+        "M nodes/nova/homelab-controller/scripts/dr/test_priority30_dr.sh",
+        "M nodes/nova/homelab-controller/scripts/incident/incident_tick.sh",
+        "M nodes/nova/homelab-controller/scripts/incident/test_priority28_incidents.sh",
+        "M nodes/nova/homelab-controller/scripts/infra/infra_tick.sh",
+        "M nodes/nova/homelab-controller/scripts/infra/test_priority37_infra.sh",
+        "M nodes/nova/homelab-controller/scripts/obs/obs_install.sh",
+        "M nodes/nova/homelab-controller/scripts/obs/obs_tick.sh",
+        "M nodes/nova/homelab-controller/scripts/obs/test_priority36_obs.sh",
+        "M nodes/nova/homelab-controller/scripts/portfolio/portfolio_tick.sh",
+        "M nodes/nova/homelab-controller/scripts/portfolio/test_priority29_portfolio.sh",
+        "M nodes/nova/homelab-controller/scripts/portfolio/test_priority39_portfolio.sh",
+        "M nodes/nova/homelab-controller/scripts/release/release_tag.sh",
+        "M nodes/nova/homelab-controller/scripts/release/release_tag_v11.sh",
+        "M nodes/nova/homelab-controller/scripts/release/test_priority35_release.sh",
+        "M nodes/nova/homelab-controller/scripts/release/test_priority42_freeze.sh",
+        "M nodes/nova/homelab-controller/scripts/sec/sec_tick.sh",
+        "M nodes/nova/homelab-controller/scripts/sec/test_priority38_sec.sh",
+        "M nodes/nova/homelab-controller/scripts/slo_tick.sh",
+        "M nodes/nova/homelab-controller/scripts/supply/supply_tick.sh",
+        "M nodes/nova/homelab-controller/scripts/supply/test_priority41_supply.sh",
+        "M nodes/nova/homelab-controller/scripts/test_priority27_slo.sh",
+        "M nodes/nova/homelab-controller/scripts/verify/test_priority40_verify.sh",
+        "M nodes/nova/homelab-controller/scripts/verify/verify_tick.sh",
+        "?? nodes/nova/homelab-controller/artifacts/events/",
+        "?? nodes/nova/homelab-controller/artifacts/release/",
+        "?? nodes/nova/homelab-controller/artifacts/supply_chain/",
+        "?? nodes/nova/homelab-controller/artifacts/verification/",
+        "?? nodes/nova/homelab-controller/dashboard/static/data/"
+      ]
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-03-05T19:09:16Z",
+  "gates": [
+    {
+      "gate": "slo_budget",
+      "threshold": 10,
+      "actual": null,
+      "pass": true,
+      "note": "no SLO data"
+    },
+    {
+      "gate": "open_incidents",
+      "threshold": 3,
+      "actual": 0,
+      "pass": true,
+      "note": "no incident data"
+    },
+    {
+      "gate": "dr_readiness",
+      "threshold": 60,
+      "actual": null,
+      "pass": true,
+      "note": "no DR data"
+    },
+    {
+      "gate": "security_audit",
+      "threshold": 60,
+      "actual": 0,
+      "pass": false
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "passing": 3
+  },
+  "pass": false,
+  "action": "BLOCK"
+}

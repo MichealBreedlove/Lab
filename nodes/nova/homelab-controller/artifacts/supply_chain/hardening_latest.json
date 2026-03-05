@@ -1,0 +1,107 @@
+{
+  "timestamp": "2026-03-05T19:09:17Z",
+  "files_checked": 112,
+  "passing": 98,
+  "failing": 14,
+  "failing_files": [
+    {
+      "file": "scripts/aiops/__init__.py",
+      "issues": [
+        "missing_shebang"
+      ],
+      "pass": false
+    },
+    {
+      "file": "scripts/bootstrap/__init__.py",
+      "issues": [
+        "missing_shebang"
+      ],
+      "pass": false
+    },
+    {
+      "file": "scripts/capacity/__init__.py",
+      "issues": [
+        "missing_shebang"
+      ],
+      "pass": false
+    },
+    {
+      "file": "scripts/docs/__init__.py",
+      "issues": [
+        "missing_shebang"
+      ],
+      "pass": false
+    },
+    {
+      "file": "scripts/dr/__init__.py",
+      "issues": [
+        "missing_shebang"
+      ],
+      "pass": false
+    },
+    {
+      "file": "scripts/incident/__init__.py",
+      "issues": [
+        "missing_shebang"
+      ],
+      "pass": false
+    },
+    {
+      "file": "scripts/infra/__init__.py",
+      "issues": [
+        "missing_shebang"
+      ],
+      "pass": false
+    },
+    {
+      "file": "scripts/obs/__init__.py",
+      "issues": [
+        "missing_shebang"
+      ],
+      "pass": false
+    },
+    {
+      "file": "scripts/portfolio/__init__.py",
+      "issues": [
+        "missing_shebang"
+      ],
+      "pass": false
+    },
+    {
+      "file": "scripts/release/__init__.py",
+      "issues": [
+        "missing_shebang"
+      ],
+      "pass": false
+    },
+    {
+      "file": "scripts/sec/__init__.py",
+      "issues": [
+        "missing_shebang"
+      ],
+      "pass": false
+    },
+    {
+      "file": "scripts/slo/__init__.py",
+      "issues": [
+        "missing_shebang"
+      ],
+      "pass": false
+    },
+    {
+      "file": "scripts/supply/__init__.py",
+      "issues": [
+        "missing_shebang"
+      ],
+      "pass": false
+    },
+    {
+      "file": "scripts/verify/__init__.py",
+      "issues": [
+        "missing_shebang"
+      ],
+      "pass": false
+    }
+  ],
+  "pass": false
+}

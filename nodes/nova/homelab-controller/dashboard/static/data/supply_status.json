@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-03-05T19:09:17Z",
+  "status": "RED",
+  "sbom": {
+    "components": 131,
+    "third_party_free": false
+  },
+  "hardening": {
+    "pass": false,
+    "files_checked": 112
+  },
+  "provenance": {
+    "recorded": true,
+    "commit": "a29d2c0d"
+  }
+}

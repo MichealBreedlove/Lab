@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-03-05T19:10:21Z",
+  "status": "RED",
+  "audit_score": 0,
+  "scan_clean": false,
+  "scan_violations": 0,
+  "last_audit": null,
+  "last_scan": null
+}
