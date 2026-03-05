@@ -615,6 +615,7 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             p39|portfolio) bash "$ROOT_DIR/scripts/portfolio/test_priority39_portfolio.sh" ;;
             p40|verify) bash "$ROOT_DIR/scripts/verify/test_priority40_verify.sh" ;;
             p41|supply) bash "$ROOT_DIR/scripts/supply/test_priority41_supply.sh" ;;
+            p42|freeze) bash "$ROOT_DIR/scripts/release/test_priority42_freeze.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do
