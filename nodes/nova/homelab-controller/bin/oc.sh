@@ -38,6 +38,11 @@ Commands:
   portfolio test        Run P29 portfolio tests
   changelog             Run changelog generation (P26)
   gate <action> <tier>  Evaluate gatekeeper for an action
+  release audit          Run release audit (configs, scripts, secrets)
+  release docs           Generate release documentation
+  release package        Build release manifest
+  release tag            Create v1.0.0 git tag [--apply]
+  release test           Run P35 release tests
   aiops anomaly          Detect anomalies in capacity metrics
   aiops correlate        Correlate alerts into incidents
   aiops analyze          AI-powered cluster analysis
@@ -288,6 +293,19 @@ print(f'Site: {d.get(\"site_url\", \"N/A\")}')
                 ;;
         esac
         ;;
+    release)
+        shift
+        subcmd="${1:-audit}"
+        shift 2>/dev/null || true
+        case "$subcmd" in
+            audit) cd "$ROOT_DIR"; python3 scripts/release/release_audit.py "$@" ;;
+            docs) cd "$ROOT_DIR"; python3 scripts/release/release_build_docs.py "$@" ;;
+            package) cd "$ROOT_DIR"; python3 scripts/release/release_package.py "$@" ;;
+            tag) bash "$ROOT_DIR/scripts/release/release_tag.sh" "$@" ;;
+            test) bash "$ROOT_DIR/scripts/release/test_priority35_release.sh" ;;
+            *) echo "Unknown release subcommand: $subcmd"; echo "Try: oc release [audit|docs|package|tag|test]" ;;
+        esac
+        ;;
     aiops)
         shift
         subcmd="${1:-tick}"
@@ -479,6 +497,7 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             p32|capacity) bash "$ROOT_DIR/scripts/capacity/test_priority32_capacity.sh" ;;
             p33|docs) bash "$ROOT_DIR/scripts/docs/test_priority33_docs.sh" ;;
             p34|aiops) bash "$ROOT_DIR/scripts/aiops/test_priority34_aiops.sh" ;;
+            p35|release) bash "$ROOT_DIR/scripts/release/test_priority35_release.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do
