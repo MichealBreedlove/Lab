@@ -1,0 +1,42 @@
+{
+  "enabled": true,
+  "stack": {
+    "host": "nova",
+    "install_dir": "~/obs-stack",
+    "bind_address": "10.1.1.21",
+    "expose_public": false
+  },
+  "prometheus": {
+    "port": 9090,
+    "retention_days": 30,
+    "scrape_interval": "30s"
+  },
+  "grafana": {
+    "port": 3000,
+    "bind": "10.1.1.21:3000"
+  },
+  "alertmanager": {
+    "port": 9093,
+    "telegram_enabled": true
+  },
+  "loki": {
+    "port": 3100,
+    "retention_days": 14
+  },
+  "node_exporter": {
+    "port": 9100,
+    "targets": ["10.1.1.21:9100", "10.1.1.22:9100", "10.1.1.23:9100"]
+  },
+  "eventbus": {
+    "enabled": true,
+    "store": "artifacts/events/events.jsonl",
+    "max_file_mb": 50
+  },
+  "alerts": {
+    "gateway_down_minutes": 5,
+    "node_down_minutes": 5,
+    "stale_snapshot_hours": 24,
+    "slo_burn_threshold": 0.5,
+    "dr_red_alert": true
+  }
+}

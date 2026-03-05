@@ -121,6 +121,13 @@
         <p id="slo-timestamp" class="timestamp"></p>
     </div>
 
+    <div id="obs-section">
+        <h2>🔭 Observability</h2>
+        <div id="obs-summary" class="summary-row"></div>
+        <div id="obs-grid" class="grid"></div>
+        <p id="obs-timestamp" class="timestamp"></p>
+    </div>
+
     <div id="capacity-section">
         <h2>📊 Capacity</h2>
         <div id="capacity-summary" class="summary-row"></div>
@@ -143,6 +150,65 @@
     </div>
 
     <script>
+    async function loadObs() {
+        try {
+            const resp = await fetch('data/obs_status.json');
+            if (!resp.ok) throw new Error('No data');
+            const obs = await resp.json();
+            renderObs(obs);
+        } catch (e) {
+            document.getElementById('obs-summary').innerHTML = '';
+            document.getElementById('obs-grid').innerHTML =
+                '<div class="card"><p style="color:#484f58">No observability data. Run <code>oc obs status</code>.</p></div>';
+        }
+    }
+
+    function renderObs(obs) {
+        const status = obs.status || 'RED';
+        const icon = status === 'GREEN' ? '🟢' : status === 'YELLOW' ? '🟡' : '🔴';
+        const cls = status === 'GREEN' ? 'ok' : status === 'YELLOW' ? 'warn' : 'error';
+
+        document.getElementById('obs-summary').innerHTML = `
+            <div class="summary-item">
+                <div class="label">Stack</div>
+                <div class="count status-${cls}">${icon} ${obs.stack?.running || 0}/${obs.stack?.total || 0}</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Events</div>
+                <div class="count">${obs.events?.recent_count || 0}</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Critical</div>
+                <div class="count">${obs.events?.critical_count || 0}</div>
+            </div>
+        `;
+
+        let html = '';
+        const containers = obs.stack?.containers || {};
+        for (const [name, info] of Object.entries(containers)) {
+            const ci = info.running ? '🟢' : '🔴';
+            const short = name.replace('obs-', '');
+            html += `<div class="card"><h3>${ci} ${short}</h3><div class="slo-detail">${info.status || 'unknown'}</div></div>`;
+        }
+
+        if (obs.events?.last_event) {
+            const e = obs.events.last_event;
+            html += `<div class="card"><h3>📋 Last Event</h3><div class="slo-detail">${e.type}: ${e.message || ''}</div><div class="slo-detail">${(e.timestamp || '').substring(0, 19)}</div></div>`;
+        }
+
+        const ep = obs.endpoints || {};
+        if (ep.grafana) {
+            html += `<div class="card"><h3>🔗 Links</h3>
+                <div class="slo-detail"><a href="${ep.grafana}" target="_blank">Grafana</a></div>
+                <div class="slo-detail"><a href="${ep.prometheus}" target="_blank">Prometheus</a></div>
+                <div class="slo-detail"><a href="${ep.alertmanager}" target="_blank">Alertmanager</a></div>
+            </div>`;
+        }
+
+        document.getElementById('obs-grid').innerHTML = html;
+        document.getElementById('obs-timestamp').textContent = `Obs data: ${obs.timestamp || 'unknown'}`;
+    }
+
     async function loadCapacity() {
         try {
             const resp = await fetch('data/capacity_status.json');
@@ -476,12 +542,14 @@
     loadDR();
     loadBootstrap();
     loadCapacity();
+    loadObs();
     // Auto-refresh every 5 minutes
     setInterval(loadData, 300000);
     setInterval(loadIncidents, 300000);
     setInterval(loadDR, 300000);
     setInterval(loadBootstrap, 300000);
     setInterval(loadCapacity, 300000);
+    setInterval(loadObs, 300000);
     </script>
 </body>
 </html>

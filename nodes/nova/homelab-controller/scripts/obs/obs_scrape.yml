@@ -1,0 +1,53 @@
+# P36 — Prometheus scrape config
+global:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+
+rule_files:
+  - "rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - "alertmanager:9093"
+
+scrape_configs:
+  # Nova node exporter
+  - job_name: "node-nova"
+    static_configs:
+      - targets: ["node-exporter:9100"]
+        labels:
+          node: "nova"
+          role: "controller"
+
+  # Remote Linux node exporters (install node_exporter on mira/orin)
+  - job_name: "node-mira"
+    static_configs:
+      - targets: ["10.1.1.22:9100"]
+        labels:
+          node: "mira"
+          role: "worker"
+
+  - job_name: "node-orin"
+    static_configs:
+      - targets: ["10.1.1.23:9100"]
+        labels:
+          node: "orin"
+          role: "worker"
+
+  # Prometheus self-monitoring
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # cAdvisor (Nova containers)
+  - job_name: "cadvisor"
+    static_configs:
+      - targets: ["cadvisor:8080"]
+        labels:
+          node: "nova"
+
+  # OpenClaw custom metrics (textfile collector via node_exporter)
+  # Place .prom files in /var/lib/node_exporter/textfile_collector/
+  # Metrics: openclaw_snapshot_age_minutes, openclaw_cluster_state, etc.
