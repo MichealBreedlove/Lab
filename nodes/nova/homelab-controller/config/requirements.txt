@@ -1,0 +1,7 @@
+# Python dependencies for homelab-controller
+# All scripts use stdlib only — no third-party packages required
+# Pin versions here if third-party deps are ever added
+#
+# Example:
+# requests==2.31.0
+# pyyaml==6.0.1

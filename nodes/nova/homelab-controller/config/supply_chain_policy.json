@@ -1,0 +1,35 @@
+{
+  "enabled": true,
+  "sbom": {
+    "format": "cyclonedx",
+    "output_dir": "artifacts/supply_chain",
+    "scan_dirs": ["scripts", "config"],
+    "include_extensions": [".py", ".sh", ".json", ".yml", ".yaml"]
+  },
+  "dependency_pinning": {
+    "python_requirements": "config/requirements.txt",
+    "enforce_pinned": true,
+    "allowed_unpinned": ["stdlib"]
+  },
+  "provenance": {
+    "enabled": true,
+    "sign_commits": false,
+    "track_build_env": true,
+    "output_file": "artifacts/supply_chain/provenance.json"
+  },
+  "hardening": {
+    "file_permissions": {
+      "scripts_max_mode": "0755",
+      "config_max_mode": "0644",
+      "secrets_max_mode": "0600"
+    },
+    "enforce_shebang": true,
+    "enforce_set_euo_pipefail": true,
+    "banned_commands": ["curl | bash", "wget | sh", "eval $(curl"],
+    "max_script_size_kb": 100
+  },
+  "reporting": {
+    "output_dir": "artifacts/supply_chain",
+    "history_file": "artifacts/supply_chain/history.jsonl"
+  }
+}

@@ -121,6 +121,12 @@
         <p id="slo-timestamp" class="timestamp"></p>
     </div>
 
+    <div id="supply-section">
+        <h2>🔗 Supply Chain</h2>
+        <div id="supply-summary" class="summary-row"></div>
+        <p id="supply-timestamp" class="timestamp"></p>
+    </div>
+
     <div id="verify-section">
         <h2>🔍 Continuous Verification</h2>
         <div id="verify-summary" class="summary-row"></div>
@@ -175,6 +181,26 @@
     </div>
 
     <script>
+    async function loadSupply() {
+        try {
+            const resp = await fetch('data/supply_status.json');
+            if (!resp.ok) throw new Error('No data');
+            const d = await resp.json();
+            const s = d.status || 'RED';
+            const icon = s === 'GREEN' ? '🟢' : s === 'YELLOW' ? '🟡' : '🔴';
+            document.getElementById('supply-summary').innerHTML = `
+                <div class="summary-item"><div class="label">Status</div><div class="count">${icon} ${s}</div></div>
+                <div class="summary-item"><div class="label">Components</div><div class="count">${d.sbom?.components||0}</div></div>
+                <div class="summary-item"><div class="label">3rd-Party Free</div><div class="count">${d.sbom?.third_party_free ? '✅' : '❌'}</div></div>
+                <div class="summary-item"><div class="label">Hardening</div><div class="count">${d.hardening?.pass ? '✅' : '❌'}</div></div>
+                <div class="summary-item"><div class="label">Provenance</div><div class="count">${d.provenance?.commit||'?'}</div></div>
+            `;
+            document.getElementById('supply-timestamp').textContent = `Supply chain data: ${d.timestamp || 'unknown'}`;
+        } catch (e) {
+            document.getElementById('supply-summary').innerHTML = '<div class="card"><p style="color:#484f58">No supply chain data. Run <code>oc supply tick</code>.</p></div>';
+        }
+    }
+
     async function loadVerify() {
         try {
             const resp = await fetch('data/verify_status.json');
@@ -648,6 +674,7 @@
     loadCapacity();
     loadObs();
     loadInfra();
+    loadSupply();
     loadVerify();
     loadSec();
     loadPortfolio();
@@ -659,6 +686,7 @@
     setInterval(loadCapacity, 300000);
     setInterval(loadObs, 300000);
     setInterval(loadInfra, 300000);
+    setInterval(loadSupply, 300000);
     setInterval(loadVerify, 300000);
     setInterval(loadSec, 300000);
     setInterval(loadPortfolio, 300000);
