@@ -312,6 +312,8 @@ print(f'Site: {d.get(\"site_url\", \"N/A\")}')
             services) python3 "$ROOT_DIR/scripts/docs/docs_services.py" "$@" ;;
             deps|dependencies) python3 "$ROOT_DIR/scripts/docs/docs_dependencies.py" "$@" ;;
             changelog) python3 "$ROOT_DIR/scripts/docs/docs_changelog.py" "$@" ;;
+            diagrams) python3 "$ROOT_DIR/scripts/docs/docs_diagrams.py" "$@" ;;
+            portfolio) python3 "$ROOT_DIR/scripts/docs/docs_portfolio.py" "$@" ;;
             test) bash "$ROOT_DIR/scripts/docs/test_priority33_docs.sh" ;;
             *) echo "Unknown docs subcommand: $subcmd"; echo "Try: oc docs [generate|topology|services|deps|changelog|test]" ;;
         esac
