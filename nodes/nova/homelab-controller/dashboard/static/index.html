@@ -121,7 +121,96 @@
         <p id="slo-timestamp" class="timestamp"></p>
     </div>
 
+    <div id="dr-section">
+        <h2>🛡️ Disaster Recovery</h2>
+        <div id="dr-summary" class="summary-row"></div>
+        <div id="dr-grid" class="grid"></div>
+        <p id="dr-timestamp" class="timestamp"></p>
+    </div>
+
     <script>
+    async function loadDR() {
+        try {
+            const resp = await fetch('data/dr_status.json');
+            if (!resp.ok) throw new Error('No data');
+            const dr = await resp.json();
+            renderDR(dr);
+        } catch (e) {
+            document.getElementById('dr-summary').innerHTML = '';
+            document.getElementById('dr-grid').innerHTML =
+                '<div class="card"><p style="color:#484f58">No DR data available. Run <code>oc dr preflight</code> on Nova.</p></div>';
+        }
+    }
+
+    function renderDR(dr) {
+        const score = dr.readiness_score || 0;
+        const status = dr.status || 'RED';
+        const statusClass = status === 'GREEN' ? 'ok' : status === 'YELLOW' ? 'warn' : 'error';
+        const statusIcon = status === 'GREEN' ? '🟢' : status === 'YELLOW' ? '🟡' : '🔴';
+
+        // Summary row
+        document.getElementById('dr-summary').innerHTML = `
+            <div class="summary-item">
+                <div class="label">Readiness</div>
+                <div class="count status-${statusClass}">${statusIcon} ${status}</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Score</div>
+                <div class="count status-${statusClass}">${score}</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Last Drill MTTR</div>
+                <div class="count">${dr.last_drill_mttr_sec != null ? dr.last_drill_mttr_sec + 's' : '—'}</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Break-Glass</div>
+                <div class="count" style="font-size:1em">${dr.break_glass_state || 'none'}</div>
+            </div>
+        `;
+
+        // DR detail cards
+        let html = '';
+
+        // Preflight card
+        const pf = dr.preflight || {};
+        const pfIcon = pf.pass ? '✅' : '❌';
+        html += `<div class="card">
+            <h3>${pfIcon} Preflight</h3>
+            <div class="slo-detail">Node: ${pf.node || '?'} (${pf.platform || '?'})</div>
+            <div class="slo-detail">Git: ${pf.git_ok ? '✅' : '❌'} | Binaries: ${pf.binaries_ok ? '✅' : '❌'} | Snapshot: ${pf.snapshot_fresh ? '✅ fresh' : '⚠️ stale'}</div>
+            <div class="slo-detail">Last: ${(pf.timestamp || '').substring(0, 19)}</div>
+        </div>`;
+
+        // Last drill card
+        const drill = dr.last_drill || {};
+        if (drill.timestamp) {
+            const drillIcon = drill.pass ? '✅' : '❌';
+            html += `<div class="card">
+                <h3>${drillIcon} Last Drill</h3>
+                <div class="value">${drill.mttr_sec != null ? drill.mttr_sec + 's' : '—'}</div>
+                <div class="slo-detail">MTTR</div>
+                <div class="slo-detail">Date: ${(drill.timestamp || '').substring(0, 10)}</div>
+                <div class="slo-detail">Stages: ${drill.stages_pass || '?'}/${drill.stages_total || '?'} passing</div>
+            </div>`;
+        }
+
+        // Node status cards
+        const nodes = dr.nodes || {};
+        for (const [name, nd] of Object.entries(nodes)) {
+            const ndIcon = nd.validate_pass ? '🟢' : '🔴';
+            html += `<div class="card">
+                <h3>${ndIcon} ${name}</h3>
+                <div class="slo-detail">Platform: ${nd.platform || '?'}</div>
+                <div class="slo-detail">Validate: ${nd.validate_pass ? 'PASS' : 'FAIL'} (${nd.checks_passing || '?'}/${nd.checks_total || '?'})</div>
+                <div class="slo-detail">Inventory: ${(nd.inventory_ts || 'none').substring(0, 19)}</div>
+                <div class="slo-detail">Components: ${nd.components || '?'}</div>
+            </div>`;
+        }
+
+        document.getElementById('dr-grid').innerHTML = html;
+        document.getElementById('dr-timestamp').textContent = `DR data: ${dr.timestamp || 'unknown'}`;
+    }
+
     async function loadIncidents() {
         try {
             const resp = await fetch('data/latest_incident.json');
@@ -264,9 +353,11 @@
     // Auto-load on page open
     loadData();
     loadIncidents();
+    loadDR();
     // Auto-refresh every 5 minutes
     setInterval(loadData, 300000);
     setInterval(loadIncidents, 300000);
+    setInterval(loadDR, 300000);
     </script>
 </body>
 </html>
