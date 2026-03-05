@@ -1,0 +1,35 @@
+{
+  "enabled": true,
+  "mode": "supervised",
+  "require_network_reachable": true,
+  "require_ssh_key_auth": true,
+  "ssh_key_path": "~/.ssh/id_ed25519",
+  "ssh_user": "micheal",
+  "ssh_timeout_sec": 15,
+  "git": {
+    "repo": "MichealBreedlove/Lab",
+    "branch": "main",
+    "clone_target": "~/Lab"
+  },
+  "openclaw": {
+    "install_method": "npm",
+    "package": "openclaw",
+    "gateway_host": "10.1.1.150",
+    "gateway_port": 18789
+  },
+  "timers": {
+    "enable_backup": true,
+    "enable_snapshot": true,
+    "enable_dr_tick": true
+  },
+  "validation": {
+    "required_ports": [18789],
+    "required_services": ["openclaw-node"],
+    "connectivity_check_nodes": ["nova", "mira", "orin", "jasper"]
+  },
+  "post_bootstrap": {
+    "run_dr_preflight": true,
+    "run_backup": true,
+    "register_in_topology": true
+  }
+}
