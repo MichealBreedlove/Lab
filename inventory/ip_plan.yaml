@@ -1,0 +1,13 @@
+# IP Address Plan
+# Subnet: 10.1.1.0/24
+
+assignments:
+  jasper: 10.1.1.x   # TODO: confirm
+  nova:   10.1.1.21
+  mira:   10.1.1.22
+  orin:   10.1.1.23
+
+reserved:
+  gateway: 10.1.1.1
+  dns:     # TODO
+  dhcp_range: # TODO

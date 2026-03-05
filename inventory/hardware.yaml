@@ -1,0 +1,39 @@
+# Hardware Inventory
+# Update as hardware changes
+
+nodes:
+  jasper:
+    role: gateway
+    os: Windows 11
+    cpu: # TODO: fill in
+    ram: # TODO: fill in
+    gpu: # TODO: fill in (RTX series)
+    storage: # TODO: fill in
+    notes: Primary workstation + OpenClaw gateway
+
+  nova:
+    role: controller
+    os: Ubuntu
+    cpu: # TODO
+    ram: # TODO
+    gpu: # TODO
+    storage: # TODO
+    notes: Ansible controller + AI compute
+
+  mira:
+    role: compute
+    os: Ubuntu
+    cpu: # TODO
+    ram: # TODO
+    gpu: # TODO
+    storage: # TODO
+    notes: AI compute node
+
+  orin:
+    role: compute
+    os: Ubuntu
+    cpu: # TODO
+    ram: # TODO
+    gpu: # TODO
+    storage: # TODO
+    notes: AI compute node

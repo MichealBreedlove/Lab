@@ -1,0 +1,23 @@
+# Services Catalog
+
+services:
+  openclaw:
+    description: AI agent orchestration
+    nodes: [jasper, nova, mira, orin]
+    ports:
+      gateway: 18789
+      node: 18793
+
+  ollama:
+    description: Local LLM inference
+    nodes: [nova, mira, orin]
+    port: 11434
+    models:
+      - qwen2.5:32b-instruct
+      - deepseek-coder-v2:latest
+      - llama3.1:70b
+
+  ansible:
+    description: Configuration management
+    controller: nova
+    managed: [mira, orin]
