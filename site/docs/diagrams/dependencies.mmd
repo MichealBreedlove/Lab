@@ -1,0 +1,11 @@
+graph TD
+    P19[P19: Chaos Injection] --> P20[P20: Resilience Score]
+    P20 --> P21[P21: Planner]
+    P21 --> P23[P23: Action Executor]
+    P22[P22: Topology Graph] --> P23
+    P23 --> P25[P25: Gatekeeper]
+    P24[P24: Evidence Packs] --> P25
+    P25 --> P27[P27: SLOs]
+    P27 --> P28[P28: Incidents]
+    P26[P26: Changelog] --> P29[P29: Portfolio]
+    P28 --> P29

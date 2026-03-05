@@ -1,0 +1,47 @@
+{
+  "enabled": true,
+  "mode": "supervised",
+  "publish_target": {
+    "branch": "gh-pages",
+    "method": "github_actions",
+    "site_url": "https://michealbreedlove.github.io/Lab/"
+  },
+  "allowed_folders": [
+    "docs",
+    "inventory",
+    "services",
+    "nodes/*/logs",
+    "nodes/*/openclaw"
+  ],
+  "allowed_file_types": [".md", ".yml", ".yaml", ".json", ".html", ".mmd", ".drawio"],
+  "redaction": {
+    "tokens": true,
+    "api_keys": true,
+    "ssh_keys": true,
+    "emails": true,
+    "phone_numbers": true,
+    "internal_ips": false,
+    "usernames": false,
+    "patterns": [
+      "sk-[a-zA-Z0-9]{20,}",
+      "ghp_[a-zA-Z0-9]{36}",
+      "gho_[a-zA-Z0-9]{36}",
+      "glpat-[a-zA-Z0-9\\-]{20,}",
+      "-----BEGIN.*PRIVATE KEY-----",
+      "Bearer [a-zA-Z0-9\\.\\-_]{20,}",
+      "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}",
+      "\\+1[\\s\\-]?\\(?\\d{3}\\)?[\\s\\-]?\\d{3}[\\s\\-]?\\d{4}"
+    ]
+  },
+  "latest_artifacts": {
+    "snapshot": "artifacts/snapshots/latest.json",
+    "plan": "artifacts/planner/latest.json",
+    "slo": "artifacts/slo/current.json",
+    "incident": "artifacts/incidents/latest_incident.json",
+    "evidence": "artifacts/evidence/latest"
+  },
+  "schedule": {
+    "weekly_day": "sunday",
+    "weekly_hour": 3
+  }
+}
