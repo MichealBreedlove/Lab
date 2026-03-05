@@ -38,6 +38,12 @@ Commands:
   portfolio test        Run P29 portfolio tests
   changelog             Run changelog generation (P26)
   gate <action> <tier>  Evaluate gatekeeper for an action
+  verify status          Verification health overview
+  verify synthetic       Run synthetic endpoint probes
+  verify canary          Run canary function probes
+  verify gates           Evaluate policy gates
+  verify tick            Full verification pipeline
+  verify test            Run P40 verification tests
   portfolio render       Generate recruiter portfolio docs
   portfolio status       Portfolio export status
   portfolio tick         Full portfolio pipeline
@@ -309,22 +315,30 @@ print(f'Site: {d.get(\"site_url\", \"N/A\")}')
                     echo "No site URL configured."
                 fi
                 ;;
+            render)
+                cd "$ROOT_DIR"; python3 scripts/portfolio/portfolio_render.py "$@"
+                ;;
+            badges)
+                cd "$ROOT_DIR"; python3 scripts/portfolio/portfolio_badges.py "$@"
+                ;;
             *)
                 echo "Unknown portfolio subcommand: $subcmd"
-                echo "Try: oc portfolio [status|build|publish|tick|test|open]"
+                echo "Try: oc portfolio [status|build|publish|render|badges|tick|test|open]"
                 ;;
         esac
         ;;
-    portfolio)
+    verify)
         shift
         subcmd="${1:-status}"
         shift 2>/dev/null || true
         case "$subcmd" in
-            render) cd "$ROOT_DIR"; python3 scripts/portfolio/portfolio_render.py "$@" ;;
-            status) cd "$ROOT_DIR"; python3 scripts/portfolio/portfolio_publish.py ;;
-            tick) bash "$ROOT_DIR/scripts/portfolio/portfolio_tick.sh" ;;
-            test) bash "$ROOT_DIR/scripts/portfolio/test_priority39_portfolio.sh" ;;
-            *) echo "Unknown portfolio subcommand: $subcmd"; echo "Try: oc portfolio [render|status|tick|test]" ;;
+            status) cd "$ROOT_DIR"; python3 scripts/verify/verify_publish.py ;;
+            synthetic) cd "$ROOT_DIR"; python3 scripts/verify/verify_synthetic.py "$@" ;;
+            canary) cd "$ROOT_DIR"; python3 scripts/verify/verify_canary.py "$@" ;;
+            gates) cd "$ROOT_DIR"; python3 scripts/verify/verify_gates.py "$@" ;;
+            tick) bash "$ROOT_DIR/scripts/verify/verify_tick.sh" ;;
+            test) bash "$ROOT_DIR/scripts/verify/test_priority40_verify.sh" ;;
+            *) echo "Unknown verify subcommand: $subcmd"; echo "Try: oc verify [status|synthetic|canary|gates|tick|test]" ;;
         esac
         ;;
     sec)
@@ -579,6 +593,7 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             p37|infra) bash "$ROOT_DIR/scripts/infra/test_priority37_infra.sh" ;;
             p38|sec) bash "$ROOT_DIR/scripts/sec/test_priority38_sec.sh" ;;
             p39|portfolio) bash "$ROOT_DIR/scripts/portfolio/test_priority39_portfolio.sh" ;;
+            p40|verify) bash "$ROOT_DIR/scripts/verify/test_priority40_verify.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do

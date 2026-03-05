@@ -121,6 +121,12 @@
         <p id="slo-timestamp" class="timestamp"></p>
     </div>
 
+    <div id="verify-section">
+        <h2>🔍 Continuous Verification</h2>
+        <div id="verify-summary" class="summary-row"></div>
+        <p id="verify-timestamp" class="timestamp"></p>
+    </div>
+
     <div id="sec-section">
         <h2>🔒 Security</h2>
         <div id="sec-summary" class="summary-row"></div>
@@ -169,6 +175,27 @@
     </div>
 
     <script>
+    async function loadVerify() {
+        try {
+            const resp = await fetch('data/verify_status.json');
+            if (!resp.ok) throw new Error('No data');
+            const d = await resp.json();
+            const s = d.status || 'RED';
+            const icon = s === 'GREEN' ? '🟢' : s === 'YELLOW' ? '🟡' : '🔴';
+            const syn = d.synthetic?.summary ? `${d.synthetic.summary.passing}/${d.synthetic.summary.total}` : '?';
+            const can = d.canary?.summary ? `${d.canary.summary.passing}/${d.canary.summary.total}` : '?';
+            document.getElementById('verify-summary').innerHTML = `
+                <div class="summary-item"><div class="label">Status</div><div class="count">${icon} ${s}</div></div>
+                <div class="summary-item"><div class="label">Synthetic</div><div class="count">${syn}</div></div>
+                <div class="summary-item"><div class="label">Canary</div><div class="count">${can}</div></div>
+                <div class="summary-item"><div class="label">Gates</div><div class="count">${d.gates?.action||'?'}</div></div>
+            `;
+            document.getElementById('verify-timestamp').textContent = `Verification data: ${d.timestamp || 'unknown'}`;
+        } catch (e) {
+            document.getElementById('verify-summary').innerHTML = '<div class="card"><p style="color:#484f58">No verification data. Run <code>oc verify tick</code>.</p></div>';
+        }
+    }
+
     async function loadSec() {
         try {
             const resp = await fetch('data/sec_status.json');
@@ -621,6 +648,7 @@
     loadCapacity();
     loadObs();
     loadInfra();
+    loadVerify();
     loadSec();
     loadPortfolio();
     // Auto-refresh every 5 minutes
@@ -631,6 +659,7 @@
     setInterval(loadCapacity, 300000);
     setInterval(loadObs, 300000);
     setInterval(loadInfra, 300000);
+    setInterval(loadVerify, 300000);
     setInterval(loadSec, 300000);
     setInterval(loadPortfolio, 300000);
     </script>
