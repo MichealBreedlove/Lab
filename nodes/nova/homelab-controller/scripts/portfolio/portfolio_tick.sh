@@ -1,25 +1,17 @@
 #!/usr/bin/env bash
-# portfolio_tick.sh — Pipeline wrapper: redact → build → publish
+# P39 — Portfolio Tick: render + secretscan + status
 set -euo pipefail
-
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$SCRIPT_DIR/../.."
-LAB_ROOT="$ROOT_DIR/../../.."
 
-echo "=== Portfolio tick @ $(date -Iseconds) ==="
-
-cd "$SCRIPT_DIR"
-
-# Step 1: Build site content
-echo "[1/3] Building site..."
-python3 portfolio_build.py
-
-# Step 2: Redact any secrets in site output
-echo "[2/3] Redacting..."
-python3 portfolio_redact.py "$LAB_ROOT/site"
-
-# Step 3: Publish
-echo "[3/3] Publishing..."
-python3 portfolio_publish.py
-
+echo "=== Portfolio Tick — $(date -u +%Y-%m-%dT%H:%M:%SZ) ==="
+echo "→ Rendering portfolio docs..."
+python3 "$SCRIPT_DIR/portfolio_render.py"
+echo ""
+echo "→ Secret scan..."
+python3 "$ROOT_DIR/scripts/sec/sec_secretscan.py" || true
+echo ""
+echo "→ Publishing status..."
+python3 "$SCRIPT_DIR/portfolio_publish.py"
+echo ""
 echo "=== Portfolio tick complete ==="

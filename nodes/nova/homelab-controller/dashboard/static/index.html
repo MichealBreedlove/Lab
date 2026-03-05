@@ -121,6 +121,18 @@
         <p id="slo-timestamp" class="timestamp"></p>
     </div>
 
+    <div id="sec-section">
+        <h2>🔒 Security</h2>
+        <div id="sec-summary" class="summary-row"></div>
+        <p id="sec-timestamp" class="timestamp"></p>
+    </div>
+
+    <div id="portfolio-section">
+        <h2>📦 Portfolio Export</h2>
+        <div id="portfolio-summary" class="summary-row"></div>
+        <p id="portfolio-timestamp" class="timestamp"></p>
+    </div>
+
     <div id="infra-section">
         <h2>🏗️ Infrastructure</h2>
         <div id="infra-summary" class="summary-row"></div>
@@ -157,6 +169,43 @@
     </div>
 
     <script>
+    async function loadSec() {
+        try {
+            const resp = await fetch('data/sec_status.json');
+            if (!resp.ok) throw new Error('No data');
+            const d = await resp.json();
+            const s = d.status || 'RED';
+            const icon = s === 'GREEN' ? '🟢' : s === 'YELLOW' ? '🟡' : '🔴';
+            document.getElementById('sec-summary').innerHTML = `
+                <div class="summary-item"><div class="label">Status</div><div class="count">${icon} ${s}</div></div>
+                <div class="summary-item"><div class="label">Audit Score</div><div class="count">${d.audit_score||0}%</div></div>
+                <div class="summary-item"><div class="label">Secret Scan</div><div class="count">${d.scan_clean ? '✅' : '❌'}</div></div>
+                <div class="summary-item"><div class="label">Violations</div><div class="count">${d.scan_violations||0}</div></div>
+            `;
+            document.getElementById('sec-timestamp').textContent = `Security data: ${d.timestamp || 'unknown'}`;
+        } catch (e) {
+            document.getElementById('sec-summary').innerHTML = '<div class="card"><p style="color:#484f58">No security data. Run <code>oc sec tick</code>.</p></div>';
+        }
+    }
+
+    async function loadPortfolio() {
+        try {
+            const resp = await fetch('data/portfolio_status.json');
+            if (!resp.ok) throw new Error('No data');
+            const d = await resp.json();
+            const s = d.status || 'RED';
+            const icon = s === 'GREEN' ? '🟢' : s === 'YELLOW' ? '🟡' : '🔴';
+            document.getElementById('portfolio-summary').innerHTML = `
+                <div class="summary-item"><div class="label">Status</div><div class="count">${icon} ${s}</div></div>
+                <div class="summary-item"><div class="label">Docs</div><div class="count">${d.docs_count||0}</div></div>
+                <div class="summary-item"><div class="label">Files</div><div class="count">${(d.docs||[]).join(', ')||'none'}</div></div>
+            `;
+            document.getElementById('portfolio-timestamp').textContent = `Portfolio data: ${d.timestamp || 'unknown'}`;
+        } catch (e) {
+            document.getElementById('portfolio-summary').innerHTML = '<div class="card"><p style="color:#484f58">No portfolio data. Run <code>oc portfolio tick</code>.</p></div>';
+        }
+    }
+
     async function loadInfra() {
         try {
             const resp = await fetch('data/infra_status.json');
@@ -572,6 +621,8 @@
     loadCapacity();
     loadObs();
     loadInfra();
+    loadSec();
+    loadPortfolio();
     // Auto-refresh every 5 minutes
     setInterval(loadData, 300000);
     setInterval(loadIncidents, 300000);
@@ -580,6 +631,8 @@
     setInterval(loadCapacity, 300000);
     setInterval(loadObs, 300000);
     setInterval(loadInfra, 300000);
+    setInterval(loadSec, 300000);
+    setInterval(loadPortfolio, 300000);
     </script>
 </body>
 </html>

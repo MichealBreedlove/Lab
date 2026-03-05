@@ -38,6 +38,10 @@ Commands:
   portfolio test        Run P29 portfolio tests
   changelog             Run changelog generation (P26)
   gate <action> <tier>  Evaluate gatekeeper for an action
+  portfolio render       Generate recruiter portfolio docs
+  portfolio status       Portfolio export status
+  portfolio tick         Full portfolio pipeline
+  portfolio test         Run P39 portfolio tests
   sec status             Security status overview
   sec audit              Run baseline audit on all nodes
   sec scan               Run secret scanner
@@ -311,6 +315,18 @@ print(f'Site: {d.get(\"site_url\", \"N/A\")}')
                 ;;
         esac
         ;;
+    portfolio)
+        shift
+        subcmd="${1:-status}"
+        shift 2>/dev/null || true
+        case "$subcmd" in
+            render) cd "$ROOT_DIR"; python3 scripts/portfolio/portfolio_render.py "$@" ;;
+            status) cd "$ROOT_DIR"; python3 scripts/portfolio/portfolio_publish.py ;;
+            tick) bash "$ROOT_DIR/scripts/portfolio/portfolio_tick.sh" ;;
+            test) bash "$ROOT_DIR/scripts/portfolio/test_priority39_portfolio.sh" ;;
+            *) echo "Unknown portfolio subcommand: $subcmd"; echo "Try: oc portfolio [render|status|tick|test]" ;;
+        esac
+        ;;
     sec)
         shift
         subcmd="${1:-status}"
@@ -562,6 +578,7 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             p36|obs) bash "$ROOT_DIR/scripts/obs/test_priority36_obs.sh" ;;
             p37|infra) bash "$ROOT_DIR/scripts/infra/test_priority37_infra.sh" ;;
             p38|sec) bash "$ROOT_DIR/scripts/sec/test_priority38_sec.sh" ;;
+            p39|portfolio) bash "$ROOT_DIR/scripts/portfolio/test_priority39_portfolio.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do
