@@ -1,0 +1,58 @@
+site_name: "Micheal Breedlove — Home Lab"
+site_description: "Multi-node AI inference and SRE automation cluster"
+site_url: "https://michealbreedlove.github.io/Lab/"
+repo_url: "https://github.com/MichealBreedlove/Lab"
+repo_name: "MichealBreedlove/Lab"
+
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: blue
+    accent: cyan
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Nodes:
+    - Jasper: nodes/jasper.md
+    - Nova: nodes/nova.md
+    - Mira: nodes/mira.md
+    - Orin: nodes/orin.md
+  - Systems:
+    - OpenClaw: systems/openclaw.md
+    - Proxmox: systems/proxmox.md
+    - TrueNAS: systems/truenas.md
+    - OPNsense: systems/opnsense.md
+    - Networking: systems/networking.md
+  - Pipelines:
+    - Snapshots: pipelines/snapshots.md
+    - Chaos Testing: pipelines/chaos.md
+    - Planner: pipelines/planner.md
+    - Actions: pipelines/actions.md
+    - Evidence Packs: pipelines/evidence.md
+    - Gatekeeper: pipelines/gatekeeper.md
+    - SLOs: pipelines/slo.md
+    - Incidents: pipelines/incidents.md
+  - Reports:
+    - Latest SLO: reports/latest_slo.md
+    - Latest Incident: reports/latest_incident.md
+  - Diagrams:
+    - Topology: diagrams/topology.mmd
+    - Services: diagrams/services.mmd
+    - Dependencies: diagrams/dependencies.mmd
+
+markdown_extensions:
+  - tables
+  - fenced_code
+  - codehilite
+  - admonition
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format

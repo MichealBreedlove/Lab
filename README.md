@@ -2,6 +2,40 @@
 
 Personal homelab running a multi-node AI + infrastructure cluster managed with OpenClaw, Ansible, and custom automation.
 
+<!-- PORTFOLIO_START -->
+## 🏗️ What This Lab Does
+
+- **Local AI inference cluster** — 4 nodes running Ollama with Qwen 2.5 32B, DeepSeek Coder, LLaMA 3.1 70B
+- **AI agent orchestration** — OpenClaw manages autonomous agents across all nodes
+- **Infrastructure-as-code** — Ansible playbooks for config management and health checks
+- **Self-healing automation** — SLO-driven actions, chaos testing, gatekeeper safety gates
+- **Full SRE pipeline** — Snapshots → Evidence → Planning → Actions → SLOs → Incidents → Postmortems
+
+## 📊 What It Demonstrates
+
+- **Site Reliability Engineering** — SLOs, error budgets, burn rates, incident management
+- **Infrastructure Automation** — Ansible, systemd, scheduled tasks, CI/CD
+- **Security Practices** — Secret scanning, sanitization, credential policies, safety gates
+- **AI/ML Operations** — Local LLM serving, model management, multi-node inference
+- **Documentation Discipline** — Architecture docs, runbooks, postmortems, change logs
+
+## 🔧 Priorities Built (P19–P29)
+
+| Priority | Feature | Status |
+|----------|---------|--------|
+| P19 | Chaos Injection Framework | ✅ |
+| P20 | Resilience Score + Regression Gate | ✅ |
+| P21 | Planner (Goal Engine + What-If) | ✅ |
+| P22 | Topology + Service Graph | ✅ |
+| P23 | Action Executor + Approval Tiers | ✅ |
+| P24 | Evidence Pack + Snapshot Diff | ✅ |
+| P25 | Gatekeeper (Safety Gates) | ✅ |
+| P26 | Change Management + Release Notes | ✅ |
+| P27 | SLOs + Error Budget | ✅ |
+| P28 | Incident Commander + Postmortems | ✅ |
+| P29 | Portfolio Publisher (GitHub Pages) | ✅ |
+<!-- PORTFOLIO_END -->
+
 ## Architecture
 
 | Node | Role | OS | Hardware |

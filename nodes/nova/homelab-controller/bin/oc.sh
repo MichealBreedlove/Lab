@@ -31,6 +31,11 @@ Commands:
   incident postmortem   Generate postmortem for latest resolved
   incident tick         Run incident trigger check
   incident test         Run P28 incident tests
+  portfolio             Show portfolio publish status
+  portfolio build       Build site content
+  portfolio publish     Publish to GitHub Pages
+  portfolio tick        Full pipeline (redact → build → publish)
+  portfolio test        Run P29 portfolio tests
   changelog             Run changelog generation (P26)
   gate <action> <tier>  Evaluate gatekeeper for an action
   test <priority>       Run tests for a priority (e.g., test p27)
@@ -208,6 +213,54 @@ case "${1:-help}" in
                 ;;
         esac
         ;;
+    portfolio)
+        shift
+        subcmd="${1:-status}"
+        shift 2>/dev/null || true
+        case "$subcmd" in
+            status)
+                LATEST="$ROOT_DIR/../../services/openclaw/portfolio/latest.json"
+                if [ -f "$LATEST" ]; then
+                    python3 -c "
+import json
+d = json.load(open('$LATEST'))
+print(f'Last publish: {d.get(\"last_publish\", \"never\")}')
+print(f'Success: {d.get(\"success\", \"?\")}')
+print(f'Site: {d.get(\"site_url\", \"N/A\")}')
+"
+                else
+                    echo "No portfolio published yet. Run: oc portfolio tick"
+                fi
+                ;;
+            build)
+                cd "$ROOT_DIR/scripts/portfolio"
+                python3 portfolio_build.py
+                ;;
+            publish)
+                cd "$ROOT_DIR/scripts/portfolio"
+                python3 portfolio_publish.py
+                ;;
+            tick)
+                bash "$ROOT_DIR/scripts/portfolio/portfolio_tick.sh"
+                ;;
+            test)
+                bash "$ROOT_DIR/scripts/portfolio/test_priority29_portfolio.sh"
+                ;;
+            open)
+                URL=$(python3 -c "import json; print(json.load(open('$ROOT_DIR/config/portfolio_policy.json')).get('publish_target',{}).get('site_url',''))" 2>/dev/null)
+                if [ -n "$URL" ]; then
+                    echo "Opening: $URL"
+                    xdg-open "$URL" 2>/dev/null || open "$URL" 2>/dev/null || echo "Open manually: $URL"
+                else
+                    echo "No site URL configured."
+                fi
+                ;;
+            *)
+                echo "Unknown portfolio subcommand: $subcmd"
+                echo "Try: oc portfolio [status|build|publish|tick|test|open]"
+                ;;
+        esac
+        ;;
     gate)
         shift
         cd "$ROOT_DIR"
@@ -229,6 +282,7 @@ case "${1:-help}" in
         case "$priority" in
             p27|slo) bash "$ROOT_DIR/scripts/test_priority27_slo.sh" ;;
             p28|incident) bash "$ROOT_DIR/scripts/incident/test_priority28_incidents.sh" ;;
+            p29|portfolio) bash "$ROOT_DIR/scripts/portfolio/test_priority29_portfolio.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do

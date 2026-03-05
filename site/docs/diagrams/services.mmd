@@ -1,0 +1,25 @@
+graph LR
+    subgraph "AI Stack"
+        Ollama[Ollama<br/>LLM Inference]
+        OpenClaw[OpenClaw<br/>Agent Orchestration]
+        Models[Models<br/>Qwen/DeepSeek/LLaMA]
+    end
+
+    subgraph "Infrastructure"
+        Ansible[Ansible<br/>Config Management]
+        Proxmox[Proxmox<br/>Virtualization]
+        TrueNAS[TrueNAS<br/>Storage]
+    end
+
+    subgraph "SRE Pipeline"
+        Snapshots --> Evidence
+        Evidence --> Planner
+        Planner --> Actions
+        Actions --> Gatekeeper
+        SLO --> Incidents
+        Incidents --> Postmortem
+    end
+
+    OpenClaw --> Ollama
+    Ollama --> Models
+    Ansible --> Snapshots

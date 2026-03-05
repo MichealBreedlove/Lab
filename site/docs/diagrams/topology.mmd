@@ -1,0 +1,15 @@
+graph TB
+    subgraph "Home Lab Network (10.1.1.0/24)"
+        Internet((Internet)) --> OPNsense[OPNsense Firewall]
+        OPNsense --> UniFi[UniFi U7 Pro XG]
+        UniFi --> Jasper[Jasper - Win11 Gateway<br/>i9-13900K / RTX 4090 / 64GB]
+        UniFi --> Nova[Nova - Ubuntu Controller<br/>Ansible + Ollama]
+        UniFi --> Mira[Mira - Ubuntu Compute<br/>Ollama + OpenClaw]
+        UniFi --> Orin[Orin - Ubuntu Compute<br/>Ollama + OpenClaw]
+    end
+
+    Jasper -->|OpenClaw Gateway| Nova
+    Jasper -->|OpenClaw Gateway| Mira
+    Jasper -->|OpenClaw Gateway| Orin
+    Nova -->|Ansible SSH| Mira
+    Nova -->|Ansible SSH| Orin
