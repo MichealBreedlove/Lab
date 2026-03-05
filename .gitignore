@@ -2,6 +2,8 @@
 **/.env
 **/*token*
 **/*secret*
+!**/sec_secretscan.py
+!**/secretscan_latest.json
 **/auth-profiles.json
 **/auth_profiles.json
 **/auth*.json
