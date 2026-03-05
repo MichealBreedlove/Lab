@@ -38,6 +38,11 @@ Commands:
   portfolio test        Run P29 portfolio tests
   changelog             Run changelog generation (P26)
   gate <action> <tier>  Evaluate gatekeeper for an action
+  capacity collect       Collect capacity metrics from all nodes
+  capacity forecast      Forecast resource exhaustion
+  capacity recommend     Generate capacity recommendations
+  capacity tick          Run full capacity pipeline
+  capacity test          Run P32 capacity tests
   bootstrap node <name> Bootstrap a node [--apply]
   bootstrap status      Show bootstrap status for all nodes
   bootstrap validate    Validate bootstrapped node [--node <name>]
@@ -271,6 +276,35 @@ print(f'Site: {d.get(\"site_url\", \"N/A\")}')
                 ;;
         esac
         ;;
+    capacity)
+        shift
+        subcmd="${1:-tick}"
+        shift 2>/dev/null || true
+        case "$subcmd" in
+            collect)
+                cd "$ROOT_DIR"
+                python3 scripts/capacity/capacity_collect.py "$@"
+                ;;
+            forecast)
+                cd "$ROOT_DIR"
+                python3 scripts/capacity/capacity_forecast.py "$@"
+                ;;
+            recommend)
+                cd "$ROOT_DIR"
+                python3 scripts/capacity/capacity_recommend.py "$@"
+                ;;
+            tick)
+                bash "$ROOT_DIR/scripts/capacity/capacity_tick.sh"
+                ;;
+            test)
+                bash "$ROOT_DIR/scripts/capacity/test_priority32_capacity.sh"
+                ;;
+            *)
+                echo "Unknown capacity subcommand: $subcmd"
+                echo "Try: oc capacity [collect|forecast|recommend|tick|test]"
+                ;;
+        esac
+        ;;
     bootstrap)
         shift
         subcmd="${1:-status}"
@@ -400,6 +434,7 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             p29|portfolio) bash "$ROOT_DIR/scripts/portfolio/test_priority29_portfolio.sh" ;;
             p30|dr) bash "$ROOT_DIR/scripts/dr/test_priority30_dr.sh" ;;
             p31|bootstrap) bash "$ROOT_DIR/scripts/bootstrap/test_priority31_bootstrap.sh" ;;
+            p32|capacity) bash "$ROOT_DIR/scripts/capacity/test_priority32_capacity.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do

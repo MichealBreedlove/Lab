@@ -121,6 +121,13 @@
         <p id="slo-timestamp" class="timestamp"></p>
     </div>
 
+    <div id="capacity-section">
+        <h2>📊 Capacity</h2>
+        <div id="capacity-summary" class="summary-row"></div>
+        <div id="capacity-grid" class="grid"></div>
+        <p id="capacity-timestamp" class="timestamp"></p>
+    </div>
+
     <div id="bootstrap-section">
         <h2>🚀 Node Bootstrap</h2>
         <div id="bootstrap-summary" class="summary-row"></div>
@@ -136,6 +143,66 @@
     </div>
 
     <script>
+    async function loadCapacity() {
+        try {
+            const resp = await fetch('data/capacity_status.json');
+            if (!resp.ok) throw new Error('No data');
+            const cap = await resp.json();
+            renderCapacity(cap);
+        } catch (e) {
+            document.getElementById('capacity-summary').innerHTML = '';
+            document.getElementById('capacity-grid').innerHTML =
+                '<div class="card"><p style="color:#484f58">No capacity data. Run <code>oc capacity collect</code> on Nova.</p></div>';
+        }
+    }
+
+    function renderCapacity(cap) {
+        const status = cap.status || 'GREEN';
+        const statusIcon = status === 'GREEN' ? '🟢' : status === 'YELLOW' ? '🟡' : '🔴';
+        const statusClass = status === 'GREEN' ? 'ok' : status === 'YELLOW' ? 'warn' : 'error';
+
+        document.getElementById('capacity-summary').innerHTML = `
+            <div class="summary-item">
+                <div class="label">Status</div>
+                <div class="count status-${statusClass}">${statusIcon} ${status}</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Alerts</div>
+                <div class="count">${cap.alert_count || 0}</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Recommendations</div>
+                <div class="count">${cap.recommendation_count || 0}</div>
+            </div>
+        `;
+
+        let html = '';
+        for (const [name, nd] of Object.entries(cap.nodes || {})) {
+            if (nd.status === 'skipped') {
+                html += `<div class="card"><h3>⏭️ ${name}</h3><div class="slo-detail">Windows (skipped)</div></div>`;
+                continue;
+            }
+            const ndIcon = nd.status === 'ok' ? '🟢' : nd.status === 'warning' ? '🟡' : '🔴';
+            const bar = (pct, label) => {
+                if (pct == null) return '';
+                const color = pct >= 90 ? '#f85149' : pct >= 80 ? '#d29922' : '#3fb950';
+                return `<div class="slo-detail">${label}: <span style="color:${color};font-weight:600">${pct}%</span></div>`;
+            };
+            html += `<div class="card">
+                <h3>${ndIcon} ${name}</h3>
+                ${bar(nd.cpu_pct, 'CPU')}
+                ${bar(nd.memory_pct, 'Memory')}
+                ${bar(nd.disk_pct, 'Disk')}
+                <div class="slo-detail">Load: ${nd.load_ratio != null ? nd.load_ratio + 'x' : '—'} (${nd.cpu_cores || '?'} cores)</div>
+                ${nd.forecast_disk_days != null ? `<div class="slo-detail">Disk forecast: ${nd.forecast_disk_days}d</div>` : ''}
+                ${nd.forecast_mem_days != null ? `<div class="slo-detail">Mem forecast: ${nd.forecast_mem_days}d</div>` : ''}
+            </div>`;
+        }
+
+        document.getElementById('capacity-grid').innerHTML = html;
+        document.getElementById('capacity-timestamp').textContent = `Capacity data: ${cap.collection_ts || 'unknown'}`;
+    }
+
     async function loadBootstrap() {
         try {
             const resp = await fetch('data/bootstrap_status.json');
@@ -408,11 +475,13 @@
     loadIncidents();
     loadDR();
     loadBootstrap();
+    loadCapacity();
     // Auto-refresh every 5 minutes
     setInterval(loadData, 300000);
     setInterval(loadIncidents, 300000);
     setInterval(loadDR, 300000);
     setInterval(loadBootstrap, 300000);
+    setInterval(loadCapacity, 300000);
     </script>
 </body>
 </html>

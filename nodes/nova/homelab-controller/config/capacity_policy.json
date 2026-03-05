@@ -1,0 +1,33 @@
+{
+  "enabled": true,
+  "mode": "monitor",
+  "collection_interval_sec": 300,
+  "ssh_user": "micheal",
+  "ssh_key_path": "~/.ssh/id_ed25519",
+  "thresholds": {
+    "cpu_warn_pct": 80,
+    "cpu_crit_pct": 95,
+    "memory_warn_pct": 80,
+    "memory_crit_pct": 95,
+    "disk_warn_pct": 80,
+    "disk_crit_pct": 90,
+    "load_warn_ratio": 2.0,
+    "load_crit_ratio": 4.0
+  },
+  "alerts": {
+    "enabled": true,
+    "channels": ["log", "dashboard"],
+    "cooldown_minutes": 30
+  },
+  "forecasting": {
+    "enabled": true,
+    "history_days": 30,
+    "warn_days_until_full": 30,
+    "crit_days_until_full": 7
+  },
+  "recommendations": {
+    "enabled": true,
+    "auto_apply": false,
+    "strategies": ["rebalance", "scale_alert", "cleanup"]
+  }
+}
