@@ -1,0 +1,39 @@
+{
+  "enabled": true,
+  "mode": "supervised",
+  "ollama": {
+    "endpoint": "http://10.1.1.150:11434",
+    "model": "llama3.1:8b",
+    "timeout_sec": 60,
+    "max_tokens": 2048
+  },
+  "analysis": {
+    "enabled": true,
+    "triggers": ["threshold_breach", "drill_failure", "forecast_warning", "anomaly"],
+    "auto_remediate": false,
+    "require_approval": true
+  },
+  "anomaly_detection": {
+    "enabled": true,
+    "z_score_threshold": 3.0,
+    "min_samples": 10,
+    "metrics": ["cpu_pct", "memory_pct", "disk_pct", "load_ratio"]
+  },
+  "incident_correlation": {
+    "enabled": true,
+    "time_window_minutes": 30,
+    "min_events_to_correlate": 2
+  },
+  "runbook_automation": {
+    "enabled": true,
+    "auto_execute": false,
+    "runbook_dir": "docs/runbooks",
+    "generate_suggestions": true
+  },
+  "reporting": {
+    "enabled": true,
+    "weekly_summary": true,
+    "include_recommendations": true,
+    "output_dir": "artifacts/aiops"
+  }
+}

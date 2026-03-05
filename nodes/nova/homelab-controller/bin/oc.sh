@@ -38,6 +38,12 @@ Commands:
   portfolio test        Run P29 portfolio tests
   changelog             Run changelog generation (P26)
   gate <action> <tier>  Evaluate gatekeeper for an action
+  aiops anomaly          Detect anomalies in capacity metrics
+  aiops correlate        Correlate alerts into incidents
+  aiops analyze          AI-powered cluster analysis
+  aiops report           Generate operations report
+  aiops tick             Run full AIOps pipeline
+  aiops test             Run P34 AIOps tests
   docs generate          Generate all documentation
   docs topology          Generate topology docs
   docs services          Generate services catalog
@@ -282,6 +288,20 @@ print(f'Site: {d.get(\"site_url\", \"N/A\")}')
                 ;;
         esac
         ;;
+    aiops)
+        shift
+        subcmd="${1:-tick}"
+        shift 2>/dev/null || true
+        case "$subcmd" in
+            anomaly) cd "$ROOT_DIR"; python3 scripts/aiops/aiops_anomaly.py "$@" ;;
+            correlate) cd "$ROOT_DIR"; python3 scripts/aiops/aiops_correlate.py "$@" ;;
+            analyze) cd "$ROOT_DIR"; python3 scripts/aiops/aiops_analyze.py "$@" ;;
+            report) cd "$ROOT_DIR"; python3 scripts/aiops/aiops_report.py "$@" ;;
+            tick) bash "$ROOT_DIR/scripts/aiops/aiops_tick.sh" ;;
+            test) bash "$ROOT_DIR/scripts/aiops/test_priority34_aiops.sh" ;;
+            *) echo "Unknown aiops subcommand: $subcmd"; echo "Try: oc aiops [anomaly|correlate|analyze|report|tick|test]" ;;
+        esac
+        ;;
     docs)
         shift
         subcmd="${1:-generate}"
@@ -456,6 +476,7 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             p31|bootstrap) bash "$ROOT_DIR/scripts/bootstrap/test_priority31_bootstrap.sh" ;;
             p32|capacity) bash "$ROOT_DIR/scripts/capacity/test_priority32_capacity.sh" ;;
             p33|docs) bash "$ROOT_DIR/scripts/docs/test_priority33_docs.sh" ;;
+            p34|aiops) bash "$ROOT_DIR/scripts/aiops/test_priority34_aiops.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do
