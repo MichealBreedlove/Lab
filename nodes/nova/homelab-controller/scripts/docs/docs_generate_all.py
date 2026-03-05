@@ -30,6 +30,8 @@ def main():
         ("services", "docs_services.py"),
         ("dependencies", "docs_dependencies.py"),
         ("changelog", "docs_changelog.py"),
+        ("diagrams", "docs_diagrams.py"),
+        ("portfolio", "docs_portfolio.py"),
     ]
 
     results = []
