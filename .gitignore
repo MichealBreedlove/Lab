@@ -1,0 +1,34 @@
+# === Secrets / Auth ===
+**/.env
+**/*token*
+**/*secret*
+**/auth-profiles.json
+**/auth_profiles.json
+**/auth*.json
+**/paired.json
+**/pending.json
+**/known_hosts
+**/id_*
+**/*.pem
+**/*.key
+**/cookies*
+**/session*
+**/*.log
+**/node_modules/
+**/__pycache__/
+artifacts/**/raw/
+
+# === OS / Editor ===
+.DS_Store
+.vscode/
+*.retry
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# === Build / Runtime ===
+*.pyc
+*.pyo
+__pycache__/
+.mypy_cache/
