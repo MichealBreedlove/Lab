@@ -1,0 +1,44 @@
+{
+  "enabled": true,
+  "auto_generate": true,
+  "output_dir": "docs/generated",
+  "formats": ["markdown", "json"],
+  "sections": {
+    "topology": {
+      "enabled": true,
+      "source": "config/node_profiles.json",
+      "include_ips": true,
+      "include_roles": true
+    },
+    "services": {
+      "enabled": true,
+      "scan_systemd": true,
+      "scan_ports": true
+    },
+    "dependencies": {
+      "enabled": true,
+      "scan_imports": true,
+      "scan_configs": true
+    },
+    "runbooks": {
+      "enabled": true,
+      "index_existing": true,
+      "auto_stub": true
+    },
+    "changelog": {
+      "enabled": true,
+      "source": "git",
+      "format": "keep-a-changelog"
+    }
+  },
+  "sanitization": {
+    "redact_tokens": true,
+    "redact_passwords": true,
+    "preserve_internal_ips": true
+  },
+  "portfolio_export": {
+    "enabled": true,
+    "target_repo": "MichealBreedlove/Lab",
+    "export_dir": "docs"
+  }
+}
