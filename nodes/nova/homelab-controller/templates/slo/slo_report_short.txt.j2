@@ -1,0 +1,11 @@
+📊 SLO Report — {{ date }}
+✅ {{ summary.slos_meeting_objective }} OK | ⚠️ {{ summary.slos_at_risk }} risk | 🔴 {{ summary.slos_exhausted }} exhausted
+{% for slo_id, slo in slos.items() %}
+  {% if slo.budget.budget_exhausted %}🔴{% elif slo.budget.budget_at_risk %}🟡{% else %}🟢{% endif %} {{ slo.name }}: {{ slo.budget.remaining_budget_pct }}%
+{% endfor %}
+{% if alerts %}
+🚨 {{ alerts | length }} alert(s)
+{% for a in alerts[:5] %}
+  {{ a.message }}
+{% endfor %}
+{% endif %}

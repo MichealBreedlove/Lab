@@ -1,0 +1,94 @@
+{
+  "slos": [
+    {
+      "id": "openclaw_gateway_availability",
+      "name": "OpenClaw Gateway Availability",
+      "description": "Gateway responds to health checks",
+      "sli_type": "availability",
+      "source": "snapshot",
+      "good_event": {
+        "field": "services.openclaw_gateway.status",
+        "operator": "eq",
+        "value": "running"
+      },
+      "objective": 0.999,
+      "error_budget_policy": "monthly",
+      "tags": ["openclaw", "gateway", "critical"]
+    },
+    {
+      "id": "ollama_availability",
+      "name": "Ollama Availability",
+      "description": "At least one Ollama endpoint responds",
+      "sli_type": "availability",
+      "source": "snapshot",
+      "good_event": {
+        "field": "services.ollama.endpoints_healthy",
+        "operator": "gte",
+        "value": 1
+      },
+      "objective": 0.995,
+      "error_budget_policy": "monthly",
+      "tags": ["ollama", "ai", "critical"]
+    },
+    {
+      "id": "dashboard_availability",
+      "name": "Dashboard Availability",
+      "description": "Dashboard HTTP endpoint is reachable",
+      "sli_type": "availability",
+      "source": "snapshot",
+      "good_event": {
+        "field": "services.dashboard.status",
+        "operator": "eq",
+        "value": "running"
+      },
+      "objective": 0.99,
+      "error_budget_policy": "monthly",
+      "tags": ["dashboard", "ui"]
+    },
+    {
+      "id": "node_connectivity",
+      "name": "Node Connectivity",
+      "description": "Fraction of paired nodes connected to gateway",
+      "sli_type": "availability",
+      "source": "snapshot",
+      "good_event": {
+        "field": "nodes.connected_fraction",
+        "operator": "gte",
+        "value": 1.0
+      },
+      "objective": 0.995,
+      "error_budget_policy": "monthly",
+      "tags": ["nodes", "connectivity"]
+    },
+    {
+      "id": "chaos_success_rate",
+      "name": "Chaos Test Success Rate",
+      "description": "Chaos experiments pass without unexpected failures",
+      "sli_type": "success_rate",
+      "source": "chaos",
+      "good_event": {
+        "field": "chaos.result",
+        "operator": "eq",
+        "value": "pass"
+      },
+      "objective": 0.95,
+      "error_budget_policy": "monthly",
+      "tags": ["chaos", "reliability"]
+    },
+    {
+      "id": "action_execution_success",
+      "name": "Action Execution Success",
+      "description": "Automated actions complete without failure",
+      "sli_type": "success_rate",
+      "source": "actions",
+      "good_event": {
+        "field": "actions.result",
+        "operator": "eq",
+        "value": "success"
+      },
+      "objective": 0.98,
+      "error_budget_policy": "monthly",
+      "tags": ["actions", "automation"]
+    }
+  ]
+}

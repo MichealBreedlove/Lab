@@ -1,0 +1,45 @@
+# SLO Report — {{ date }}
+
+Generated: {{ timestamp }}
+
+## Summary
+- **Total SLOs:** {{ summary.total_slos }}
+- **Meeting objective:** {{ summary.slos_meeting_objective }} ✅
+- **At risk:** {{ summary.slos_at_risk }} ⚠️
+- **Budget exhausted:** {{ summary.slos_exhausted }} 🔴
+- **Active alerts:** {{ summary.active_alerts }}
+
+## SLO Details
+
+{% for slo_id, slo in slos.items() %}
+### {% if slo.budget.budget_exhausted %}🔴{% elif slo.budget.budget_at_risk %}🟡{% else %}🟢{% endif %} {{ slo.name }}
+
+| Metric | Value |
+|--------|-------|
+| Objective | {{ slo.objective }} |
+| Current SLI | {{ slo.budget.sli_current | default("N/A") }} |
+| Budget remaining | {{ slo.budget.remaining_budget_pct }}% |
+| Bad events | {{ slo.budget.bad_events }} / {{ slo.budget.allowed_bad_events }} allowed |
+
+{% if slo.burn_rates %}
+**Burn rates:**
+{% for window, data in slo.burn_rates.items() %}
+- {{ window }}: {{ data.burn_rate | default("N/A") }}x
+{% endfor %}
+{% endif %}
+
+{% if slo.alerts %}
+**Alerts:**
+{% for alert in slo.alerts %}
+- ⚠️ {{ alert.message }}
+{% endfor %}
+{% endif %}
+
+{% endfor %}
+
+{% if gate_decisions %}
+## Gate Decisions
+{% for g in gate_decisions %}
+- 🚫 **{{ g.slo_id }}**: {{ g.action }} (max tier {{ g.max_tier }}) — {{ g.reason }}
+{% endfor %}
+{% endif %}
