@@ -1,0 +1,64 @@
+{
+  "enabled": true,
+  "mode": "supervised",
+  "schedule": {
+    "daily_hour_local": 6,
+    "weekly_day": "monday",
+    "weekly_hour_local": 7
+  },
+  "windows": {
+    "rolling_1h": 3600,
+    "rolling_6h": 21600,
+    "rolling_24h": 86400,
+    "rolling_7d": 604800,
+    "rolling_28d": 2419200
+  },
+  "burn_thresholds": {
+    "fast": {
+      "multiplier": 14,
+      "window": "rolling_1h",
+      "consecutive_ticks": 1
+    },
+    "medium": {
+      "multiplier": 6,
+      "window": "rolling_6h",
+      "consecutive_ticks": 2
+    },
+    "slow": {
+      "multiplier": 2,
+      "window": "rolling_24h",
+      "consecutive_ticks": 3
+    }
+  },
+  "publish": {
+    "dashboard": true,
+    "telegram": {
+      "enabled": false,
+      "channel_id": "",
+      "policy": "deny"
+    }
+  },
+  "retention": {
+    "history_max_lines": 10000,
+    "history_max_days": 90,
+    "reports_keep_daily": 30,
+    "reports_keep_weekly": 12
+  },
+  "gating_integration": {
+    "deny_if_burn_rate_ge": {
+      "fast_1h": 6,
+      "slow_6h": 2
+    },
+    "cap_max_action_tier_on_burn": {
+      "budget_below_pct": 50,
+      "max_tier": 1
+    }
+  },
+  "artifact_roots": {
+    "snapshots": "artifacts/snapshots",
+    "evidence": "artifacts/evidence",
+    "actions": "artifacts/actions",
+    "chaos": "artifacts/chaos",
+    "gateway_health": "artifacts/gateway"
+  }
+}
