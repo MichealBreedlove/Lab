@@ -20,9 +20,13 @@ PATTERNS = [
     ("generic_secret", re.compile(r'(?:password|secret|token|api_key)\s*[=:]\s*["\'][^"\']{8,}["\']', re.I)),
 ]
 
-SKIP_DIRS = {".git", "__pycache__", "node_modules", ".venv"}
-SKIP_FILES = {"security_policy.json", "supply_chain_policy.json"}  # These define patterns, not secrets
+SKIP_DIRS = {".git", "__pycache__", "node_modules", ".venv", "artifacts"}
 SCAN_EXTENSIONS = {".json", ".py", ".sh", ".ps1", ".md", ".yaml", ".yml", ".toml", ".cfg", ".conf", ".env", ".txt"}
+
+# Regex-aware false positive filter: if the match contains regex metacharacters
+# like .* or [A-Z] or \S+, it's a pattern definition, not an actual secret
+FALSE_POSITIVE_INDICATORS = re.compile(r'(\.\*|\[[\w-]+\]|\\[sSdDwW]|\{[\d,]+\}|^\^|\\b)')
+
 
 
 def scan(root_path=None):
@@ -37,8 +41,6 @@ def scan(root_path=None):
             continue
         if any(skip in f.parts for skip in SKIP_DIRS):
             continue
-        if f.name in SKIP_FILES:
-            continue
         if f.suffix not in SCAN_EXTENSIONS:
             continue
 
@@ -51,12 +53,15 @@ def scan(root_path=None):
         for name, pattern in PATTERNS:
             matches = pattern.findall(content)
             if matches:
-                violations.append({
-                    "file": str(f.relative_to(root_path)),
-                    "pattern": name,
-                    "count": len(matches),
-                    "sample": matches[0][:20] + "..." if len(matches[0]) > 20 else matches[0],
-                })
+                # Filter out false positives: regex pattern definitions, not real secrets
+                real_matches = [m for m in matches if not FALSE_POSITIVE_INDICATORS.search(m)]
+                if real_matches:
+                    violations.append({
+                        "file": str(f.relative_to(root_path)),
+                        "pattern": name,
+                        "count": len(real_matches),
+                        "sample": real_matches[0][:20] + "..." if len(real_matches[0]) > 20 else real_matches[0],
+                    })
 
     timestamp = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     result = {
