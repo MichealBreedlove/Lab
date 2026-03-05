@@ -1,0 +1,128 @@
+{
+  "nodes": {
+    "jasper": {
+      "platform": "windows",
+      "repo_root": "nodes/jasper",
+      "restore_units": ["openclaw_config", "scheduled_tasks", "system_state"],
+      "components": {
+        "openclaw_config": {
+          "type": "files",
+          "source_paths": ["nodes/jasper/openclaw/config/"],
+          "dest_paths": ["~/.openclaw/"],
+          "restart": ["openclaw gateway restart"],
+          "validate": {"ports": [18789]},
+          "notes": "OpenClaw gateway configuration"
+        },
+        "scheduled_tasks": {
+          "type": "schtasks",
+          "source_paths": ["nodes/jasper/windows/scheduled_tasks/"],
+          "dest_paths": [],
+          "restart": [],
+          "validate": {"tasks": ["OpenClawGateway", "LabBackup"]},
+          "notes": "Windows scheduled tasks for gateway and backup"
+        },
+        "system_state": {
+          "type": "files",
+          "source_paths": ["nodes/jasper/windows/system_state.md"],
+          "dest_paths": [],
+          "restart": [],
+          "validate": {},
+          "notes": "Reference only — not restored automatically"
+        }
+      },
+      "packages": [],
+      "notes": "Windows gateway node — restore is semi-manual"
+    },
+    "nova": {
+      "platform": "linux",
+      "repo_root": "nodes/nova",
+      "restore_units": ["openclaw_node", "homelab_controller", "automation", "timers"],
+      "components": {
+        "openclaw_node": {
+          "type": "systemd_user",
+          "source_paths": ["nodes/nova/openclaw/"],
+          "dest_paths": ["~/.openclaw/"],
+          "restart": ["systemctl --user restart openclaw-node"],
+          "validate": {"ports": [18789], "services": ["openclaw-node"]},
+          "notes": "OpenClaw node agent"
+        },
+        "homelab_controller": {
+          "type": "files",
+          "source_paths": ["nodes/nova/homelab-controller/"],
+          "dest_paths": ["~/homelab-controller/"],
+          "restart": [],
+          "validate": {"files": ["~/homelab-controller/bin/oc.sh"]},
+          "notes": "Full homelab controller with SRE pipeline"
+        },
+        "automation": {
+          "type": "files",
+          "source_paths": ["nodes/nova/automation/"],
+          "dest_paths": ["~/automation/"],
+          "restart": [],
+          "validate": {},
+          "notes": "Ansible playbooks and automation scripts"
+        },
+        "timers": {
+          "type": "systemd_user",
+          "source_paths": [],
+          "dest_paths": [],
+          "restart": ["systemctl --user daemon-reload", "systemctl --user enable --now lab-backup.timer"],
+          "validate": {"services": ["lab-backup.timer"]},
+          "notes": "Systemd user timers for backup and snapshot"
+        }
+      },
+      "packages": ["python3", "python3-pip", "python3-yaml", "git", "ansible", "jq"],
+      "notes": "Controller node — most complex restore"
+    },
+    "mira": {
+      "platform": "linux",
+      "repo_root": "nodes/mira",
+      "restore_units": ["openclaw_node", "system_config"],
+      "components": {
+        "openclaw_node": {
+          "type": "systemd_user",
+          "source_paths": ["nodes/mira/openclaw/"],
+          "dest_paths": ["~/.openclaw/"],
+          "restart": ["systemctl --user restart openclaw-node"],
+          "validate": {"ports": [18789], "services": ["openclaw-node"]},
+          "notes": "OpenClaw node agent"
+        },
+        "system_config": {
+          "type": "files",
+          "source_paths": ["nodes/mira/system/"],
+          "dest_paths": [],
+          "restart": [],
+          "validate": {},
+          "notes": "System configuration reference"
+        }
+      },
+      "packages": ["python3", "git"],
+      "notes": "Utility compute node — lightweight restore"
+    },
+    "orin": {
+      "platform": "linux",
+      "repo_root": "nodes/orin",
+      "restore_units": ["openclaw_node", "system_config"],
+      "components": {
+        "openclaw_node": {
+          "type": "systemd_user",
+          "source_paths": ["nodes/orin/openclaw/"],
+          "dest_paths": ["~/.openclaw/"],
+          "restart": ["systemctl --user restart openclaw-node"],
+          "validate": {"ports": [18789], "services": ["openclaw-node"]},
+          "notes": "OpenClaw node agent"
+        },
+        "system_config": {
+          "type": "files",
+          "source_paths": ["nodes/orin/system/"],
+          "dest_paths": [],
+          "restart": [],
+          "validate": {},
+          "notes": "System configuration reference"
+        }
+      },
+      "packages": ["python3", "git"],
+      "notes": "Server workloads node — lightweight restore"
+    }
+  }
+}
