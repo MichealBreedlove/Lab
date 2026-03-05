@@ -58,17 +58,23 @@ def secret_scan():
         r'-----BEGIN.*PRIVATE KEY-----',
         r'sk-[a-zA-Z0-9]{48}',
     ]
+    # Matches containing regex metacharacters are pattern definitions, not real secrets
+    false_positive_re = re.compile(r'(\.\*|\[[\w-]+\]|\\[sSdDwW]|\{[\d,]+\})')
+    skip_dirs = {".git", "__pycache__", "artifacts"}
     violations = []
     for f in ROOT.rglob("*"):
-        if f.is_dir() or ".git" in str(f) or "__pycache__" in str(f):
+        if f.is_dir():
+            continue
+        if any(skip in f.parts for skip in skip_dirs):
             continue
         if f.suffix in (".json", ".py", ".sh", ".ps1", ".md", ".yaml", ".yml"):
             try:
                 content = f.read_text(errors="ignore")
                 for pattern in patterns:
                     matches = re.findall(pattern, content)
-                    if matches:
-                        violations.append({"file": str(f.relative_to(ROOT)), "pattern": pattern, "count": len(matches)})
+                    real = [m for m in matches if not false_positive_re.search(m)]
+                    if real:
+                        violations.append({"file": str(f.relative_to(ROOT)), "pattern": pattern, "count": len(real)})
             except Exception:
                 pass
     return violations
