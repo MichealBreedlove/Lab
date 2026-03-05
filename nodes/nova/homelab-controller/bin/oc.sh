@@ -38,6 +38,12 @@ Commands:
   portfolio test        Run P29 portfolio tests
   changelog             Run changelog generation (P26)
   gate <action> <tier>  Evaluate gatekeeper for an action
+  supply status          Supply chain health overview
+  supply sbom            Generate SBOM
+  supply provenance      Record build provenance
+  supply harden          Run hardening checks
+  supply tick            Full supply chain pipeline
+  supply test            Run P41 supply chain tests
   verify status          Verification health overview
   verify synthetic       Run synthetic endpoint probes
   verify canary          Run canary function probes
@@ -327,6 +333,20 @@ print(f'Site: {d.get(\"site_url\", \"N/A\")}')
                 ;;
         esac
         ;;
+    supply)
+        shift
+        subcmd="${1:-status}"
+        shift 2>/dev/null || true
+        case "$subcmd" in
+            status) cd "$ROOT_DIR"; python3 scripts/supply/supply_publish.py ;;
+            sbom) cd "$ROOT_DIR"; python3 scripts/supply/supply_sbom.py "$@" ;;
+            provenance) cd "$ROOT_DIR"; python3 scripts/supply/supply_provenance.py "$@" ;;
+            harden) cd "$ROOT_DIR"; python3 scripts/supply/supply_harden.py "$@" ;;
+            tick) bash "$ROOT_DIR/scripts/supply/supply_tick.sh" ;;
+            test) bash "$ROOT_DIR/scripts/supply/test_priority41_supply.sh" ;;
+            *) echo "Unknown supply subcommand: $subcmd"; echo "Try: oc supply [status|sbom|provenance|harden|tick|test]" ;;
+        esac
+        ;;
     verify)
         shift
         subcmd="${1:-status}"
@@ -594,6 +614,7 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             p38|sec) bash "$ROOT_DIR/scripts/sec/test_priority38_sec.sh" ;;
             p39|portfolio) bash "$ROOT_DIR/scripts/portfolio/test_priority39_portfolio.sh" ;;
             p40|verify) bash "$ROOT_DIR/scripts/verify/test_priority40_verify.sh" ;;
+            p41|supply) bash "$ROOT_DIR/scripts/supply/test_priority41_supply.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do
