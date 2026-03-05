@@ -1,0 +1,40 @@
+{
+  "opnsense": {
+    "host": "10.1.1.1",
+    "method": "manual-export",
+    "backup_dir": "network/firewall/opnsense/config_backups",
+    "notes": "Export config.xml via System > Configuration > Backups. Drop into backup_dir."
+  },
+  "proxmox": {
+    "hosts": {
+      "proxmox-1": {"ip": "10.1.1.2", "ssh_user": "root"},
+      "proxmox-2": {"ip": "10.1.1.4", "ssh_user": "root"},
+      "proxmox-3": {"ip": "10.1.1.5", "ssh_user": "root"}
+    },
+    "export_paths": ["/etc/pve/storage.cfg", "/etc/pve/corosync.conf", "/etc/pve/datacenter.cfg"],
+    "backup_dir": "proxmox/cluster/configs"
+  },
+  "switches": {
+    "cisco_nexus_3064": {
+      "ip": "unknown",
+      "method": "manual",
+      "notes": "SSH to switch, run 'show running-config', save to Lab/network/switches/cisco_nexus_3064/"
+    },
+    "brocade_6610": {
+      "ip": "unknown",
+      "method": "manual",
+      "notes": "SSH to switch, run 'configshow', save to Lab/network/switches/brocade_6610/"
+    },
+    "nicgiga_s25": {
+      "ip": "unknown",
+      "method": "manual",
+      "notes": "Web UI export or SSH, save to Lab/network/switches/nicgiga_s25/"
+    }
+  },
+  "nodes": {
+    "nova": {"ip": "10.1.1.21", "ssh_user": "micheal", "platform": "linux"},
+    "mira": {"ip": "10.1.1.22", "ssh_user": "micheal", "platform": "linux"},
+    "orin": {"ip": "10.1.1.23", "ssh_user": "micheal", "platform": "linux"},
+    "jasper": {"ip": "10.1.1.150", "platform": "windows"}
+  }
+}

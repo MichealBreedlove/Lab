@@ -38,6 +38,11 @@ Commands:
   portfolio test        Run P29 portfolio tests
   changelog             Run changelog generation (P26)
   gate <action> <tier>  Evaluate gatekeeper for an action
+  infra status           Infrastructure health status
+  infra inventory        Collect node inventory
+  infra backup           Export Proxmox + check OPNsense
+  infra tick             Full infrastructure pipeline
+  infra test             Run P37 infra tests
   obs status             Observability stack status
   obs install            Install Docker + stack directories [--apply]
   obs up                 Start observability stack
@@ -301,6 +306,19 @@ print(f'Site: {d.get(\"site_url\", \"N/A\")}')
                 ;;
         esac
         ;;
+    infra)
+        shift
+        subcmd="${1:-status}"
+        shift 2>/dev/null || true
+        case "$subcmd" in
+            status) cd "$ROOT_DIR"; python3 scripts/infra/infra_publish.py ;;
+            inventory) cd "$ROOT_DIR"; python3 scripts/infra/infra_inventory.py "$@" ;;
+            backup) cd "$ROOT_DIR"; python3 scripts/infra/proxmox_export.py "$@"; python3 scripts/infra/opnsense_backup.py "$@" ;;
+            tick) bash "$ROOT_DIR/scripts/infra/infra_tick.sh" ;;
+            test) bash "$ROOT_DIR/scripts/infra/test_priority37_infra.sh" ;;
+            *) echo "Unknown infra subcommand: $subcmd"; echo "Try: oc infra [status|inventory|backup|tick|test]" ;;
+        esac
+        ;;
     obs)
         shift
         subcmd="${1:-status}"
@@ -524,6 +542,7 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             p34|aiops) bash "$ROOT_DIR/scripts/aiops/test_priority34_aiops.sh" ;;
             p35|release) bash "$ROOT_DIR/scripts/release/test_priority35_release.sh" ;;
             p36|obs) bash "$ROOT_DIR/scripts/obs/test_priority36_obs.sh" ;;
+            p37|infra) bash "$ROOT_DIR/scripts/infra/test_priority37_infra.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do
