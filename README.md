@@ -1,94 +1,113 @@
-# Lab — Home Lab Infrastructure
+# Lab — AI Infrastructure & Homelab
 
-Personal homelab running a multi-node AI + infrastructure cluster managed with OpenClaw, Ansible, and custom automation.
+Multi-node infrastructure cluster running AI inference, SRE automation, and security tooling. Managed with OpenClaw, Ansible, and custom Python/Bash automation.
 
-<!-- PORTFOLIO_START -->
-## 🏗️ What This Lab Does
+Part of the infrastructure documented at [michealbreedlove.com](https://michealbreedlove.com).
 
-- **Local AI inference cluster** — 4 nodes running Ollama with Qwen 2.5 32B, DeepSeek Coder, LLaMA 3.1 70B
-- **AI agent orchestration** — OpenClaw manages autonomous agents across all nodes
-- **Infrastructure-as-code** — Ansible playbooks for config management and health checks
-- **Self-healing automation** — SLO-driven actions, chaos testing, gatekeeper safety gates
-- **Full SRE pipeline** — Snapshots → Evidence → Planning → Actions → SLOs → Incidents → Postmortems
-
-## 📊 What It Demonstrates
-
-- **Site Reliability Engineering** — SLOs, error budgets, burn rates, incident management
-- **Infrastructure Automation** — Ansible, systemd, scheduled tasks, CI/CD
-- **Security Practices** — Secret scanning, sanitization, credential policies, safety gates
-- **AI/ML Operations** — Local LLM serving, model management, multi-node inference
-- **Documentation Discipline** — Architecture docs, runbooks, postmortems, change logs
-
-## 🔧 Priorities Built (P19–P29)
-
-| Priority | Feature | Status |
-|----------|---------|--------|
-| P19 | Chaos Injection Framework | ✅ |
-| P20 | Resilience Score + Regression Gate | ✅ |
-| P21 | Planner (Goal Engine + What-If) | ✅ |
-| P22 | Topology + Service Graph | ✅ |
-| P23 | Action Executor + Approval Tiers | ✅ |
-| P24 | Evidence Pack + Snapshot Diff | ✅ |
-| P25 | Gatekeeper (Safety Gates) | ✅ |
-| P26 | Change Management + Release Notes | ✅ |
-| P27 | SLOs + Error Budget | ✅ |
-| P28 | Incident Commander + Postmortems | ✅ |
-| P29 | Portfolio Publisher (GitHub Pages) | ✅ |
-<!-- PORTFOLIO_END -->
+---
 
 ## Architecture
 
-| Node | Role | OS | Hardware |
-|------|------|----|----------|
-| **Jasper** | Gateway / Windows workstation | Windows 11 | Gaming PC, RTX GPU |
-| **Nova** | Ansible controller / AI node | Ubuntu | Linux server |
-| **Mira** | AI compute node | Ubuntu | Linux server |
-| **Orin** | AI compute node | Ubuntu | Linux server |
+| Node | Role | Hardware | OS |
+|---|---|---|---|
+| **Jasper** | GPU inference, gateway, dev workstation | i9-13900K, RTX 4090, 64 GB | Windows 11 Pro |
+| **Nova** | Ansible controller, storage, services | Intel N305, 32 GB DDR5 | Ubuntu (Proxmox) |
+| **Mira** | Utility compute | i7-2600K, 16 GB | Ubuntu (Proxmox) |
+| **Orin** | Server workloads | Dual Xeon E5-2667v4, 16 GB ECC | Ubuntu (Proxmox) |
+
+**Network:** 2.5 GbE + 10 GbE segments, OPNsense firewall, UniFi AP, VLAN segmentation
+
+---
+
+## What This Lab Demonstrates
+
+**Site Reliability Engineering**
+SLO evaluation with error budgets, burn-rate alerting across 5 time windows, incident tracking, auto-generated postmortems, and safety gates that block risky automation when reliability is degraded.
+
+**Infrastructure Automation**
+Ansible playbooks for provisioning and config management, systemd services, scheduled backup tasks, and CI/CD pipelines with GitHub Actions.
+
+**Security Practices**
+Secret scanning (11 regex patterns), credential sanitization on every commit, VLAN segmentation, least-privilege access, and automated restore verification.
+
+**AI/ML Operations**
+Local LLM inference via Ollama (RTX 4090), multi-model orchestration through OpenClaw, distributed agent execution across all nodes.
+
+---
+
+## Key Systems
+
+| System | Purpose |
+|---|---|
+| OpenClaw | AI agent orchestration across all nodes |
+| Ollama | Local LLM inference (GPU-backed on Jasper) |
+| Proxmox | VM and container management (3-node cluster) |
+| Ansible | Configuration management from Nova |
+| TrueNAS | Network storage |
+| OPNsense | Firewall, routing, VLAN management |
+
+---
+
+## Reliability Pipeline
+
+End-to-end SRE automation running on Nova:
+
+1. **SLO Evaluation** — 6 service-level objectives across 5 sliding windows
+2. **Burn-Rate Alerting** — Detects budget consumption trends before breach
+3. **Incident Management** — Automated detection, tracking, and escalation
+4. **Postmortems** — Auto-generated with timeline, root cause, and action items
+5. **Safety Gates** — Block automation when error budget is exhausted
+6. **Acceptance Tests** — 38+ tests validate every pipeline component
+
+→ [Case study: SRE Pipeline](https://michealbreedlove.com/case-study-sre-pipeline.html)
+
+---
+
+## GitOps & Backup System
+
+Automated daily backups from all 4 nodes with CI enforcement:
+
+- Per-node sanitized state committed daily
+- GitHub Actions CI gate scans for 11 secret patterns
+- Restore verification and node rebuild documentation
+- Zero credential leaks since deployment
+
+→ [Case study: GitOps Backups](https://michealbreedlove.com/case-study-gitops-backups.html)
+
+---
 
 ## Repo Structure
 
 ```
 Lab/
-├── docs/              # Architecture, runbooks, diagrams
-├── inventory/         # Hardware, IP plan, services catalog
-├── nodes/             # Per-node configs & state (segregated)
-│   ├── jasper/        # Windows gateway
-│   ├── nova/          # Controller + AI
-│   ├── mira/          # AI compute
-│   └── orin/          # AI compute
+├── docs/              # Architecture docs, runbooks
+├── inventory/         # Hardware specs, IP plan, services catalog
+├── nodes/             # Per-node configs and state (segregated)
+│   ├── jasper/        # Windows gateway + GPU inference
+│   ├── nova/          # Controller + homelab-controller system
+│   ├── mira/          # Utility compute
+│   └── orin/          # Server workloads
 ├── services/          # Cross-node service configs
-│   ├── openclaw/      # Policies, priorities, artifacts
-│   ├── ollama/        # LLM serving
-│   ├── proxmox/       # Virtualization
-│   └── truenas/       # Storage
-├── snapshots/         # Daily/weekly infra snapshots
-├── tools/             # Backup & automation scripts
-└── .github/           # CI workflows (secret scanning, lint)
+├── site/              # MkDocs documentation site
+├── snapshots/         # Daily/weekly infrastructure snapshots
+├── tools/             # Backup and automation scripts
+└── .github/           # CI workflows (secret scanning)
 ```
 
-## Key Features
+---
 
-- **Automated backup**: Each node auto-commits sanitized state daily
-- **Secret scanning**: GitHub Actions block any accidental credential commits
-- **Segregated by node**: Each machine owns its own folder
-- **Recruiter-friendly**: Clean documentation, architecture diagrams, runbooks
+## Security Considerations
 
-## Services
+- All commits pass CI secret scanning before merge
+- Credentials stored outside the repo; policy documented in `inventory/creds_policy.md`
+- VLAN segmentation isolates IoT, infrastructure, and personal devices
+- SSH key authentication only; no password-based access
+- Sensitive values redacted in all public-facing documentation
 
-- **OpenClaw** — AI agent orchestration across all nodes
-- **Ollama** — Local LLM inference (Qwen, DeepSeek, LLaMA)
-- **Proxmox** — VM/container management
-- **Ansible** — Configuration management from Nova
+---
 
-## Notes
+## Links
 
-- If OpenClaw runs as a system-level systemd service, enable linger so it remains active after logout:
-  ```bash
-  sudo loginctl enable-linger <username>
-  ```
-- `systemctl --user` output may be incomplete in non-login SSH sessions (DBUS unavailable). This is reported but does not fail runs.
-- `ss -ltnp` shows PID/process only for processes owned by the SSH user. Add `become: yes` if root-level visibility is needed.
-
-## License
-
-Private infrastructure repo. Not for redistribution.
+- [Portfolio](https://michealbreedlove.com)
+- [AI Cluster Architecture](https://michealbreedlove.com/ai-cluster.html)
+- [Proof Pack](https://michealbreedlove.com/proof.html)
