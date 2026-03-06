@@ -4,8 +4,9 @@ opnsense_api_configured: false  # Set true when API key/secret in secrets.env
 opnsense_backup_method: "ssh"   # "api" or "ssh"
 opnsense_config_path: "/conf/config.xml"
 opnsense_commands:
-  - { name: "version", cmd: "opnsense-version || cat /usr/local/opnsense/version/opnsense" }
+  - { name: "version", cmd: "opnsense-version" }
   - { name: "interfaces", cmd: "ifconfig -a" }
   - { name: "routes", cmd: "netstat -rn" }
-  - { name: "pf_rules", cmd: "pfctl -sr 2>/dev/null | head -100" }
-  - { name: "dhcp_leases", cmd: "cat /var/dhcpd/var/db/dhcpd.leases 2>/dev/null | head -200" }
+  - { name: "pf_rules", cmd: "pfctl -sr" }
+  - { name: "dhcp_leases", cmd: "cat /var/dhcpd/var/db/dhcpd.leases" }
+  - { name: "installed_plugins", cmd: "pkg info" }
