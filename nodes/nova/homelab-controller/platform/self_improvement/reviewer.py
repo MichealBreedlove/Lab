@@ -61,7 +61,7 @@ def generate_review(incident_id, actual_action=None, outcome=None,
         if confidence < 0.80:
             lessons.append("Low confidence investigation — consider adding evidence sources")
         if human_override:
-            lessons.append("Human overrode AI recommendation — review playbook accuracy")
+            lessons.append("Human override of AI recommendation — review playbook accuracy")
         if actual_action != recommended:
             lessons.append(f"Actual action '{actual_action}' differed from recommended '{recommended}'")
 
