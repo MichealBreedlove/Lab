@@ -38,7 +38,7 @@ run_test "T8: Demo runner script exists and executable" \
     "test -x '$ROOT_DIR/scripts/demo/demo_runner.sh'"
 
 run_test "T9: Demo baseline runs" \
-    "python3 '$ROOT_DIR/scripts/demo/demo_baseline.py' /tmp/demo_test_$$"
+    "mkdir -p /tmp/demo_test_$$ && python3 '$ROOT_DIR/scripts/demo/demo_baseline.py' /tmp/demo_test_$$"
 
 run_test "T10: No secrets in new files" \
     "! grep -rEi '(password|token|secret)\s*[:=]\s*[A-Za-z0-9+/]{8,}' '$ROOT_DIR/scripts/drift/' '$ROOT_DIR/scripts/demo/' '$ROOT_DIR/scripts/observability/' 2>/dev/null | grep -v 'admin_password.*homelab' | grep -v '.json' || true"

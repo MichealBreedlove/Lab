@@ -10,7 +10,7 @@
       "ports": [22],
       "packages": ["ansible", "python3", "git", "jq"],
       "ssh_config": {
-        "PermitRootLogin": "prohibit-password",
+        "PermitRootLogin": "without-password",
         "PasswordAuthentication": "yes"
       },
       "firewall": {
@@ -22,11 +22,11 @@
       "ip": "10.1.1.22",
       "user": "mira",
       "role": "worker",
-      "services": ["ssh", "cron", "systemd-timesyncd"],
+      "services": ["ssh", "cron"],
       "ports": [22],
       "packages": ["python3", "git"],
       "ssh_config": {
-        "PermitRootLogin": "prohibit-password",
+        "PermitRootLogin": "without-password",
         "PasswordAuthentication": "yes"
       }
     },
@@ -34,11 +34,11 @@
       "ip": "10.1.1.23",
       "user": "orin",
       "role": "worker",
-      "services": ["ssh", "cron", "systemd-timesyncd"],
+      "services": ["ssh", "cron"],
       "ports": [22],
       "packages": ["python3", "git"],
       "ssh_config": {
-        "PermitRootLogin": "prohibit-password",
+        "PermitRootLogin": "without-password",
         "PasswordAuthentication": "yes"
       }
     }
