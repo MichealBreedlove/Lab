@@ -1,0 +1,1 @@
+{"agent_id":"jasper","role":"coordinator","node_name":"jasper","hostname":"10.1.1.150","capabilities":["task_routing","incident_management","artifact_generation","policy_evaluation","cluster_planning"],"execution_mode":"assisted","heartbeat_interval":30}

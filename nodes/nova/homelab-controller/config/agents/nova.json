@@ -1,0 +1,1 @@
+{"agent_id":"nova","role":"proxmox_optimizer","node_name":"nova","hostname":"10.1.1.21","capabilities":["cluster_scan","vm_inventory","storage_analysis","backup_audit","snapshot_cleanup"],"execution_mode":"autonomous_low_risk","heartbeat_interval":30}

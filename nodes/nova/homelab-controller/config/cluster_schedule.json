@@ -1,0 +1,11 @@
+{
+  "enabled": true,
+  "schedules": [
+    {"name": "cluster_health_scan", "task_type": "cluster_scan", "target_role": "proxmox_optimizer", "interval_minutes": 15, "priority": "normal"},
+    {"name": "firewall_audit", "task_type": "audit_firewall", "target_role": "network_optimizer", "interval_minutes": 720, "priority": "normal"},
+    {"name": "wifi_audit", "task_type": "audit_wifi", "target_role": "network_optimizer", "interval_minutes": 1440, "priority": "low"},
+    {"name": "proxmox_audit", "task_type": "audit_proxmox", "target_role": "proxmox_optimizer", "interval_minutes": 1440, "priority": "normal"},
+    {"name": "drift_detection", "task_type": "detect_drift", "target_role": "infra_scanner", "interval_minutes": 360, "priority": "normal"},
+    {"name": "daily_scorecard", "task_type": "generate_artifact", "target_role": "coordinator", "interval_minutes": 1440, "priority": "low", "payload": {"type": "daily_scorecard"}}
+  ]
+}

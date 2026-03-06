@@ -836,6 +836,14 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             firewall) bash "$ROOT_DIR/platform/tests/test_firewall_optimizer.sh" ;;
             wifi) bash "$ROOT_DIR/platform/tests/test_wifi_optimizer.sh" ;;
             proxmox) bash "$ROOT_DIR/platform/tests/test_proxmox_optimizer.sh" ;;
+            p64|registry) bash "$ROOT_DIR/platform/tests/test_priority64_agent_registry.sh" ;;
+            p65|taskbus) bash "$ROOT_DIR/platform/tests/test_priority65_task_bus.sh" ;;
+            p66|router) bash "$ROOT_DIR/platform/tests/test_priority66_capability_router.sh" ;;
+            p67|agents) bash "$ROOT_DIR/platform/tests/test_priority67_node_agents.sh" ;;
+            p68|healthfailover) bash "$ROOT_DIR/platform/tests/test_priority68_agent_health_failover.sh" ;;
+            p69|execpolicy) bash "$ROOT_DIR/platform/tests/test_priority69_distributed_execution_policy.sh" ;;
+            p70|handoff) bash "$ROOT_DIR/platform/tests/test_priority70_artifact_handoff.sh" ;;
+            p71|opsloop) bash "$ROOT_DIR/platform/tests/test_priority71_autonomous_ops_loop.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do
