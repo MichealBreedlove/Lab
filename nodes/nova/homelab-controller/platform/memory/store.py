@@ -12,8 +12,19 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-ENTRIES_DIR = ROOT / "data" / "memory" / "entries"
-INDEX_FILE = ROOT / "data" / "memory" / "memory_index.json"
+
+# Shared memory path: prefer NFS mount, fall back to local data/
+_SHARED_MEMORY = Path("/mnt/openclaw/shared_memory")
+if _SHARED_MEMORY.exists() and _SHARED_MEMORY.is_dir():
+    ENTRIES_DIR = _SHARED_MEMORY / "entries"
+    INDEX_FILE = _SHARED_MEMORY / "memory_index.json"
+    RELATIONS_DIR = _SHARED_MEMORY / "relations"
+    RELATIONS_INDEX = _SHARED_MEMORY / "relations_index.json"
+else:
+    ENTRIES_DIR = ROOT / "data" / "memory" / "entries"
+    INDEX_FILE = ROOT / "data" / "memory" / "memory_index.json"
+    RELATIONS_DIR = ROOT / "data" / "memory" / "relations"
+    RELATIONS_INDEX = ROOT / "data" / "memory" / "relations_index.json"
 
 sys.path.insert(0, str(ROOT / "platform" / "events"))
 from bus import emit as emit_event
