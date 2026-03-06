@@ -106,6 +106,17 @@ Lab/
 
 ---
 
+## Documentation
+
+- [Architecture](ARCHITECTURE.md) — Node roles, control plane design, GitHub strategy
+- [Operations](OPERATIONS.md) — Daily workflow, CLI commands, artifact locations
+- [Disaster Recovery](DISASTER_RECOVERY.md) — Restore workflow, break-glass protocol, DR drills
+- [Observability](OBSERVABILITY.md) — Prometheus/Grafana/Loki stack, dashboards, alerting
+- [Platform API](PLATFORM_API.md) — Internal control interface, endpoints, evidence generation
+- [Roadmap](ROADMAP.md) — Project phases and future plans
+
+---
+
 ## Links
 
 - [Portfolio](https://michealbreedlove.com)
