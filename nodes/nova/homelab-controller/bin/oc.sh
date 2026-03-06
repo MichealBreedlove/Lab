@@ -38,6 +38,12 @@ Commands:
   portfolio test        Run P29 portfolio tests
   changelog             Run changelog generation (P26)
   gate <action> <tier>  Evaluate gatekeeper for an action
+  auth token create      Create access token
+  auth token revoke      Revoke a token
+  auth token list        List active tokens
+  auth audit             Show audit summary
+  auth whoami            Show current identity
+  auth test              Run auth self-test
   platform status        Platform API status
   platform chaos         Trigger chaos via API
   platform change        Trigger change via API
@@ -350,6 +356,28 @@ print(f'Site: {d.get(\"site_url\", \"N/A\")}')
                 echo "Unknown portfolio subcommand: $subcmd"
                 echo "Try: oc portfolio [status|build|publish|render|badges|tick|test|open]"
                 ;;
+        esac
+        ;;
+    auth)
+        shift
+        subcmd="${1:-whoami}"
+        shift 2>/dev/null || true
+        case "$subcmd" in
+            token)
+                action="${1:-list}"
+                shift 2>/dev/null || true
+                case "$action" in
+                    create) python3 "$ROOT_DIR/scripts/identity/token_issuer.py" create "$@" ;;
+                    revoke) python3 "$ROOT_DIR/scripts/identity/token_issuer.py" revoke "$@" ;;
+                    list) python3 "$ROOT_DIR/scripts/identity/token_issuer.py" list "$@" ;;
+                    *) echo "Usage: oc auth token [create|revoke|list]" ;;
+                esac
+                ;;
+            audit) python3 "$ROOT_DIR/scripts/identity/audit_log.py" summary ;;
+            whoami) python3 "$ROOT_DIR/scripts/identity/auth_manager.py" whoami "$@" ;;
+            test) python3 "$ROOT_DIR/scripts/identity/auth_manager.py" test ;;
+            tick) bash "$ROOT_DIR/scripts/identity/identity_tick.sh" ;;
+            *) echo "Usage: oc auth [token create|token revoke|token list|audit|whoami|test|tick]" ;;
         esac
         ;;
     platform)
@@ -776,6 +804,7 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             p44|platform) bash "$ROOT_DIR/scripts/demo/test_platform_upgrades.sh" ;;
             p45|change) bash "$ROOT_DIR/scripts/change/test_change_system.sh" ;;
             p46|platform) bash "$ROOT_DIR/platform/tests/test_platform_api.sh" ;;
+            p47|identity) bash "$ROOT_DIR/scripts/identity/test_priority47_identity.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do
