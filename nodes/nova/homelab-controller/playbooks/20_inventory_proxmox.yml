@@ -1,9 +1,12 @@
 ---
 # P43 — Proxmox Inventory: export cluster configs and status
+# Note: Proxmox hosts use root SSH which requires separate credentials.
+# If SSH fails, produces a status report with Proxmox API fallback info.
 - name: "Proxmox Inventory"
   hosts: proxmox
   gather_facts: false
   become: false
+  ignore_unreachable: true
   vars:
     local_output: "{{ playbook_dir }}/../artifacts/controlplane/proxmox/{{ pve_name }}/{{ lookup('pipe', 'date +%Y-%m-%d') }}"
 
@@ -15,55 +18,82 @@
         mode: "0750"
       delegate_to: localhost
 
-    - name: Collect PVE commands
+    - name: Test SSH connectivity
+      ping:
+      register: pve_ping
+      ignore_errors: true
+
+    - name: Collect PVE commands (when reachable)
       raw: "{{ item.cmd }}"
       register: pve_cmds
       loop: "{{ pve_commands }}"
       ignore_errors: true
       changed_when: false
+      when: pve_ping is succeeded
 
     - name: Save command outputs
       copy:
         content: "{{ item.stdout | default('command failed or not available') }}"
         dest: "{{ local_output }}/{{ item.item.name }}.txt"
       delegate_to: localhost
-      loop: "{{ pve_cmds.results }}"
-      when: item is not skipped
+      loop: "{{ pve_cmds.results | default([]) }}"
+      when: pve_ping is succeeded and item is not skipped
 
-    - name: Fetch config files
+    - name: Fetch config files (when reachable)
       raw: "cat {{ item }} 2>/dev/null || echo 'FILE NOT FOUND: {{ item }}'"
       register: pve_configs
       loop: "{{ pve_config_paths }}"
       ignore_errors: true
       changed_when: false
+      when: pve_ping is succeeded
 
     - name: Save config files
       copy:
         content: "{{ item.stdout | default('') }}"
         dest: "{{ local_output }}/{{ item.item | basename }}"
       delegate_to: localhost
-      loop: "{{ pve_configs.results }}"
-      when: item.stdout is defined and item.stdout != ''
+      loop: "{{ pve_configs.results | default([]) }}"
+      when: pve_ping is succeeded and item.stdout is defined
 
-    - name: Collect network info
+    - name: Collect network info (when reachable)
       raw: "ip addr show 2>/dev/null"
       register: pve_network
       ignore_errors: true
       changed_when: false
+      when: pve_ping is succeeded
 
     - name: Save network info
       copy:
         content: "{{ pve_network.stdout | default('') }}"
         dest: "{{ local_output }}/ip_addr.txt"
       delegate_to: localhost
+      when: pve_ping is succeeded and pve_network.stdout is defined
 
-    - name: Write inventory summary
+    - name: Check Proxmox API (when SSH unreachable)
+      uri:
+        url: "https://{{ ansible_host }}:8006/api2/json/version"
+        validate_certs: false
+        timeout: 5
+      register: pve_api
+      ignore_errors: true
+      delegate_to: localhost
+      when: pve_ping is not succeeded
+
+    - name: Write summary
       copy:
         content: |
-          # Proxmox Inventory — {{ pve_name }} — {{ lookup('pipe', 'date -u +%Y-%m-%dT%H:%M:%SZ') }}
+          # Proxmox Inventory -- {{ pve_name }}
+          # {{ lookup('pipe', 'date -u +%Y-%m-%dT%H:%M:%SZ') }}
           Host: {{ ansible_host }}
-          PVE Name: {{ pve_name }}
-          Commands collected: {{ pve_cmds.results | selectattr('rc', 'defined') | selectattr('rc', 'eq', 0) | list | length }}/{{ pve_commands | length }}
-          Config files: {{ pve_config_paths | length }}
+          SSH reachable: {{ 'yes' if pve_ping is succeeded else 'no' }}
+          WebUI (8006): {{ 'yes' if (pve_api is defined and pve_api is succeeded) else 'check manually' }}
+          {% if pve_ping is not succeeded %}
+
+          ## SSH Access Setup
+          Proxmox root password differs from node passwords.
+          From Nova, run:
+            ssh-copy-id root@{{ ansible_host }}
+          (Enter the Proxmox root password when prompted)
+          {% endif %}
         dest: "{{ local_output }}/SUMMARY.md"
       delegate_to: localhost
