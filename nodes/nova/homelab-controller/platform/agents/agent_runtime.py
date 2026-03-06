@@ -21,20 +21,35 @@ import urllib.error
 from datetime import datetime, timezone
 from pathlib import Path
 
-# Resolve paths
+# Resolve paths — works both in-repo (platform/agents/) and deployed (/opt/openclaw/agents/)
 SCRIPT_DIR = Path(__file__).resolve().parent
-ROOT = SCRIPT_DIR.parent.parent
+_repo_root = SCRIPT_DIR.parent.parent  # in-repo: homelab-controller/
+_deploy_root = SCRIPT_DIR.parent       # deployed: /opt/openclaw/
+
+# Detect environment: deployed if /opt/openclaw/config exists, else in-repo
+if (_deploy_root / "config").exists() and not (_repo_root / "platform").exists():
+    ROOT = _deploy_root
+    # Deployed layout: flat directories under /opt/openclaw/
+    sys.path.insert(0, str(ROOT / "agents"))
+    sys.path.insert(0, str(ROOT / "cluster"))
+    sys.path.insert(0, str(ROOT / "network"))
+    sys.path.insert(0, str(ROOT / "proxmox"))
+    sys.path.insert(0, str(ROOT / "memory"))
+    sys.path.insert(0, str(ROOT / "events"))
+    sys.path.insert(0, str(ROOT / "aiops"))
+else:
+    ROOT = _repo_root
+    # In-repo layout: platform/ subdirectories
+    sys.path.insert(0, str(ROOT / "platform" / "agents"))
+    sys.path.insert(0, str(ROOT / "platform" / "cluster"))
+    sys.path.insert(0, str(ROOT / "platform" / "network"))
+    sys.path.insert(0, str(ROOT / "platform" / "proxmox"))
+    sys.path.insert(0, str(ROOT / "platform" / "memory"))
+    sys.path.insert(0, str(ROOT / "platform" / "events"))
+    sys.path.insert(0, str(ROOT / "platform" / "aiops"))
+
 DEFAULT_CONFIG_DIR = ROOT / "config" / "agents"
 LOG_DIR = ROOT / "data" / "cluster" / "agents"
-
-# Import local agent modules
-sys.path.insert(0, str(ROOT / "platform" / "agents"))
-sys.path.insert(0, str(ROOT / "platform" / "cluster"))
-sys.path.insert(0, str(ROOT / "platform" / "network"))
-sys.path.insert(0, str(ROOT / "platform" / "proxmox"))
-sys.path.insert(0, str(ROOT / "platform" / "memory"))
-sys.path.insert(0, str(ROOT / "platform" / "events"))
-sys.path.insert(0, str(ROOT / "platform" / "aiops"))
 
 _running = True
 
@@ -254,7 +269,7 @@ def main():
 
     # Main loop
     last_heartbeat = 0
-    poll_interval = 5
+    poll_interval = config.get("poll_interval", 15)  # seconds between task polls
 
     while _running:
         try:
