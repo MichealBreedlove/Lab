@@ -1,0 +1,44 @@
+{
+  "dashboard": {
+    "title": "Node Health",
+    "uid": "node-health",
+    "tags": ["homelab", "nodes"],
+    "timezone": "browser",
+    "refresh": "30s",
+    "panels": [
+      {
+        "title": "CPU Usage %",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [{"expr": "100 - (avg by(node)(rate(node_cpu_seconds_total{mode='idle'}[5m])) * 100)", "legendFormat": "{{node}}"}]
+      },
+      {
+        "title": "Memory Usage %",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [{"expr": "(1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100", "legendFormat": "{{node}}"}]
+      },
+      {
+        "title": "Disk Usage %",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "targets": [{"expr": "(1 - node_filesystem_avail_bytes{mountpoint='/'} / node_filesystem_size_bytes{mountpoint='/'}) * 100", "legendFormat": "{{node}}"}]
+      },
+      {
+        "title": "Network I/O",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "targets": [
+          {"expr": "rate(node_network_receive_bytes_total{device!='lo'}[5m])", "legendFormat": "{{node}} rx"},
+          {"expr": "rate(node_network_transmit_bytes_total{device!='lo'}[5m])", "legendFormat": "{{node}} tx"}
+        ]
+      },
+      {
+        "title": "Load Average (1m)",
+        "type": "gauge",
+        "gridPos": {"h": 6, "w": 24, "x": 0, "y": 16},
+        "targets": [{"expr": "node_load1", "legendFormat": "{{node}}"}]
+      }
+    ]
+  }
+}
