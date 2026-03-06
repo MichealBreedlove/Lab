@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # P77 — Memory-Aware Infrastructure Optimization tests
-set -euo pipefail
+set -uo pipefail
 cd "$(dirname "$0")/../.."
 PASS=0; FAIL=0
-check() { if eval "$2"; then echo "  [PASS] $1"; ((PASS++)); else echo "  [FAIL] $1"; ((FAIL++)); fi; }
+check() { if eval "$2" 2>/dev/null; then echo "  [PASS] $1"; PASS=$((PASS+1)); else echo "  [FAIL] $1"; FAIL=$((FAIL+1)); fi; return 0; }
 
 echo "=== P77: Memory-Aware Infrastructure Optimization ==="
 
@@ -22,7 +22,7 @@ import sys; sys.path.insert(0,'.'); sys.path.insert(0,'platform/network')
 from firewall_optimizer import run_audit
 report = run_audit()
 print(report['finding_count'] >= 0)
-")
+" | tail -1)
 check "firewall audit runs without memory" "[ '$RESULT' = 'True' ]"
 
 # T5: wifi audit still runs with no memory data
@@ -31,7 +31,7 @@ import sys; sys.path.insert(0,'.'); sys.path.insert(0,'platform/network')
 from wifi_optimizer import run_audit
 report = run_audit()
 print(report['finding_count'] >= 0)
-")
+" | tail -1)
 check "wifi audit runs without memory" "[ '$RESULT' = 'True' ]"
 
 # T6: proxmox audit still runs with no memory data
@@ -40,7 +40,7 @@ import sys; sys.path.insert(0,'.'); sys.path.insert(0,'platform/proxmox')
 from cluster_optimizer import run_audit
 report = run_audit()
 print(report['finding_count'] >= 0)
-")
+" | tail -1)
 check "proxmox audit runs without memory" "[ '$RESULT' = 'True' ]"
 
 # T7: suppression works for repeatedly rejected recommendations

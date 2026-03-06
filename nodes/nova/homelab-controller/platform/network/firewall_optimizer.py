@@ -135,11 +135,15 @@ def _query_memory_for_recommendations(finding_type, tags):
         from store import get_memory
 
         # Find past optimization memories with these tags
-        entries = search(category="optimization", tags=tags, status=None, limit=20)
+        entries = search(category="optimization", tags=tags, status=None, limit=50)
+        tag_set = set(tags)
         accepted = 0
         rejected = 0
         rollbacks = 0
         for ie in entries:
+            # Require ALL query tags to be present (not just any overlap)
+            if not tag_set.issubset(set(ie.get("tags", []))):
+                continue
             full = get_memory(ie["memory_id"])
             if not full:
                 continue
