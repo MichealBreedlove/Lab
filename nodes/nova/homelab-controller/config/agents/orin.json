@@ -1,0 +1,1 @@
+{"agent_id":"orin","role":"heavy_analysis","node_name":"orin","hostname":"10.1.1.23","capabilities":["log_analysis","incident_investigation","anomaly_detection"],"execution_mode":"assisted","heartbeat_interval":30}

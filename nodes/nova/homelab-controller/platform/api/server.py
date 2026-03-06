@@ -40,6 +40,13 @@ ENDPOINT_ROLES = {
     "GET:/topology":   "viewer",
     "GET:/incidents":  "viewer",
     "GET:/events":     "viewer",
+    "GET:/cluster/agents": "viewer",
+    "GET:/cluster/tasks": "viewer",
+    "POST:/cluster/agents/register": "automation",
+    "POST:/cluster/agents/heartbeat": "automation",
+    "POST:/cluster/tasks": "operator",
+    "POST:/cluster/tasks/claim": "automation",
+    "POST:/cluster/tasks/result": "automation",
     "POST:/investigate": "sre",
     "POST:/remediation/artifact": "sre",
     "POST:/change":    "operator",
@@ -262,7 +269,7 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
             self._track("/", token_id, role)
             self._send_json({
                 "service": "homelab-platform-api",
-                "version": "2.2",
+                "version": "3.0",
                 "status": "running",
                 "auth": {"token_id": token_id, "role": role},
                 "rate_limit_enabled": True,
@@ -274,6 +281,7 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
                 "firewall_optimizer_enabled": Path(ROOT / "config" / "network_optimizer.json").exists(),
                 "wifi_optimizer_enabled": Path(ROOT / "config" / "network_optimizer.json").exists(),
                 "proxmox_optimizer_enabled": Path(ROOT / "config" / "proxmox_optimizer.json").exists(),
+                "distributed_cluster_enabled": Path(ROOT / "config" / "cluster_routing_policy.json").exists(),
                 "endpoints": ["/", "/topology", "/events", "/events/alertmanager", "/self-improvement/review",
                               "/incidents", "/change", "/chaos", "/incident", "/snapshot",
                               "/recover", "/failover", "/investigate", "/remediation/artifact"],
@@ -287,6 +295,20 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
             except Exception:
                 data = {"raw": out}
             self._send_json({"topology": data})
+        elif path == "/cluster/agents":
+            self._track("/cluster/agents", token_id, role)
+            sys.path.insert(0, str(ROOT / "platform" / "cluster"))
+            from registry import get_agents, summary as agent_summary
+            agents = get_agents()
+            self._send_json({"agents": agents, "summary": agent_summary()})
+        elif path == "/cluster/tasks":
+            self._track("/cluster/tasks", token_id, role)
+            sys.path.insert(0, str(ROOT / "platform" / "cluster"))
+            from task_bus import get_tasks, task_summary
+            params = parse_qs(urlparse(self.path).query)
+            status_filter = params.get("status", [None])[0]
+            tasks = get_tasks(status=status_filter)
+            self._send_json({"tasks": tasks, "summary": task_summary()})
         elif path == "/events":
             self._track("/events", token_id, role)
             params = parse_qs(urlparse(self.path).query)
@@ -319,7 +341,66 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
 
         body = self._read_body()
 
-        if path == "/self-improvement/review":
+        if path == "/cluster/agents/register":
+            self._track("/cluster/agents/register", token_id, role)
+            sys.path.insert(0, str(ROOT / "platform" / "cluster"))
+            from registry import register_agent
+            agent = register_agent(
+                agent_id=body.get("agent_id", "unknown"),
+                node_name=body.get("node_name", "unknown"),
+                role=body.get("role", "unknown"),
+                capabilities=body.get("capabilities", []),
+                execution_mode=body.get("execution_mode", "audit"),
+                hostname=body.get("hostname"),
+                version=body.get("version", "1.0"),
+            )
+            self._send_json({"agent": agent})
+
+        elif path == "/cluster/agents/heartbeat":
+            self._track("/cluster/agents/heartbeat", token_id, role)
+            sys.path.insert(0, str(ROOT / "platform" / "cluster"))
+            from registry import heartbeat as agent_hb
+            agent = agent_hb(body.get("agent_id", ""))
+            if agent:
+                self._send_json({"agent": agent})
+            else:
+                self._send_json({"error": "agent not found"}, 404)
+
+        elif path == "/cluster/tasks":
+            self._track("/cluster/tasks", token_id, role)
+            sys.path.insert(0, str(ROOT / "platform" / "cluster"))
+            from task_bus import create_task
+            task = create_task(
+                task_type=body.get("task_type", "unknown"),
+                source_agent=body.get("source_agent", "api"),
+                target_agent=body.get("target_agent"),
+                target_role=body.get("target_role"),
+                priority=body.get("priority", "normal"),
+                payload=body.get("payload", {}),
+            )
+            self._send_json({"task": task})
+
+        elif path == "/cluster/tasks/claim":
+            self._track("/cluster/tasks/claim", token_id, role)
+            sys.path.insert(0, str(ROOT / "platform" / "cluster"))
+            from task_bus import claim_task
+            task = claim_task(body.get("agent_id", ""), body.get("capabilities", []), body.get("role", ""))
+            if task:
+                self._send_json({"task": task})
+            else:
+                self._send_json({"task": None, "message": "no tasks available"})
+
+        elif path == "/cluster/tasks/result":
+            self._track("/cluster/tasks/result", token_id, role)
+            sys.path.insert(0, str(ROOT / "platform" / "cluster"))
+            from task_bus import complete_task
+            task = complete_task(body.get("task_id", ""), body.get("agent_id", ""), body.get("result", {}))
+            if task:
+                self._send_json({"task": task})
+            else:
+                self._send_json({"error": "task not found"}, 404)
+
+        elif path == "/self-improvement/review":
             self._track("/self-improvement/review", token_id, role)
             inc_id = body.get("incident_id", "INC-MANUAL")
             actual = body.get("actual_action")
@@ -477,7 +558,7 @@ def main():
     _state["started_at"] = datetime.now(timezone.utc).isoformat()
     update_dashboard()
     server = http.server.HTTPServer((BIND, PORT), PlatformHandler)
-    print(f"Platform API v2.2 listening on {BIND}:{PORT}")
+    print(f"Platform API v3.0 listening on {BIND}:{PORT}")
     print(f"Auth: Bearer token required (RBAC enforced)")
     print(f"Network: {ALLOWED_NETWORK}")
     try:

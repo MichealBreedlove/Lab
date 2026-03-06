@@ -1,0 +1,21 @@
+{
+  "enabled": true,
+  "auto_allow_task_types": [
+    "audit_firewall", "audit_wifi", "audit_proxmox",
+    "cluster_scan", "detect_drift", "document_change",
+    "generate_artifact", "optimize_backups"
+  ],
+  "require_review_task_types": [
+    "investigate_incident", "validate_proposal", "anomaly_detection"
+  ],
+  "deny_task_types": [],
+  "capability_enforcement": true,
+  "mode_restrictions": {
+    "audit": ["audit_firewall", "audit_wifi", "audit_proxmox", "cluster_scan", "detect_drift"],
+    "assisted": ["audit_firewall", "audit_wifi", "audit_proxmox", "cluster_scan", "detect_drift",
+                  "investigate_incident", "generate_artifact", "document_change",
+                  "validate_proposal", "analyze_logs", "anomaly_detection", "optimize_backups"],
+    "autonomous_low_risk": ["audit_firewall", "audit_wifi", "audit_proxmox", "cluster_scan",
+                            "detect_drift", "generate_artifact", "document_change", "optimize_backups"]
+  }
+}

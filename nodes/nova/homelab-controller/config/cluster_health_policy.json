@@ -1,0 +1,7 @@
+{
+  "heartbeat_interval_seconds": 30,
+  "degraded_after_seconds": 90,
+  "offline_after_seconds": 180,
+  "auto_reassign_low_risk_tasks": true,
+  "auto_reassign_high_risk_tasks": false
+}

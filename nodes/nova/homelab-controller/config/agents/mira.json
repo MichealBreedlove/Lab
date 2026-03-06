@@ -1,0 +1,1 @@
+{"agent_id":"mira","role":"network_optimizer","node_name":"mira","hostname":"10.1.1.22","capabilities":["firewall_audit","alias_cleanup","wifi_analysis","network_drift_detection"],"execution_mode":"audit","heartbeat_interval":30}

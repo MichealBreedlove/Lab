@@ -1,0 +1,39 @@
+{
+  "enabled": true,
+  "default_timeout_seconds": 300,
+  "roles": {
+    "jasper": ["coordinator", "investigator", "remediator", "documenter"],
+    "nova": ["proxmox_optimizer", "infra_scanner", "backup_auditor"],
+    "mira": ["network_optimizer", "wifi_optimizer", "firewall_optimizer"],
+    "orin": ["heavy_analysis", "log_analyzer", "anomaly_detector"]
+  },
+  "task_routing": {
+    "audit_firewall": "network_optimizer",
+    "audit_wifi": "wifi_optimizer",
+    "audit_proxmox": "proxmox_optimizer",
+    "investigate_incident": "investigator",
+    "generate_artifact": "documenter",
+    "validate_proposal": "coordinator",
+    "analyze_logs": "log_analyzer",
+    "optimize_backups": "backup_auditor",
+    "detect_drift": "infra_scanner",
+    "document_change": "documenter",
+    "anomaly_detection": "anomaly_detector",
+    "cluster_scan": "infra_scanner"
+  },
+  "fallback_order": {
+    "network_optimizer": ["mira", "jasper"],
+    "wifi_optimizer": ["mira", "jasper"],
+    "firewall_optimizer": ["mira", "jasper"],
+    "proxmox_optimizer": ["nova", "jasper"],
+    "infra_scanner": ["nova", "jasper"],
+    "backup_auditor": ["nova", "jasper"],
+    "heavy_analysis": ["orin", "jasper"],
+    "log_analyzer": ["orin", "jasper"],
+    "anomaly_detector": ["orin", "jasper"],
+    "investigator": ["jasper", "orin"],
+    "remediator": ["jasper"],
+    "documenter": ["jasper"],
+    "coordinator": ["jasper"]
+  }
+}
