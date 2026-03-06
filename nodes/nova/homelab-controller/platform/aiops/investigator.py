@@ -182,7 +182,7 @@ def investigate(incident_id, service, state="confirmed", simulate=False):
     else:
         hypothesis = f"{service} investigation completed with no clear failure signal"
 
-    # Risk assessment
+    # Risk assessment via policy engine
     risk = "low" if score >= 0.80 else "medium" if score >= 0.50 else "high"
     approval_threshold = policy.get("approval_required_below_confidence", 0.80)
     approval_required = score < approval_threshold
@@ -200,6 +200,13 @@ def investigate(incident_id, service, state="confirmed", simulate=False):
         "risk": risk,
         "approval_required": approval_required,
     }
+
+    # Enrich with policy engine metadata
+    try:
+        from policy_engine import enrich_investigation
+        investigation = enrich_investigation(investigation)
+    except ImportError:
+        pass
 
     # Persist
     out_file = INVESTIGATION_DIR / f"{inv_id}.json"

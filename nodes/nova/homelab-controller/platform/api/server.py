@@ -47,6 +47,7 @@ ENDPOINT_ROLES = {
     "POST:/incident":  "operator",
     "POST:/recover":   "sre",
     "POST:/failover":  "sre",
+    "POST:/events/alertmanager": "automation",
     "POST:/chaos":     "sre",
 }
 
@@ -260,7 +261,7 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
             self._track("/", token_id, role)
             self._send_json({
                 "service": "homelab-platform-api",
-                "version": "2.1",
+                "version": "2.2",
                 "status": "running",
                 "auth": {"token_id": token_id, "role": role},
                 "rate_limit_enabled": True,
@@ -268,8 +269,8 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
                 "recovery_enabled": Path(ROOT / "config" / "recovery_policy.json").exists(),
                 "event_bus_enabled": True,
                 "remediation_artifacts_enabled": Path(ROOT / "config" / "aiops_policy.json").exists(),
-                "endpoints": ["/", "/topology", "/events", "/incidents",
-                              "/change", "/chaos", "/incident", "/snapshot",
+                "endpoints": ["/", "/topology", "/events", "/events/alertmanager",
+                              "/incidents", "/change", "/chaos", "/incident", "/snapshot",
                               "/recover", "/failover", "/investigate", "/remediation/artifact"],
                 "request_count": _state["request_count"],
             })
@@ -313,7 +314,20 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
 
         body = self._read_body()
 
-        if path == "/change":
+        if path == "/events/alertmanager":
+            self._track("/events/alertmanager", token_id, role)
+            sys.path.insert(0, str(ROOT / "platform" / "events"))
+            from alert_ingest import ingest_alertmanager_payload
+            results = ingest_alertmanager_payload(body)
+            self._send_json({
+                "status": "accepted",
+                "processed": len(results),
+                "results": [{"action": r["action"],
+                              "incident_id": r["incident"]["incident_id"]}
+                             for r in results],
+            })
+
+        elif path == "/change":
             self._track("/change", token_id, role)
             trigger = body.get("trigger", "manual")
             summary = body.get("summary", "API-triggered change")
@@ -445,7 +459,7 @@ def main():
     _state["started_at"] = datetime.now(timezone.utc).isoformat()
     update_dashboard()
     server = http.server.HTTPServer((BIND, PORT), PlatformHandler)
-    print(f"Platform API v2.0 listening on {BIND}:{PORT}")
+    print(f"Platform API v2.2 listening on {BIND}:{PORT}")
     print(f"Auth: Bearer token required (RBAC enforced)")
     print(f"Network: {ALLOWED_NETWORK}")
     try:
