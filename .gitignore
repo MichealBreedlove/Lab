@@ -6,6 +6,7 @@
 !**/secretscan_latest.json
 !**/token_issuer.py
 !**/active_tokens.json
+!**/test_priority50_token_revocation.sh
 **/auth-profiles.json
 **/auth_profiles.json
 **/auth*.json
