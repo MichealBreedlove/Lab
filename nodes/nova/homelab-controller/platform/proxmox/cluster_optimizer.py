@@ -155,8 +155,27 @@ def analyze_backups(backup_jobs):
     return findings
 
 
+def _query_proxmox_memory(finding_type):
+    """P77: Check cluster memory for historical Proxmox optimization outcomes."""
+    try:
+        sys.path.insert(0, str(ROOT / "platform" / "memory"))
+        from index import search
+        from store import get_memory
+        entries = search(category="optimization", tags=["proxmox", finding_type], status=None, limit=20)
+        accepted = sum(1 for ie in entries
+                       if (get_memory(ie["memory_id"]) or {}).get("payload", {}).get("outcome") in ("accepted", "applied"))
+        rejected = sum(1 for ie in entries
+                       if (get_memory(ie["memory_id"]) or {}).get("payload", {}).get("outcome") in ("rejected", "declined"))
+        rollbacks = sum(1 for ie in entries
+                        if (get_memory(ie["memory_id"]) or {}).get("payload", {}).get("outcome") in ("rollback", "reverted"))
+        return {"accepted": accepted, "rejected": rejected, "rollbacks": rollbacks,
+                "total": accepted + rejected + rollbacks}
+    except Exception:
+        return None
+
+
 def generate_recommendations(findings):
-    """Generate recommendations with safety classification."""
+    """Generate recommendations with safety classification, informed by cluster memory."""
     recs = []
     mode = get_mode()
     for f in findings:
@@ -166,13 +185,24 @@ def generate_recommendations(findings):
             action in LOW_RISK_ACTIONS and
             action not in NEVER_AUTO_APPLY
         )
-        recs.append({
+        rec = {
             "finding": f["type"],
             "action": action,
             "auto_applicable": auto_applicable,
             "severity": f.get("severity", "medium"),
             "detail": f["detail"],
-        })
+        }
+        # P77: Enrich with memory history
+        mem = _query_proxmox_memory(f["type"])
+        if mem and mem["total"] > 0:
+            rec["memory_history"] = mem
+            if mem["rejected"] >= 3 and mem["accepted"] == 0:
+                rec["action"] = "suppressed_by_memory"
+                rec["auto_applicable"] = False
+                rec["suppression_reason"] = f"Rejected {mem['rejected']} times previously"
+            elif mem["accepted"] >= 2 and mem["rollbacks"] == 0:
+                rec["memory_boost"] = True
+        recs.append(rec)
     return recs
 
 

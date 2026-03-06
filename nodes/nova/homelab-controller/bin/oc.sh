@@ -787,6 +787,35 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
         cd "$ROOT_DIR"
         python3 scripts/changelog_runner.py "$@" 2>/dev/null || echo "Changelog not available (P26)"
         ;;
+    memory)
+        shift
+        subcmd="${1:-status}"
+        shift 2>/dev/null || true
+        case "$subcmd" in
+            status) cd "$ROOT_DIR"; python3 platform/memory/store.py stats ;;
+            list) cd "$ROOT_DIR"; python3 platform/memory/store.py list "$@" ;;
+            get) cd "$ROOT_DIR"; python3 platform/memory/store.py get "$@" ;;
+            search) cd "$ROOT_DIR"; python3 platform/memory/index.py search "$@" ;;
+            similar) cd "$ROOT_DIR"; python3 platform/memory/index.py similar "$@" ;;
+            graph) cd "$ROOT_DIR"; python3 platform/memory/graph.py "$@" ;;
+            relations) cd "$ROOT_DIR"; python3 platform/memory/graph.py stats ;;
+            routing) cd "$ROOT_DIR"; python3 platform/memory/routing_history.py "$@" ;;
+            hygiene) cd "$ROOT_DIR"; python3 platform/memory/lifecycle.py report ;;
+            archive) cd "$ROOT_DIR"; python3 platform/memory/lifecycle.py archive "$@" ;;
+            tick) cd "$ROOT_DIR"; python3 platform/memory/lifecycle.py tick "$@"; python3 platform/memory/memory_publish.py ;;
+            publish) cd "$ROOT_DIR"; python3 platform/memory/memory_publish.py ;;
+            test)
+                bash "$ROOT_DIR/platform/tests/test_priority72_memory_store.sh"
+                bash "$ROOT_DIR/platform/tests/test_priority73_memory_search.sh"
+                bash "$ROOT_DIR/platform/tests/test_priority74_knowledge_graph.sh"
+                bash "$ROOT_DIR/platform/tests/test_priority75_memory_aware_investigation.sh"
+                bash "$ROOT_DIR/platform/tests/test_priority76_memory_aware_routing.sh"
+                bash "$ROOT_DIR/platform/tests/test_priority77_memory_aware_optimization.sh"
+                bash "$ROOT_DIR/platform/tests/test_priority78_memory_policy.sh"
+                ;;
+            *) echo "Unknown memory subcommand: $subcmd"; echo "Try: oc memory [status|list|get|search|similar|graph|relations|routing|hygiene|archive|tick|publish|test]" ;;
+        esac
+        ;;
     snapshot)
         shift
         cd "$ROOT_DIR"
@@ -844,6 +873,13 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             p69|execpolicy) bash "$ROOT_DIR/platform/tests/test_priority69_distributed_execution_policy.sh" ;;
             p70|handoff) bash "$ROOT_DIR/platform/tests/test_priority70_artifact_handoff.sh" ;;
             p71|opsloop) bash "$ROOT_DIR/platform/tests/test_priority71_autonomous_ops_loop.sh" ;;
+            p72|memorystore) bash "$ROOT_DIR/platform/tests/test_priority72_memory_store.sh" ;;
+            p73|memorysearch) bash "$ROOT_DIR/platform/tests/test_priority73_memory_search.sh" ;;
+            p74|knowledgegraph) bash "$ROOT_DIR/platform/tests/test_priority74_knowledge_graph.sh" ;;
+            p75|memoryinvestigation) bash "$ROOT_DIR/platform/tests/test_priority75_memory_aware_investigation.sh" ;;
+            p76|memoryrouting) bash "$ROOT_DIR/platform/tests/test_priority76_memory_aware_routing.sh" ;;
+            p77|memoryoptimization) bash "$ROOT_DIR/platform/tests/test_priority77_memory_aware_optimization.sh" ;;
+            p78|memorypolicy) bash "$ROOT_DIR/platform/tests/test_priority78_memory_policy.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do

@@ -1,0 +1,24 @@
+{
+  "enabled": true,
+  "archive_after_days": {
+    "routing_history": 30,
+    "optimization": 60,
+    "incident": 365,
+    "investigation": 365,
+    "remediation": 365,
+    "infrastructure": 180,
+    "operator_feedback": 365,
+    "policy_decision": 365,
+    "self_improvement": 180
+  },
+  "never_auto_delete": [
+    "policy_decision",
+    "operator_feedback"
+  ],
+  "summary_rollups": {
+    "routing_history": true,
+    "optimization": true
+  },
+  "max_entries_before_rollup": 500,
+  "hygiene_check_interval_hours": 24
+}

@@ -269,7 +269,7 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
             self._track("/", token_id, role)
             self._send_json({
                 "service": "homelab-platform-api",
-                "version": "3.0",
+                "version": "3.1",
                 "status": "running",
                 "auth": {"token_id": token_id, "role": role},
                 "rate_limit_enabled": True,
@@ -282,9 +282,13 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
                 "wifi_optimizer_enabled": Path(ROOT / "config" / "network_optimizer.json").exists(),
                 "proxmox_optimizer_enabled": Path(ROOT / "config" / "proxmox_optimizer.json").exists(),
                 "distributed_cluster_enabled": Path(ROOT / "config" / "cluster_routing_policy.json").exists(),
+                "cluster_memory_enabled": Path(ROOT / "config" / "memory_policy.json").exists(),
+                "memory_aware_routing_enabled": True,
+                "memory_aware_investigation_enabled": True,
                 "endpoints": ["/", "/topology", "/events", "/events/alertmanager", "/self-improvement/review",
                               "/incidents", "/change", "/chaos", "/incident", "/snapshot",
-                              "/recover", "/failover", "/investigate", "/remediation/artifact"],
+                              "/recover", "/failover", "/investigate", "/remediation/artifact",
+                              "/memory", "/memory/query", "/memory/stats", "/memory/relation"],
                 "request_count": _state["request_count"],
             })
         elif path == "/topology":
@@ -328,6 +332,30 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
                 self._send_json({"incidents": data.get("incidents", [])[-20:]})
             else:
                 self._send_json({"incidents": []})
+        elif path == "/memory":
+            self._track("/memory", token_id, role)
+            sys.path.insert(0, str(ROOT / "platform" / "memory"))
+            from store import list_memories, memory_stats
+            from graph import relation_stats
+            params = parse_qs(urlparse(self.path).query)
+            cat = params.get("category", [None])[0]
+            entries = list_memories(category=cat, limit=50)
+            self._send_json({
+                "entries": entries,
+                "stats": memory_stats(),
+                "relation_stats": relation_stats(),
+            })
+        elif path == "/memory/stats":
+            self._track("/memory/stats", token_id, role)
+            sys.path.insert(0, str(ROOT / "platform" / "memory"))
+            from store import memory_stats
+            from graph import relation_stats
+            from lifecycle import memory_hygiene_report
+            self._send_json({
+                "memory": memory_stats(),
+                "relations": relation_stats(),
+                "hygiene": memory_hygiene_report(),
+            })
         else:
             self._send_json({"error": "not found"}, 404)
 
@@ -550,6 +578,42 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
                 "status": "completed",
             })
 
+        elif path == "/memory":
+            self._track("/memory", token_id, role)
+            sys.path.insert(0, str(ROOT / "platform" / "memory"))
+            from store import store_memory
+            entry = store_memory(
+                category=body.get("category", "incident"),
+                source_agent=body.get("source_agent", "api"),
+                payload=body.get("payload", {}),
+                tags=body.get("tags", []),
+                related_ids=body.get("related_ids", []),
+                confidence=body.get("confidence", 0.5),
+            )
+            self._send_json({"entry": entry})
+
+        elif path == "/memory/query":
+            self._track("/memory/query", token_id, role)
+            sys.path.insert(0, str(ROOT / "platform" / "memory"))
+            from query import execute_query
+            result = execute_query(body)
+            self._send_json(result)
+
+        elif path == "/memory/relation":
+            self._track("/memory/relation", token_id, role)
+            sys.path.insert(0, str(ROOT / "platform" / "memory"))
+            from graph import add_relation
+            rel = add_relation(
+                source_id=body.get("source_id", ""),
+                source_type=body.get("source_type", "memory"),
+                relation_type=body.get("relation_type", "related_to"),
+                target_id=body.get("target_id", ""),
+                target_type=body.get("target_type", "memory"),
+                metadata=body.get("metadata"),
+                source_agent=body.get("source_agent", "api"),
+            )
+            self._send_json({"relation": rel})
+
         else:
             self._send_json({"error": "not found"}, 404)
 
@@ -558,7 +622,7 @@ def main():
     _state["started_at"] = datetime.now(timezone.utc).isoformat()
     update_dashboard()
     server = http.server.HTTPServer((BIND, PORT), PlatformHandler)
-    print(f"Platform API v3.0 listening on {BIND}:{PORT}")
+    print(f"Platform API v3.1 listening on {BIND}:{PORT}")
     print(f"Auth: Bearer token required (RBAC enforced)")
     print(f"Network: {ALLOWED_NETWORK}")
     try:
