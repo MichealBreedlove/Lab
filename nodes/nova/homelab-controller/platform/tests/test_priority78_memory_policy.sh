@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # P78 — Memory Retention, Hygiene, and Policy tests
-set -euo pipefail
+set -uo pipefail
 cd "$(dirname "$0")/../.."
 PASS=0; FAIL=0
-check() { if eval "$2"; then echo "  [PASS] $1"; ((PASS++)); else echo "  [FAIL] $1"; ((FAIL++)); fi; }
+check() { if eval "$2" 2>/dev/null; then echo "  [PASS] $1"; PASS=$((PASS+1)); else echo "  [FAIL] $1"; FAIL=$((FAIL+1)); fi; return 0; }
 
 echo "=== P78: Memory Retention and Policy ==="
 

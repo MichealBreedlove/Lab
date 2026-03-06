@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
 export LANG=C.UTF-8 LC_ALL=C.UTF-8
 SD="$(cd "$(dirname "$0")" && pwd)"; RD="$SD/../.."
 PASS=0; FAIL=0

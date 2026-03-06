@@ -69,11 +69,14 @@ def _query_wifi_memory(finding_type):
         sys.path.insert(0, str(ROOT / "platform" / "memory"))
         from index import search
         from store import get_memory
-        entries = search(category="optimization", tags=["wifi", finding_type], status=None, limit=20)
+        required_tags = {"wifi", finding_type}
+        entries = search(category="optimization", tags=["wifi", finding_type], status=None, limit=50)
         accepted = sum(1 for ie in entries
-                       if (get_memory(ie["memory_id"]) or {}).get("payload", {}).get("outcome") in ("accepted", "applied"))
+                       if required_tags.issubset(set(ie.get("tags", [])))
+                       and (get_memory(ie["memory_id"]) or {}).get("payload", {}).get("outcome") in ("accepted", "applied"))
         rejected = sum(1 for ie in entries
-                       if (get_memory(ie["memory_id"]) or {}).get("payload", {}).get("outcome") in ("rejected", "declined"))
+                       if required_tags.issubset(set(ie.get("tags", [])))
+                       and (get_memory(ie["memory_id"]) or {}).get("payload", {}).get("outcome") in ("rejected", "declined"))
         return {"accepted": accepted, "rejected": rejected, "total": accepted + rejected}
     except Exception:
         return None
