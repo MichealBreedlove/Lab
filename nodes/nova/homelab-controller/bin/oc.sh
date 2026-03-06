@@ -38,6 +38,10 @@ Commands:
   portfolio test        Run P29 portfolio tests
   changelog             Run changelog generation (P26)
   gate <action> <tier>  Evaluate gatekeeper for an action
+  change list            List recent changes
+  change show <id>       Show a specific change
+  change create <trigger> <summary>  Create new change
+  change validate <id>   Validate a change
   drift status           Show drift detection status
   drift run              Run full drift detection pipeline
   obs up|down|status     Manage observability stack
@@ -342,6 +346,51 @@ print(f'Site: {d.get(\"site_url\", \"N/A\")}')
                 echo "Unknown portfolio subcommand: $subcmd"
                 echo "Try: oc portfolio [status|build|publish|render|badges|tick|test|open]"
                 ;;
+        esac
+        ;;
+    change)
+        shift
+        subcmd="${1:-list}"
+        shift 2>/dev/null || true
+        case "$subcmd" in
+            list)
+                echo "Recent Changes:"
+                if [ -d "$ROOT_DIR/changes" ]; then
+                    ls -1d "$ROOT_DIR/changes"/CHG-* 2>/dev/null | sort -r | head -20 | while read d; do
+                        id=$(basename "$d")
+                        if [ -f "$d/change.json" ]; then
+                            trigger=$(python3 -c "import json; print(json.load(open('$d/change.json')).get('trigger','?'))" 2>/dev/null)
+                            status=$(python3 -c "import json; print(json.load(open('$d/change.json')).get('status','?'))" 2>/dev/null)
+                            echo "  $id  [$trigger]  $status"
+                        else
+                            echo "  $id  (no metadata)"
+                        fi
+                    done
+                else
+                    echo "  No changes recorded yet."
+                fi
+                ;;
+            show)
+                cid="${1:?Usage: oc change show <change_id>}"
+                if [ -f "$ROOT_DIR/changes/$cid/change.md" ]; then
+                    cat "$ROOT_DIR/changes/$cid/change.md"
+                elif [ -f "$ROOT_DIR/changes/$cid/change.json" ]; then
+                    python3 -m json.tool "$ROOT_DIR/changes/$cid/change.json"
+                else
+                    echo "Change not found: $cid"
+                fi
+                ;;
+            create)
+                trigger="${1:-manual}"
+                shift 2>/dev/null || true
+                summary="$*"
+                python3 "$ROOT_DIR/scripts/change/change_create.py" "$trigger" "$summary"
+                ;;
+            validate)
+                cid="${1:-}"
+                python3 "$ROOT_DIR/scripts/change/change_validate.py" "$cid"
+                ;;
+            *) echo "Usage: oc change [list|show <id>|create <trigger> <summary>|validate <id>]" ;;
         esac
         ;;
     drift)
@@ -681,6 +730,7 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             p42|freeze) bash "$ROOT_DIR/scripts/release/test_priority42_freeze.sh" ;;
             p43|controlplane|cp) bash "$ROOT_DIR/scripts/controlplane/test_controlplane.sh" ;;
             p44|platform) bash "$ROOT_DIR/scripts/demo/test_platform_upgrades.sh" ;;
+            p45|change) bash "$ROOT_DIR/scripts/change/test_change_system.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do
