@@ -823,6 +823,9 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             p51|serviceaccount) bash "$ROOT_DIR/platform/tests/test_priority51_service_accounts.sh" ;;
             p52|tls) bash "$ROOT_DIR/platform/tests/test_priority52_tls_config.sh" ;;
             p53|selfhealing) bash "$ROOT_DIR/platform/tests/test_priority53_self_healing.sh" ;;
+            p54|eventbus) bash "$ROOT_DIR/platform/tests/test_priority54_event_bus.sh" ;;
+            p55|investigation) bash "$ROOT_DIR/platform/tests/test_priority55_ai_investigation.sh" ;;
+            p56|remediation) bash "$ROOT_DIR/platform/tests/test_priority56_git_remediation.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do

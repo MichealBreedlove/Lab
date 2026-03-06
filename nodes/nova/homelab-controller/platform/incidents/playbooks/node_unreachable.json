@@ -1,0 +1,26 @@
+{
+  "name": "node_unreachable",
+  "trigger_conditions": {
+    "service": "node",
+    "state": ["confirmed", "failed_recovery"]
+  },
+  "evidence_steps": [
+    "ping_check",
+    "ssh_check",
+    "prometheus_target_status"
+  ],
+  "allowed_checks": [
+    "ping",
+    "ssh_connect",
+    "http_get"
+  ],
+  "confidence_rules": {
+    "high": ["ping_failed", "ssh_failed"],
+    "medium": ["ssh_failed"]
+  },
+  "recommended_actions": [
+    "check_physical",
+    "reboot_node",
+    "failover_workloads"
+  ]
+}

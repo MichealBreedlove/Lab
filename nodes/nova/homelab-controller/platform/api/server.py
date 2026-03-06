@@ -39,6 +39,9 @@ ENDPOINT_ROLES = {
     "GET:/":           "viewer",
     "GET:/topology":   "viewer",
     "GET:/incidents":  "viewer",
+    "GET:/events":     "viewer",
+    "POST:/investigate": "sre",
+    "POST:/remediation/artifact": "sre",
     "POST:/change":    "operator",
     "POST:/snapshot":  "operator",
     "POST:/incident":  "operator",
@@ -263,7 +266,11 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
                 "rate_limit_enabled": True,
                 "tls_configured": Path(ROOT / "deploy" / "caddy" / "Caddyfile").exists(),
                 "recovery_enabled": Path(ROOT / "config" / "recovery_policy.json").exists(),
-                "endpoints": ["/", "/topology", "/change", "/chaos", "/incident", "/snapshot"],
+                "event_bus_enabled": True,
+                "remediation_artifacts_enabled": Path(ROOT / "config" / "aiops_policy.json").exists(),
+                "endpoints": ["/", "/topology", "/events", "/incidents",
+                              "/change", "/chaos", "/incident", "/snapshot",
+                              "/recover", "/failover", "/investigate", "/remediation/artifact"],
                 "request_count": _state["request_count"],
             })
         elif path == "/topology":
@@ -274,6 +281,16 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
             except Exception:
                 data = {"raw": out}
             self._send_json({"topology": data})
+        elif path == "/events":
+            self._track("/events", token_id, role)
+            params = parse_qs(urlparse(self.path).query)
+            etype = params.get("type", [None])[0]
+            inc_id = params.get("incident_id", [None])[0]
+            lim = int(params.get("limit", ["50"])[0])
+            sys.path.insert(0, str(ROOT / "platform" / "events"))
+            from bus import query as event_query
+            events = event_query(event_type=etype, incident_id=inc_id, limit=lim)
+            self._send_json({"events": events, "count": len(events)})
         elif path == "/incidents":
             self._track("/incidents", token_id, role)
             inc_file = ROOT / "artifacts" / "recovery" / "incidents.json"
@@ -361,6 +378,42 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
                     f"python3 platform/recovery/engine.py check {service}"
                     + (" --dry-run" if dry_run else ""))
                 self._send_json({"service": service, "output": out.split("\n")[-5:], "dry_run": dry_run})
+
+        elif path == "/remediation/artifact":
+            self._track("/remediation/artifact", token_id, role)
+            inc_id = body.get("incident_id")
+            inv_id = body.get("investigation_id")
+            patch = body.get("include_patch_plan", True)
+            rc, out, _ = run_cmd(
+                f"python3 platform/aiops/remediator.py generate"
+                + (f" {inc_id}" if inc_id else "")
+                + (f" {inv_id}" if inv_id else "")
+                + ("" if patch else " --no-patch"))
+            # List generated files
+            rem_dir = ROOT / "data" / "remediation" / "incidents"
+            files = []
+            if rem_dir.exists() and inc_id:
+                files = [f.name for f in rem_dir.glob(f"{inc_id}-*")]
+            self._send_json({"incident_id": inc_id, "artifacts": files, "output": out.split("\n")[-5:]})
+
+        elif path == "/investigate":
+            self._track("/investigate", token_id, role)
+            inc_id = body.get("incident_id", "INC-API")
+            service = body.get("service", "api")
+            state = body.get("state", "confirmed")
+            simulate = body.get("simulate", True)
+            rc, out, _ = run_cmd(
+                f"python3 platform/aiops/investigator.py run {inc_id} {service} {state}"
+                + (" --simulate" if simulate else ""))
+            # Read latest investigation
+            inv_dir = ROOT / "data" / "incidents" / "investigations"
+            inv_data = {}
+            if inv_dir.exists():
+                files = sorted(inv_dir.glob("INV-*.json"))
+                if files:
+                    with open(files[-1]) as f:
+                        inv_data = json.load(f)
+            self._send_json({"investigation": inv_data})
 
         elif path == "/snapshot":
             self._track("/snapshot", token_id, role)
