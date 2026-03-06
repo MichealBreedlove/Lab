@@ -1,14 +1,11 @@
 ---
-# P43 — OPNsense Inventory: backup config and collect system info
-# SSH is disabled on this OPNsense — uses API over HTTPS when configured,
-# otherwise produces a status-only report.
+# P43 — OPNsense Inventory: backup config and collect system info via SSH
 - name: "OPNsense Inventory"
-  hosts: localhost
+  hosts: opnsense
   gather_facts: false
+  become: false
   vars:
-    opnsense_host: "10.1.1.1"
     local_output: "{{ playbook_dir }}/../artifacts/controlplane/opnsense/{{ lookup('pipe', 'date +%Y-%m-%d') }}"
-    secrets_env: "{{ lookup('env', 'HOME') }}/.config/homelab/secrets.env"
 
   tasks:
     - name: Create local output directory
@@ -16,86 +13,43 @@
         path: "{{ local_output }}"
         state: directory
         mode: "0750"
+      delegate_to: localhost
 
-    - name: Check if API credentials exist
-      stat:
-        path: "{{ secrets_env }}"
-      register: secrets_file
-
-    - name: Load API credentials
-      shell: "grep -E '^OPNSENSE_API_(KEY|SECRET)=' {{ secrets_env }} | wc -l"
-      register: api_cred_count
-      when: secrets_file.stat.exists
+    - name: Collect system commands
+      raw: "{{ item.cmd }}"
+      register: opn_cmds
+      loop: "{{ opnsense_commands }}"
+      ignore_errors: true
       changed_when: false
-      failed_when: false
 
-    - name: Set API availability fact
-      set_fact:
-        api_available: "{{ secrets_file.stat.exists and (api_cred_count.stdout | default('0') | int >= 2) }}"
+    - name: Save command outputs
+      copy:
+        content: "{{ item.stdout | default('command failed') }}"
+        dest: "{{ local_output }}/{{ item.item.name }}.txt"
+      delegate_to: localhost
+      loop: "{{ opn_cmds.results }}"
+      when: item is not skipped
 
-    - name: Check HTTPS connectivity
-      uri:
-        url: "https://{{ opnsense_host }}"
-        validate_certs: false
-        timeout: 5
-        status_code: [200, 301, 302, 403]
-      register: https_check
+    - name: Backup config.xml via SSH
+      raw: "cat {{ opnsense_config_path }}"
+      register: opn_config
       ignore_errors: true
+      changed_when: false
 
-    - name: API-based config backup (when credentials available)
-      shell: |
-        source {{ secrets_env }}
-        curl -sk -u "$OPNSENSE_API_KEY:$OPNSENSE_API_SECRET" \
-          "https://{{ opnsense_host }}/api/core/backup/download/this" \
-          -o "{{ local_output }}/config.xml.raw"
-      args:
-        executable: /bin/bash
-      when: api_available | bool
-      ignore_errors: true
-      register: api_backup
+    - name: Save config.xml (will be sanitized)
+      copy:
+        content: "{{ opn_config.stdout | default('backup failed') }}"
+        dest: "{{ local_output }}/config.xml.raw"
+      delegate_to: localhost
+      when: opn_config is succeeded
 
-    - name: API firmware status (when credentials available)
-      shell: |
-        source {{ secrets_env }}
-        curl -sk -u "$OPNSENSE_API_KEY:$OPNSENSE_API_SECRET" \
-          "https://{{ opnsense_host }}/api/core/firmware/status" \
-          -o "{{ local_output }}/firmware_status.json"
-      args:
-        executable: /bin/bash
-      when: api_available | bool
-      ignore_errors: true
-
-    - name: API interface list (when credentials available)
-      shell: |
-        source {{ secrets_env }}
-        curl -sk -u "$OPNSENSE_API_KEY:$OPNSENSE_API_SECRET" \
-          "https://{{ opnsense_host }}/api/diagnostics/interface/getInterfaceStatistics" \
-          -o "{{ local_output }}/interfaces.json"
-      args:
-        executable: /bin/bash
-      when: api_available | bool
-      ignore_errors: true
-
-    - name: Write status report
+    - name: Write inventory summary
       copy:
         content: |
           # OPNsense Inventory -- {{ lookup('pipe', 'date -u +%Y-%m-%dT%H:%M:%SZ') }}
-          Host: {{ opnsense_host }}
-          HTTPS reachable: {{ 'yes' if https_check is succeeded else 'no' }}
-          SSH enabled: no (port 22 closed)
-          API credentials: {{ 'configured' if (api_available | bool) else 'NOT configured' }}
-          Config backup: {{ 'yes' if (api_backup is defined and api_backup is succeeded) else 'no (needs API key)' }}
-
-          ## Setup Instructions
-          To enable API-based backup:
-          1. OPNsense UI > System > Access > Users > [user] > Create API Key
-          2. Save key+secret to ~/.config/homelab/secrets.env:
-             OPNSENSE_API_KEY=your_key
-             OPNSENSE_API_SECRET=your_secret
-          3. Re-run: oc controlplane full
-
-          To enable SSH (optional):
-          1. OPNsense UI > System > Settings > Administration
-          2. Enable Secure Shell, set port (22 or custom)
-          3. Update inventory/group_vars/opnsense.yml with port
+          Host: {{ ansible_host }}
+          Method: SSH
+          Commands collected: {{ opn_cmds.results | selectattr('rc', 'defined') | selectattr('rc', 'eq', 0) | list | length }}/{{ opnsense_commands | length }}
+          Config backup: {{ 'yes' if opn_config is succeeded else 'failed' }}
         dest: "{{ local_output }}/SUMMARY.md"
+      delegate_to: localhost
