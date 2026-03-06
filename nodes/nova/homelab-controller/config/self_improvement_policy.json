@@ -1,0 +1,17 @@
+{
+  "enabled": true,
+  "auto_promote_types": [
+    "documentation_update",
+    "artifact_template_update"
+  ],
+  "require_review_types": [
+    "playbook_update",
+    "confidence_threshold_update",
+    "alert_mapping_update"
+  ],
+  "deny_types": [
+    "policy_change_request"
+  ],
+  "require_validation": true,
+  "require_passing_tests": true
+}

@@ -1,0 +1,14 @@
+{
+  "mode": "audit",
+  "enabled": true,
+  "cluster": "CL-1",
+  "nodes": ["10.1.1.2", "10.1.1.4", "10.1.1.5"],
+  "low_risk_actions": [
+    "add_tags", "generate_notes", "normalize_backup_metadata",
+    "flag_outdated_templates", "create_config_snapshot"
+  ],
+  "never_auto_apply": [
+    "bridge_changes", "bond_changes", "vlan_trunk_changes",
+    "storage_migration", "ha_policy_changes", "cluster_quorum_changes"
+  ]
+}
