@@ -4,7 +4,7 @@ set -euo pipefail
 
 TARGET_DIR="${1:-.}"
 
-echo "→ Sanitizing artifacts in: $TARGET_DIR"
+echo "-> Sanitizing artifacts in: $TARGET_DIR"
 
 # Patterns to redact (case-insensitive where possible)
 PATTERNS=(
@@ -42,4 +42,4 @@ done < <(find "$TARGET_DIR" -type f \( -name "*.txt" -o -name "*.xml" -o -name "
 # Remove .raw files (unsanitized originals)
 find "$TARGET_DIR" -name "*.raw" -delete 2>/dev/null || true
 
-echo "✅ Sanitized $COUNT files"
+echo "[OK] Sanitized $COUNT files"
