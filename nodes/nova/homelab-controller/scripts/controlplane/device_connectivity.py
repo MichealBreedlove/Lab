@@ -67,9 +67,9 @@ if __name__ == "__main__":
     if "--json" in sys.argv:
         print(json.dumps(results, indent=2))
     else:
-        print(f"🔍 Device Connectivity ({results['timestamp'][:19]})")
+        print(f"Device Connectivity ({results['timestamp'][:19]})")
         print(f"   {results['summary']['reachable']}/{results['summary']['total']} reachable\n")
         for name, d in results["devices"].items():
-            icon = "✅" if d["reachable"] else "❌"
+            icon = "OK" if d["reachable"] else "FAIL"
             ports = ", ".join(f"{p}:{'✓' if v else '✗'}" for p, v in d["ports"].items())
             print(f"  {icon} {name:15s} {d['ip']:15s} ping:{'✓' if d['ping'] else '✗'}  {ports}")

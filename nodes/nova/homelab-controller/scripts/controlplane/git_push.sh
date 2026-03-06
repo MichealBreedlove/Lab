@@ -8,10 +8,10 @@ ARTIFACTS="$ROOT_DIR/artifacts/controlplane"
 LAB_REPO="$HOME/Lab"
 TIMESTAMP=$(date +%Y-%m-%d)
 
-echo "→ Syncing artifacts to Lab repo..."
+echo "-> Syncing artifacts to Lab repo..."
 
 if [ ! -d "$LAB_REPO/.git" ]; then
-    echo "❌ Lab repo not found at $LAB_REPO"
+    echo "[ERROR] Lab repo not found at $LAB_REPO"
     echo "   Clone it: git clone https://github.com/MichealBreedlove/Lab.git ~/Lab"
     exit 1
 fi
@@ -23,7 +23,7 @@ sync_dir() {
     if [ -d "$src" ]; then
         mkdir -p "$LAB_REPO/$dst"
         rsync -av --delete "$src/" "$LAB_REPO/$dst/" 2>/dev/null || cp -r "$src/"* "$LAB_REPO/$dst/"
-        echo "  ✅ $dst"
+        echo "  [OK] $dst"
     fi
 }
 
@@ -39,14 +39,14 @@ git add -A 2>/dev/null || true
 
 if ! git diff --cached --quiet 2>/dev/null; then
     git commit -m "inventory: controlplane sync $TIMESTAMP" 2>/dev/null
-    echo "✅ Committed to Lab repo"
+    echo "[OK] Committed to Lab repo"
 
     if git push origin main 2>/dev/null; then
-        echo "✅ Pushed to GitHub"
+        echo "[OK] Pushed to GitHub"
     else
-        echo "⚠️  Push failed (no credentials or network issue)"
+        echo "[WARN] Push failed (no credentials or network issue)"
         echo "   Run from GamingPC: cd ~/Lab && git pull && git push"
     fi
 else
-    echo "ℹ️  No changes to push"
+    echo "[INFO] No changes to push"
 fi
