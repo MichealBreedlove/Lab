@@ -116,10 +116,10 @@ def collect_infrastructure(infra):
         "proxmox": {"nodes": {}},
     }
 
-    # OPNsense
+    # OPNsense (FreeBSD — use full path or fallback)
     opn = infra.get("opnsense", {})
     if opn.get("ip"):
-        version = ssh_cmd(opn["ip"], "root", "opnsense-version 2>/dev/null")
+        version = ssh_cmd(opn["ip"], "root", "/usr/local/sbin/opnsense-version 2>/dev/null || uname -r")
         observed["opnsense"]["reachable"] = version is not None
         observed["opnsense"]["version"] = version
 
