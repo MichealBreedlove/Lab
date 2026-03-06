@@ -15,6 +15,22 @@ OBSERVED_DIR = ROOT / "state" / "observed"
 def ssh_cmd(host, user, cmd, timeout=10):
     """Run command on remote host via SSH, return stdout or None."""
     try:
+        # If this is the local host, run directly
+        import socket
+        local_ips = []
+        try:
+            local_ips = [a[4][0] for a in socket.getaddrinfo(socket.gethostname(), None)]
+            local_ips.append("127.0.0.1")
+        except Exception:
+            pass
+
+        if host in local_ips or socket.gethostname().lower() == user.lower():
+            r = subprocess.run(
+                ["bash", "-c", cmd],
+                capture_output=True, text=True, timeout=timeout
+            )
+            return r.stdout.strip() if r.returncode == 0 else None
+
         r = subprocess.run(
             ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=5",
              f"{user}@{host}", cmd],
