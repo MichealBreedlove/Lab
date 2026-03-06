@@ -1,38 +1,60 @@
-# Platform Hardening Checklist
+# Platform Hardening Checklist (Phase 7)
 
-Post-P58 stabilization tasks for production readiness.
+## Reliability
 
-## Storage & State
+- [ ] Event bus log rotation (cap at 10K events, archive older)
+- [ ] Task bus cleanup (archive completed tasks older than 7 days)
+- [ ] Memory store data directory size monitoring
+- [ ] Agent heartbeat stress test (simulate rapid degraded→offline transitions)
+- [ ] Task routing failover test (kill agent mid-task, verify reassignment)
+- [ ] Recovery engine stress test (multiple simultaneous service failures)
+- [ ] Platform API restart recovery (verify state survives restart)
 
-- [ ] **Persistent rate limiting backend** — File-backed or Redis sliding window state that survives API restarts
-- [ ] **Event bus rotation** — Rotate `event_log.jsonl` daily or by size (>10MB); archive to `data/events/archive/`
-- [ ] **Platform state backup** — Include `artifacts/identity/`, `data/events/`, `data/auth/`, `config/` in automated backup pipeline
-- [ ] **Audit log rotation** — Rotate `api_audit.jsonl` and `policy_audit.jsonl` monthly
+## Safety Validation
 
-## Disaster Recovery
+- [ ] Verify all NEVER_AUTO_APPLY categories are enforced in:
+  - Firewall optimizer
+  - WiFi optimizer
+  - Proxmox optimizer
+  - Distributed execution policy
+- [ ] Verify high-risk tasks never auto-reassigned on failover
+- [ ] Verify memory cannot override approval requirements
+- [ ] Verify self-improvement cannot auto-promote policy changes
+- [ ] Test viewer role cannot access write endpoints
+- [ ] Test rate limiting under sustained load
 
-- [ ] **DR test for identity layer** — Verify token store restore from backup
-- [ ] **DR test for incident data** — Verify incidents.json restore
-- [ ] **Event bus replay** — Confirm events can be replayed from JSONL backup
-- [ ] **Recovery engine stress test** — Simulate 10+ concurrent incidents; verify no race conditions
+## Data Integrity
 
-## TLS & Network Security
+- [ ] Memory lifecycle tick runs without errors
+- [ ] Memory rollup summaries are coherent
+- [ ] Knowledge graph traversal handles cycles
+- [ ] Investigation context handles empty/corrupt memory gracefully
+- [ ] Remediation artifacts are well-formed after memory enrichment
 
-- [ ] **TLS certificate rotation** — Document Caddy auto-renewal verification steps
-- [ ] **mTLS between nodes** — Client certificates for Nova-to-Mira/Orin recovery commands
-- [ ] **API bind restriction** — Verify 10.1.1.0/24 enforcement under all entry paths
-- [ ] **Firewall audit** — Confirm UFW rules match expected ports (8080, 8081, 3000, 9090, 3100, 9100)
+## Backup / Restore
 
-## Monitoring & Observability
+- [ ] Platform state backup script (config/ + data/ snapshot)
+- [ ] Restore from backup test
+- [ ] Git push all state changes
+- [ ] Verify .gitignore excludes runtime data correctly
 
-- [ ] **Monitoring coverage validation** — All 6 nodes (3 PVE + 3 Linux) reporting to Prometheus
-- [ ] **Alert rules audit** — Verify `alert_rules.yml` covers: node down, disk >90%, API latency >5s
-- [ ] **Grafana dashboard review** — Confirm dashboards show: temps, disk, CPU, memory, API latency
-- [ ] **Loki log ingestion** — Verify platform API logs flowing to Loki
+## Network Safety
 
-## Identity & Access
+- [ ] Agent runtime handles API unreachable gracefully
+- [ ] Agent re-registers after API restart
+- [ ] No credentials in logs or event bus
+- [ ] Token in agent config is not committed to git
 
-- [ ] **Token rotation policy** — Auto-expire tokens >7 days; notify on approaching expiry
-- [ ] **Service account audit** — Review active service accounts quarterly
-- [ ] **Failed auth alerting** — Alert on >10 failed auth attempts in 5 minutes
-- [ ] **Audit log review** — Weekly review of policy_audit.jsonl for anomalies
+## Monitoring
+
+- [ ] Agent health visible in dashboard
+- [ ] Memory stats visible in dashboard
+- [ ] Task queue visible in dashboard
+- [ ] Daily scorecard generation works end-to-end
+
+## Documentation Gaps
+
+- [ ] README.md reflects final architecture
+- [ ] All API endpoints documented
+- [ ] CLI `oc` subcommands documented
+- [ ] Agent deployment documented
