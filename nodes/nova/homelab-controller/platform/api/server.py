@@ -38,9 +38,12 @@ ROLE_RANK = {"viewer": 0, "operator": 1, "automation": 1, "sre": 2, "admin": 3}
 ENDPOINT_ROLES = {
     "GET:/":           "viewer",
     "GET:/topology":   "viewer",
+    "GET:/incidents":  "viewer",
     "POST:/change":    "operator",
     "POST:/snapshot":  "operator",
     "POST:/incident":  "operator",
+    "POST:/recover":   "sre",
+    "POST:/failover":  "sre",
     "POST:/chaos":     "sre",
 }
 
@@ -98,6 +101,9 @@ def update_dashboard():
             "status": "running",
             "port": PORT,
             "auth_required": True,
+            "rate_limit_enabled": True,
+            "tls_configured": Path(ROOT / "deploy" / "caddy" / "Caddyfile").exists(),
+            "recovery_enabled": Path(ROOT / "config" / "recovery_policy.json").exists(),
             "started_at": _state["started_at"],
             "last_request": _state["last_request"],
             "last_change": _state["last_change"],
@@ -162,6 +168,26 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
         token_id = result["token_id"]
         role = result["role"]
 
+        # Check service account enabled state
+        try:
+            from token_issuer import load_tokens
+            tokens_data = load_tokens()
+            for t in tokens_data.get("tokens", []):
+                if t.get("token_id") == token_id and t.get("principal_type") == "service_account":
+                    sa_name = t.get("service_account", "")
+                    if sa_name:
+                        sys.path.insert(0, str(ROOT / "scripts" / "identity"))
+                        from service_accounts import is_sa_enabled
+                        if not is_sa_enabled(sa_name):
+                            _state["failed_auth_count"] += 1
+                            audit_api(token_id, role, endpoint, method, "401_sa_disabled", ip)
+                            self._send_json({"error": "unauthorized",
+                                             "message": f"Service account '{sa_name}' is disabled"}, 401)
+                            return False, token_id, role
+                    break
+        except Exception:
+            pass
+
         # Check role permission
         endpoint_key = f"{method}:{endpoint}"
         required_role = ENDPOINT_ROLES.get(endpoint_key, "admin")
@@ -177,6 +203,24 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
                 "message": f"Role '{role}' cannot access {endpoint} (requires '{required_role}')",
             }, 403)
             return False, token_id, role
+
+        # Rate limit check
+        try:
+            from rate_limit import check_rate_limit
+            allowed_rl, limit, remaining, reset_at = check_rate_limit(token_id, role)
+            if not allowed_rl:
+                _state["failed_auth_count"] += 1
+                audit_api(token_id, role, endpoint, method, "429_rate_limited", ip,
+                          {"limit": limit})
+                self._send_json({
+                    "error": "too many requests",
+                    "message": f"Rate limit exceeded for role '{role}'",
+                    "role": role,
+                    "limit": limit,
+                }, 429)
+                return False, token_id, role
+        except ImportError:
+            pass  # rate_limit module not available, skip
 
         # Authorized
         audit_api(token_id, role, endpoint, method, "200_authorized", ip)
@@ -213,9 +257,12 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
             self._track("/", token_id, role)
             self._send_json({
                 "service": "homelab-platform-api",
-                "version": "2.0",
+                "version": "2.1",
                 "status": "running",
                 "auth": {"token_id": token_id, "role": role},
+                "rate_limit_enabled": True,
+                "tls_configured": Path(ROOT / "deploy" / "caddy" / "Caddyfile").exists(),
+                "recovery_enabled": Path(ROOT / "config" / "recovery_policy.json").exists(),
                 "endpoints": ["/", "/topology", "/change", "/chaos", "/incident", "/snapshot"],
                 "request_count": _state["request_count"],
             })
@@ -227,6 +274,15 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
             except Exception:
                 data = {"raw": out}
             self._send_json({"topology": data})
+        elif path == "/incidents":
+            self._track("/incidents", token_id, role)
+            inc_file = ROOT / "artifacts" / "recovery" / "incidents.json"
+            if inc_file.exists():
+                with open(inc_file) as f:
+                    data = json.load(f)
+                self._send_json({"incidents": data.get("incidents", [])[-20:]})
+            else:
+                self._send_json({"incidents": []})
         else:
             self._send_json({"error": "not found"}, 404)
 
@@ -281,6 +337,30 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
                 "incident": {"title": title, "severity": severity},
                 "status": "logged",
             })
+
+        elif path == "/recover":
+            self._track("/recover", token_id, role)
+            service = body.get("service", "")
+            dry_run = body.get("dry_run", True)
+            if not service:
+                self._send_json({"error": "service required"}, 400)
+            else:
+                rc, out, _ = run_cmd(
+                    f"python3 platform/recovery/engine.py check {service}"
+                    + (" --dry-run" if dry_run else ""))
+                self._send_json({"service": service, "output": out.split("\n")[-5:], "dry_run": dry_run})
+
+        elif path == "/failover":
+            self._track("/failover", token_id, role)
+            service = body.get("service", "")
+            dry_run = body.get("dry_run", True)
+            if not service:
+                self._send_json({"error": "service required"}, 400)
+            else:
+                rc, out, _ = run_cmd(
+                    f"python3 platform/recovery/engine.py check {service}"
+                    + (" --dry-run" if dry_run else ""))
+                self._send_json({"service": service, "output": out.split("\n")[-5:], "dry_run": dry_run})
 
         elif path == "/snapshot":
             self._track("/snapshot", token_id, role)

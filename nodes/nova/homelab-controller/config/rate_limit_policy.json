@@ -1,0 +1,10 @@
+{
+  "enabled": true,
+  "window_seconds": 60,
+  "limits": {
+    "viewer": 60,
+    "operator": 30,
+    "sre": 20,
+    "admin": 0
+  }
+}

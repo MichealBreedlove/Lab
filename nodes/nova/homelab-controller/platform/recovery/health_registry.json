@@ -1,0 +1,41 @@
+{
+  "services": [
+    {
+      "name": "api",
+      "host": "nova",
+      "health_url": "http://127.0.0.1:8081/",
+      "criticality": "high",
+      "restart_action": "systemctl --user restart homelab-platform-api",
+      "failover_target": "orin",
+      "cooldown_seconds": 600,
+      "enabled": true
+    },
+    {
+      "name": "prometheus",
+      "host": "nova",
+      "health_url": "http://127.0.0.1:9090/-/healthy",
+      "criticality": "high",
+      "restart_action": "cd scripts/observability && sudo docker compose restart prometheus",
+      "cooldown_seconds": 600,
+      "enabled": true
+    },
+    {
+      "name": "dashboard",
+      "host": "nova",
+      "health_url": "http://127.0.0.1:8080/",
+      "criticality": "medium",
+      "restart_action": "systemctl --user restart homelab-dashboard",
+      "cooldown_seconds": 300,
+      "enabled": true
+    },
+    {
+      "name": "grafana",
+      "host": "nova",
+      "health_url": "http://127.0.0.1:3000/api/health",
+      "criticality": "medium",
+      "restart_action": "cd scripts/observability && sudo docker compose restart grafana",
+      "cooldown_seconds": 600,
+      "enabled": true
+    }
+  ]
+}

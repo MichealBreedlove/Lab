@@ -1,0 +1,34 @@
+# Homelab Platform API — Caddy reverse proxy with internal TLS
+# Usage: caddy run --config /path/to/Caddyfile
+#
+# Prerequisites:
+#   1. Add "10.1.1.21 api.homelab.local" to /etc/hosts (or DNS)
+#   2. Install Caddy: sudo apt install caddy
+#   3. Run: caddy run --config deploy/caddy/Caddyfile
+
+api.homelab.local {
+    tls internal
+
+    # Forward auth header to backend
+    reverse_proxy 127.0.0.1:8081 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+
+    # Health endpoint (unauthenticated at proxy level)
+    handle /health {
+        respond "OK" 200
+    }
+
+    log {
+        output file /var/log/caddy/api-access.log
+        format json
+    }
+}
+
+# HTTP redirect
+http://api.homelab.local {
+    redir https://api.homelab.local{uri} permanent
+}

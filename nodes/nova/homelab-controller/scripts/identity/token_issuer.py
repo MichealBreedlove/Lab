@@ -74,7 +74,7 @@ def create_token(role="operator", name="", ttl_hours=None):
     return token_id
 
 
-def revoke_token(token_id):
+def revoke_token(token_id, reason=""):
     """Revoke a token by ID."""
     data = load_tokens()
     found = False
@@ -82,6 +82,8 @@ def revoke_token(token_id):
         if t["token_id"] == token_id:
             t["revoked"] = True
             t["revoked_at"] = datetime.now(timezone.utc).isoformat()
+            if reason:
+                t["revoked_reason"] = reason
             found = True
             break
 
@@ -181,10 +183,14 @@ def main():
         create_token(role=role, name=name)
     elif cmd == "revoke":
         token_id = sys.argv[2] if len(sys.argv) > 2 else ""
+        reason = ""
+        if "--reason" in sys.argv:
+            idx = sys.argv.index("--reason")
+            reason = sys.argv[idx + 1] if idx + 1 < len(sys.argv) else ""
         if not token_id:
-            print("[ERROR] Usage: token_issuer.py revoke <token_id>")
+            print("[ERROR] Usage: token_issuer.py revoke <token_id> [--reason <reason>]")
         else:
-            revoke_token(token_id)
+            revoke_token(token_id, reason=reason)
     elif cmd == "list":
         show_all = "--all" in sys.argv
         list_tokens(show_expired=show_all)

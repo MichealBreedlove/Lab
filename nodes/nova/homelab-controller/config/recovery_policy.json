@@ -1,0 +1,7 @@
+{
+  "enabled": true,
+  "max_automated_actions_per_window": 1,
+  "action_window_seconds": 600,
+  "allow_failover": true,
+  "require_multi_signal_for_failover": true
+}

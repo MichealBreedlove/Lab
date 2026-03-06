@@ -1,0 +1,6 @@
+{
+  "api": {
+    "primary": "nova",
+    "secondary": "orin"
+  }
+}
