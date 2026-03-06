@@ -48,6 +48,7 @@ ENDPOINT_ROLES = {
     "POST:/recover":   "sre",
     "POST:/failover":  "sre",
     "POST:/events/alertmanager": "automation",
+    "POST:/self-improvement/review": "sre",
     "POST:/chaos":     "sre",
 }
 
@@ -269,7 +270,11 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
                 "recovery_enabled": Path(ROOT / "config" / "recovery_policy.json").exists(),
                 "event_bus_enabled": True,
                 "remediation_artifacts_enabled": Path(ROOT / "config" / "aiops_policy.json").exists(),
-                "endpoints": ["/", "/topology", "/events", "/events/alertmanager",
+                "self_improvement_enabled": Path(ROOT / "config" / "self_improvement_policy.json").exists(),
+                "firewall_optimizer_enabled": Path(ROOT / "config" / "network_optimizer.json").exists(),
+                "wifi_optimizer_enabled": Path(ROOT / "config" / "network_optimizer.json").exists(),
+                "proxmox_optimizer_enabled": Path(ROOT / "config" / "proxmox_optimizer.json").exists(),
+                "endpoints": ["/", "/topology", "/events", "/events/alertmanager", "/self-improvement/review",
                               "/incidents", "/change", "/chaos", "/incident", "/snapshot",
                               "/recover", "/failover", "/investigate", "/remediation/artifact"],
                 "request_count": _state["request_count"],
@@ -314,7 +319,20 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
 
         body = self._read_body()
 
-        if path == "/events/alertmanager":
+        if path == "/self-improvement/review":
+            self._track("/self-improvement/review", token_id, role)
+            inc_id = body.get("incident_id", "INC-MANUAL")
+            actual = body.get("actual_action")
+            outcome = body.get("outcome")
+            override = body.get("human_override", False)
+            lessons = body.get("lessons_learned")
+            sys.path.insert(0, str(ROOT / "platform" / "self_improvement"))
+            from reviewer import generate_review
+            review = generate_review(inc_id, actual_action=actual, outcome=outcome,
+                                     human_override=override, lessons=lessons)
+            self._send_json({"review": review})
+
+        elif path == "/events/alertmanager":
             self._track("/events/alertmanager", token_id, role)
             sys.path.insert(0, str(ROOT / "platform" / "events"))
             from alert_ingest import ingest_alertmanager_payload

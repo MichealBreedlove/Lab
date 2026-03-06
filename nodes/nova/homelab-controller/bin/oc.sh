@@ -828,6 +828,14 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             p56|remediation) bash "$ROOT_DIR/platform/tests/test_priority56_git_remediation.sh" ;;
             p57|policy) bash "$ROOT_DIR/platform/tests/test_priority57_execution_policy.sh" ;;
             p58|alertmanager) bash "$ROOT_DIR/platform/tests/test_priority58_alert_ingestion.sh" ;;
+            p59|review) bash "$ROOT_DIR/platform/tests/test_priority59_after_action_review.sh" ;;
+            p60|proposal) bash "$ROOT_DIR/platform/tests/test_priority60_improvement_proposal.sh" ;;
+            p61|validation) bash "$ROOT_DIR/platform/tests/test_priority61_validation_runner.sh" ;;
+            p62|promotionpolicy) bash "$ROOT_DIR/platform/tests/test_priority62_promotion_policy.sh" ;;
+            p63|autopromotion) bash "$ROOT_DIR/platform/tests/test_priority63_safe_auto_promotion.sh" ;;
+            firewall) bash "$ROOT_DIR/platform/tests/test_firewall_optimizer.sh" ;;
+            wifi) bash "$ROOT_DIR/platform/tests/test_wifi_optimizer.sh" ;;
+            proxmox) bash "$ROOT_DIR/platform/tests/test_proxmox_optimizer.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do

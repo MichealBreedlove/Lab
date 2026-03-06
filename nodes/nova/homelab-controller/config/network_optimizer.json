@@ -1,0 +1,21 @@
+{
+  "mode": "audit",
+  "enabled": true,
+  "firewall": {
+    "target": "10.1.1.1",
+    "type": "opnsense",
+    "never_auto_apply": [
+      "wan_rules", "default_deny_rules", "gateway_changes",
+      "dhcp_subnet_changes", "dns_resolver_changes", "vlan_trunk_changes",
+      "management_access_rules"
+    ]
+  },
+  "wifi": {
+    "controller": "unifi",
+    "mode": "assisted",
+    "never_auto_apply": [
+      "ssid_changes", "security_mode_changes",
+      "controller_migrations", "site_configuration_changes"
+    ]
+  }
+}
