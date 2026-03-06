@@ -11,7 +11,7 @@ import sys; sys.path.insert(0,'$RD/platform/cluster')
 from registry import register_agent
 register_agent('mira','mira','network_optimizer',['firewall_audit','wifi_analysis'],'audit')
 register_agent('nova','nova','proxmox_optimizer',['cluster_scan'],'autonomous_low_risk')
-register_agent('jasper','jasper','coordinator',['task_routing'],'assisted')
+register_agent('jasper','jasper','coordinator',['task_routing','incident_management','incident_investigation'],'assisted')
 " 2>/dev/null
 
 run_test "T1: audit_firewall allowed for mira" "python3 -c \"
