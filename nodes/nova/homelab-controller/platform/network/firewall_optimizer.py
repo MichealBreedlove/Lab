@@ -127,32 +127,77 @@ def generate_report(findings, report_type="firewall_audit"):
     return report
 
 
+def _query_memory_for_recommendations(finding_type, tags):
+    """P77: Query cluster memory for historical recommendation outcomes."""
+    try:
+        sys.path.insert(0, str(ROOT / "platform" / "memory"))
+        from index import search
+        from store import get_memory
+
+        # Find past optimization memories with these tags
+        entries = search(category="optimization", tags=tags, status=None, limit=20)
+        accepted = 0
+        rejected = 0
+        rollbacks = 0
+        for ie in entries:
+            full = get_memory(ie["memory_id"])
+            if not full:
+                continue
+            outcome = full.get("payload", {}).get("outcome", "")
+            if outcome in ("accepted", "applied", "success"):
+                accepted += 1
+            elif outcome in ("rejected", "declined"):
+                rejected += 1
+            elif outcome in ("rollback", "reverted"):
+                rollbacks += 1
+        return {"accepted": accepted, "rejected": rejected, "rollbacks": rollbacks,
+                "total": accepted + rejected + rollbacks}
+    except Exception:
+        return None
+
+
 def generate_recommendations(findings):
-    """Generate safe recommendations based on findings."""
+    """Generate safe recommendations based on findings, informed by cluster memory."""
     recs = []
     for f in findings:
         cat = f.get("category", "")
+        rec = None
         if cat in NEVER_AUTO_APPLY or f.get("severity") == "high":
-            recs.append({
+            rec = {
                 "finding": f["type"],
                 "action": "manual_review_required",
                 "auto_applicable": False,
                 "detail": f["detail"],
-            })
+            }
         elif f.get("severity") == "low":
-            recs.append({
+            rec = {
                 "finding": f["type"],
                 "action": "assisted_cleanup",
                 "auto_applicable": get_mode() == "autonomous",
                 "detail": f["detail"],
-            })
+            }
         else:
-            recs.append({
+            rec = {
                 "finding": f["type"],
                 "action": "review_and_fix",
                 "auto_applicable": False,
                 "detail": f["detail"],
-            })
+            }
+
+        # P77: Enrich with memory history
+        mem = _query_memory_for_recommendations(f["type"], ["firewall", f["type"]])
+        if mem and mem["total"] > 0:
+            rec["memory_history"] = mem
+            # Suppress recommendations that were repeatedly rejected
+            if mem["rejected"] >= 3 and mem["accepted"] == 0:
+                rec["action"] = "suppressed_by_memory"
+                rec["auto_applicable"] = False
+                rec["suppression_reason"] = f"Rejected {mem['rejected']} times previously"
+            # Boost if historically accepted
+            elif mem["accepted"] >= 2 and mem["rollbacks"] == 0:
+                rec["memory_boost"] = True
+
+        recs.append(rec)
     return recs
 
 

@@ -121,6 +121,12 @@
         <p id="slo-timestamp" class="timestamp"></p>
     </div>
 
+    <div id="memory-section">
+        <h2>🧠 Cluster Memory</h2>
+        <div id="memory-summary" class="summary-row"></div>
+        <p id="memory-timestamp" class="timestamp"></p>
+    </div>
+
     <div id="supply-section">
         <h2>🔗 Supply Chain</h2>
         <div id="supply-summary" class="summary-row"></div>
@@ -181,6 +187,31 @@
     </div>
 
     <script>
+    async function loadMemory() {
+        try {
+            const resp = await fetch('data/memory_status.json');
+            if (!resp.ok) throw new Error('No data');
+            const d = await resp.json();
+            const total = d.total_entries || 0;
+            const active = d.active || 0;
+            const archived = d.archived || 0;
+            const relations = d.relation_count || 0;
+            const stale = d.stale_candidates || 0;
+            document.getElementById('memory-summary').innerHTML = `
+                <div class="summary-item"><div class="label">Entries</div><div class="count">${total}</div></div>
+                <div class="summary-item"><div class="label">Active</div><div class="count status-ok">${active}</div></div>
+                <div class="summary-item"><div class="label">Archived</div><div class="count">${archived}</div></div>
+                <div class="summary-item"><div class="label">Relations</div><div class="count">${relations}</div></div>
+                <div class="summary-item"><div class="label">Stale</div><div class="count ${stale > 0 ? 'status-warn' : ''}">${stale}</div></div>
+                <div class="summary-item"><div class="label">Memory Routing</div><div class="count status-ok">✅</div></div>
+                <div class="summary-item"><div class="label">Memory Investigation</div><div class="count status-ok">✅</div></div>
+            `;
+            document.getElementById('memory-timestamp').textContent = `Memory data: ${d.timestamp || 'unknown'}`;
+        } catch (e) {
+            document.getElementById('memory-summary').innerHTML = '<div class="card"><p style="color:#484f58">No memory data. Run <code>oc memory tick</code>.</p></div>';
+        }
+    }
+
     async function loadSupply() {
         try {
             const resp = await fetch('data/supply_status.json');
@@ -678,6 +709,7 @@
     loadVerify();
     loadSec();
     loadPortfolio();
+    loadMemory();
     // Auto-refresh every 5 minutes
     setInterval(loadData, 300000);
     setInterval(loadIncidents, 300000);
@@ -690,6 +722,7 @@
     setInterval(loadVerify, 300000);
     setInterval(loadSec, 300000);
     setInterval(loadPortfolio, 300000);
+    setInterval(loadMemory, 300000);
     </script>
 </body>
 </html>

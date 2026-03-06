@@ -59,7 +59,22 @@ def route_task(task_type, preferred_agent=None):
         else:
             return "jasper", f"No fallback for role '{target_role}', defaulting to coordinator"
 
-    # Try each agent in fallback order
+    # P76: Memory-aware routing — re-rank candidates by historical performance
+    try:
+        sys.path.insert(0, str(ROOT / "platform" / "memory"))
+        from routing_history import get_best_agent_for_task
+        rankings = get_best_agent_for_task(task_type, fallback, min_history=2)
+        # Use memory-ranked order if any agent has enough history
+        has_history = any(r[2]["total_tasks"] >= 2 for r in rankings)
+        if has_history:
+            for agent_id, score, perf in rankings:
+                agent = get_agent(agent_id)
+                if agent and agent["status"] in ("online", "degraded"):
+                    return agent_id, f"Memory-ranked to '{agent_id}' (score={score:.3f}, role={target_role})"
+    except Exception:
+        pass  # Memory system not available — fall back to static routing
+
+    # Try each agent in fallback order (static)
     for agent_id in fallback:
         agent = get_agent(agent_id)
         if agent and agent["status"] in ("online", "degraded"):

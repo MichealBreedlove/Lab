@@ -208,6 +208,38 @@ def investigate(incident_id, service, state="confirmed", simulate=False):
     except ImportError:
         pass
 
+    # P75: Enrich with cluster memory context
+    try:
+        sys.path.insert(0, str(ROOT / "platform" / "memory"))
+        from investigation_context import build_investigation_context, record_investigation_to_memory
+        mem_ctx = build_investigation_context(
+            incident_type=service,
+            tags=[service, state],
+            node_name=None,
+            incident_id=incident_id,
+        )
+        investigation["related_cases"] = mem_ctx.get("related_cases", [])
+        investigation["historical_success_rate"] = mem_ctx.get("historical_success_rate")
+        investigation["prior_recommended_actions"] = mem_ctx.get("prior_recommended_actions", [])
+        investigation["memory_informed_confidence"] = mem_ctx.get("memory_informed_confidence")
+
+        # Adjust confidence if memory provides stronger signal
+        mic = mem_ctx.get("memory_informed_confidence")
+        if mic is not None and mem_ctx.get("total_historical_remediations", 0) >= 3:
+            blended = round(score * 0.6 + mic * 0.4, 3)
+            investigation["confidence"] = blended
+            investigation["confidence_source"] = "memory_blended"
+
+        # Record this investigation to memory
+        record_investigation_to_memory(
+            incident_id=incident_id,
+            incident_type=service,
+            investigation_result=investigation,
+            tags=[service, state],
+        )
+    except Exception:
+        pass  # Memory system not available — non-fatal
+
     # Persist
     out_file = INVESTIGATION_DIR / f"{inv_id}.json"
     with open(out_file, "w") as f:

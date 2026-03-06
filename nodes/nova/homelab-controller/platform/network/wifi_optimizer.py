@@ -63,26 +63,53 @@ def analyze_channels(ap_data):
     return findings
 
 
+def _query_wifi_memory(finding_type):
+    """P77: Check cluster memory for historical wifi optimization outcomes."""
+    try:
+        sys.path.insert(0, str(ROOT / "platform" / "memory"))
+        from index import search
+        from store import get_memory
+        entries = search(category="optimization", tags=["wifi", finding_type], status=None, limit=20)
+        accepted = sum(1 for ie in entries
+                       if (get_memory(ie["memory_id"]) or {}).get("payload", {}).get("outcome") in ("accepted", "applied"))
+        rejected = sum(1 for ie in entries
+                       if (get_memory(ie["memory_id"]) or {}).get("payload", {}).get("outcome") in ("rejected", "declined"))
+        return {"accepted": accepted, "rejected": rejected, "total": accepted + rejected}
+    except Exception:
+        return None
+
+
 def generate_suggestions(findings):
-    """Generate optimization suggestions (assisted mode only)."""
+    """Generate optimization suggestions (assisted mode only), informed by cluster memory."""
     suggestions = []
     for f in findings:
+        sug = None
         if f["type"] == "co_channel_interference":
-            suggestions.append({
+            sug = {
                 "finding": f["type"],
                 "suggestion": "channel_reassignment",
                 "detail": f["detail"],
                 "auto_applicable": False,
                 "mode": "assisted",
-            })
+            }
         elif f["type"] == "excessive_tx_power":
-            suggestions.append({
+            sug = {
                 "finding": f["type"],
                 "suggestion": "power_adjustment",
                 "detail": f["detail"],
                 "auto_applicable": False,
                 "mode": "assisted",
-            })
+            }
+
+        if sug:
+            # P77: Enrich with memory history
+            mem = _query_wifi_memory(f["type"])
+            if mem and mem["total"] > 0:
+                sug["memory_history"] = mem
+                if mem["rejected"] >= 3 and mem["accepted"] == 0:
+                    sug["suggestion"] = "suppressed_by_memory"
+                    sug["suppression_reason"] = f"Rejected {mem['rejected']} times"
+            suggestions.append(sug)
     return suggestions
 
 
