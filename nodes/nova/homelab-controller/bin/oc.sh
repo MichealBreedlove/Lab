@@ -805,6 +805,7 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             p45|change) bash "$ROOT_DIR/scripts/change/test_change_system.sh" ;;
             p46|platform) bash "$ROOT_DIR/platform/tests/test_platform_api.sh" ;;
             p47|identity) bash "$ROOT_DIR/scripts/identity/test_priority47_identity.sh" ;;
+            p48|apiauth) bash "$ROOT_DIR/platform/tests/test_priority48_api_auth.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do

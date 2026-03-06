@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Platform API — internal control interface for the homelab.
 Listens on 0.0.0.0:8081, restricts to 10.1.1.0/24.
+All endpoints require Bearer token auth with role-based enforcement (P48).
 """
 import http.server
 import ipaddress
@@ -8,29 +9,43 @@ import json
 import os
 import subprocess
 import sys
-import threading
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 BIND = os.environ.get("PLATFORM_BIND", "0.0.0.0")
 PORT = int(os.environ.get("PLATFORM_PORT", "8081"))
 ALLOWED_NETWORK = ipaddress.ip_network("10.1.1.0/24")
 DASHBOARD_DATA = ROOT / "dashboard" / "static" / "data"
+API_AUDIT_FILE = ROOT / "artifacts" / "identity" / "api_audit.jsonl"
 
-# Track last request for dashboard
+# Add identity scripts to path
+sys.path.insert(0, str(ROOT / "scripts" / "identity"))
+
 _state = {
     "started_at": None,
     "last_request": None,
     "last_change": None,
     "request_count": 0,
+    "failed_auth_count": 0,
+}
+
+# Endpoint -> minimum role mapping
+# Roles ranked: viewer < operator < sre < admin
+ROLE_RANK = {"viewer": 0, "operator": 1, "automation": 1, "sre": 2, "admin": 3}
+ENDPOINT_ROLES = {
+    "GET:/":           "viewer",
+    "GET:/topology":   "viewer",
+    "POST:/change":    "operator",
+    "POST:/snapshot":  "operator",
+    "POST:/incident":  "operator",
+    "POST:/chaos":     "sre",
 }
 
 
 def is_allowed(ip_str):
-    """Check if IP is in the allowed LAN subnet or localhost."""
     try:
         ip = ipaddress.ip_address(ip_str)
         return ip in ALLOWED_NETWORK or ip.is_loopback
@@ -39,12 +54,9 @@ def is_allowed(ip_str):
 
 
 def run_cmd(cmd, timeout=120):
-    """Run a shell command, return (exit_code, stdout, stderr)."""
     try:
-        r = subprocess.run(
-            cmd, shell=True, capture_output=True, text=True,
-            timeout=timeout, cwd=str(ROOT)
-        )
+        r = subprocess.run(cmd, shell=True, capture_output=True, text=True,
+                           timeout=timeout, cwd=str(ROOT))
         return r.returncode, r.stdout.strip(), r.stderr.strip()
     except subprocess.TimeoutExpired:
         return -1, "", "timeout"
@@ -53,11 +65,7 @@ def run_cmd(cmd, timeout=120):
 
 
 def create_change(trigger, summary):
-    """Create a change log entry and return change_id."""
-    rc, out, _ = run_cmd(
-        f"python3 scripts/change/change_create.py {trigger} '{summary}'"
-    )
-    # Extract CHG-xxx from output
+    rc, out, _ = run_cmd(f"python3 scripts/change/change_create.py {trigger} '{summary}'")
     for line in out.split("\n"):
         line = line.strip()
         if line.startswith("CHG-"):
@@ -65,24 +73,42 @@ def create_change(trigger, summary):
     return None
 
 
+def audit_api(token_id, role, endpoint, method, status, source_ip, details=None):
+    """Append an API audit entry."""
+    API_AUDIT_FILE.parent.mkdir(parents=True, exist_ok=True)
+    entry = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "token_id": token_id or "none",
+        "role": role or "none",
+        "endpoint": endpoint,
+        "action": method,
+        "status": status,
+        "source_ip": source_ip,
+        "details": details or {},
+    }
+    with open(API_AUDIT_FILE, "a") as f:
+        f.write(json.dumps(entry) + "\n")
+
+
 def update_dashboard():
-    """Write platform status to dashboard data."""
     DASHBOARD_DATA.mkdir(parents=True, exist_ok=True)
     with open(DASHBOARD_DATA / "platform_status.json", "w") as f:
         json.dump({
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "status": "running",
             "port": PORT,
+            "auth_required": True,
             "started_at": _state["started_at"],
             "last_request": _state["last_request"],
             "last_change": _state["last_change"],
             "request_count": _state["request_count"],
+            "failed_auth_count": _state["failed_auth_count"],
         }, f, indent=2)
 
 
 class PlatformHandler(http.server.BaseHTTPRequestHandler):
     def log_message(self, format, *args):
-        pass  # Suppress default logging
+        pass
 
     def _send_json(self, data, status=200):
         body = json.dumps(data, indent=2).encode()
@@ -92,12 +118,69 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def _check_access(self):
-        client_ip = self.client_address[0]
-        if not is_allowed(client_ip):
-            self._send_json({"error": "forbidden", "ip": client_ip}, 403)
+    def _client_ip(self):
+        return self.client_address[0]
+
+    def _check_network(self):
+        if not is_allowed(self._client_ip()):
+            self._send_json({"error": "forbidden", "ip": self._client_ip()}, 403)
             return False
         return True
+
+    def _authenticate(self, method, endpoint):
+        """Validate Bearer token and check role. Returns (allowed, token_id, role)."""
+        ip = self._client_ip()
+
+        # Extract token from Authorization header
+        auth_header = self.headers.get("Authorization", "")
+        token_secret = None
+        if auth_header.startswith("Bearer "):
+            token_secret = auth_header[7:].strip()
+
+        if not token_secret:
+            _state["failed_auth_count"] += 1
+            audit_api(None, None, endpoint, method, "401_no_token", ip)
+            self._send_json({"error": "unauthorized", "message": "Bearer token required"}, 401)
+            return False, None, None
+
+        # Validate token
+        try:
+            from token_issuer import validate_token
+            result = validate_token(token_secret)
+        except Exception as e:
+            _state["failed_auth_count"] += 1
+            audit_api(None, None, endpoint, method, "401_error", ip, {"error": str(e)})
+            self._send_json({"error": "unauthorized", "message": "Token validation failed"}, 401)
+            return False, None, None
+
+        if not result:
+            _state["failed_auth_count"] += 1
+            audit_api(None, None, endpoint, method, "401_invalid", ip)
+            self._send_json({"error": "unauthorized", "message": "Invalid or expired token"}, 401)
+            return False, None, None
+
+        token_id = result["token_id"]
+        role = result["role"]
+
+        # Check role permission
+        endpoint_key = f"{method}:{endpoint}"
+        required_role = ENDPOINT_ROLES.get(endpoint_key, "admin")
+        required_rank = ROLE_RANK.get(required_role, 3)
+        user_rank = ROLE_RANK.get(role, -1)
+
+        if user_rank < required_rank:
+            _state["failed_auth_count"] += 1
+            audit_api(token_id, role, endpoint, method, "403_insufficient_role", ip,
+                      {"required": required_role})
+            self._send_json({
+                "error": "forbidden",
+                "message": f"Role '{role}' cannot access {endpoint} (requires '{required_role}')",
+            }, 403)
+            return False, token_id, role
+
+        # Authorized
+        audit_api(token_id, role, endpoint, method, "200_authorized", ip)
+        return True, token_id, role
 
     def _read_body(self):
         length = int(self.headers.get("Content-Length", 0))
@@ -108,54 +191,59 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
                 return {}
         return {}
 
-    def _track(self, endpoint):
+    def _track(self, endpoint, token_id=None, role=None):
         _state["last_request"] = {
             "endpoint": endpoint,
             "time": datetime.now(timezone.utc).isoformat(),
-            "ip": self.client_address[0],
+            "ip": self._client_ip(),
+            "token_id": token_id,
+            "role": role,
         }
         _state["request_count"] += 1
 
     def do_GET(self):
-        if not self._check_access():
+        if not self._check_network():
+            return
+        path = urlparse(self.path).path.rstrip("/") or "/"
+        allowed, token_id, role = self._authenticate("GET", path)
+        if not allowed:
             return
 
-        path = urlparse(self.path).path.rstrip("/")
-
-        if path == "" or path == "/":
-            self._track("/")
+        if path == "/":
+            self._track("/", token_id, role)
             self._send_json({
                 "service": "homelab-platform-api",
-                "version": "1.0",
+                "version": "2.0",
                 "status": "running",
+                "auth": {"token_id": token_id, "role": role},
                 "endpoints": ["/", "/topology", "/change", "/chaos", "/incident", "/snapshot"],
                 "request_count": _state["request_count"],
             })
-
         elif path == "/topology":
-            self._track("/topology")
+            self._track("/topology", token_id, role)
             rc, out, _ = run_cmd("python3 scripts/controlplane/device_connectivity.py --json")
             try:
                 data = json.loads(out)
             except Exception:
                 data = {"raw": out}
             self._send_json({"topology": data})
-
         else:
             self._send_json({"error": "not found"}, 404)
 
     def do_POST(self):
-        if not self._check_access():
+        if not self._check_network():
+            return
+        path = urlparse(self.path).path.rstrip("/")
+        allowed, token_id, role = self._authenticate("POST", path)
+        if not allowed:
             return
 
-        path = urlparse(self.path).path.rstrip("/")
         body = self._read_body()
 
         if path == "/change":
-            self._track("/change")
+            self._track("/change", token_id, role)
             trigger = body.get("trigger", "manual")
             summary = body.get("summary", "API-triggered change")
-
             change_id = create_change(trigger, summary)
             if change_id:
                 run_cmd(f"python3 scripts/change/change_diff.py {change_id}")
@@ -168,10 +256,9 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
                 self._send_json({"error": "failed to create change"}, 500)
 
         elif path == "/chaos":
-            self._track("/chaos")
+            self._track("/chaos", token_id, role)
             scenario = body.get("scenario", "gateway_restart_outage")
             change_id = create_change("chaos_experiment", f"Chaos: {scenario}")
-
             rc, out, _ = run_cmd(f"bash scripts/demo/demo_runner.sh {scenario}")
             _state["last_change"] = change_id
             update_dashboard()
@@ -183,11 +270,10 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
             })
 
         elif path == "/incident":
-            self._track("/incident")
+            self._track("/incident", token_id, role)
             title = body.get("title", "Manual incident")
             severity = body.get("severity", "warning")
             change_id = create_change("remediation", f"Incident: {title}")
-
             _state["last_change"] = change_id
             update_dashboard()
             self._send_json({
@@ -197,29 +283,21 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
             })
 
         elif path == "/snapshot":
-            self._track("/snapshot")
+            self._track("/snapshot", token_id, role)
             change_id = create_change("controlplane_tick", "API-triggered snapshot")
-
-            # Run drift + collect
             run_cmd("python3 scripts/drift/state_render_desired.py")
             run_cmd("python3 scripts/drift/state_collect_observed.py")
-            rc_drift, out_drift, _ = run_cmd("python3 scripts/drift/state_drift.py")
-
-            # Run change pipeline
+            run_cmd("python3 scripts/drift/state_drift.py")
             run_cmd(f"python3 scripts/change/change_diff.py {change_id}")
             run_cmd(f"python3 scripts/change/change_validate.py {change_id}")
             run_cmd(f"python3 scripts/change/change_render.py {change_id}")
-
             _state["last_change"] = change_id
             update_dashboard()
-
-            # Read drift status
             drift_file = ROOT / "state" / "drift" / "drift_report.json"
             drift_status = "unknown"
             if drift_file.exists():
                 with open(drift_file) as f:
                     drift_status = json.load(f).get("status", "unknown")
-
             self._send_json({
                 "change_id": change_id,
                 "drift_status": drift_status,
@@ -233,11 +311,10 @@ class PlatformHandler(http.server.BaseHTTPRequestHandler):
 def main():
     _state["started_at"] = datetime.now(timezone.utc).isoformat()
     update_dashboard()
-
     server = http.server.HTTPServer((BIND, PORT), PlatformHandler)
-    print(f"Platform API listening on {BIND}:{PORT}")
-    print(f"Allowed network: {ALLOWED_NETWORK}")
-
+    print(f"Platform API v2.0 listening on {BIND}:{PORT}")
+    print(f"Auth: Bearer token required (RBAC enforced)")
+    print(f"Network: {ALLOWED_NETWORK}")
     try:
         server.serve_forever()
     except KeyboardInterrupt:
