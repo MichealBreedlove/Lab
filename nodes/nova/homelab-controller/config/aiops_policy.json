@@ -4,11 +4,25 @@
   "auto_apply_actions": [
     "restart_service"
   ],
+  "confidence_thresholds": {
+    "auto_apply": 0.90,
+    "requires_review": 0.80
+  },
   "approval_required_below_confidence": 0.80,
+  "action_risk_levels": {
+    "restart_service": "low",
+    "rollback_config": "medium",
+    "failover_service": "medium",
+    "firewall_change": "high",
+    "delete_data": "high",
+    "mass_config_rewrite": "high",
+    "broad_failover": "high",
+    "manual_review": "medium"
+  },
   "high_risk_actions": [
     "firewall_change",
-    "mass_config_rewrite",
     "delete_data",
+    "mass_config_rewrite",
     "broad_failover"
   ]
 }
