@@ -26,6 +26,17 @@
         "auth:whoami"
       ]
     },
+    "sre": {
+      "description": "SRE with chaos and incident access",
+      "allowed_actions": [
+        "drift:run", "drift:status",
+        "change:create", "change:list", "change:show", "change:validate",
+        "platform:status", "platform:snapshot", "platform:change", "platform:chaos",
+        "obs:status", "obs:up", "obs:down",
+        "demo:list", "demo:run",
+        "auth:whoami", "auth:audit"
+      ]
+    },
     "automation": {
       "description": "Scheduled tasks and CI pipelines",
       "allowed_actions": [
