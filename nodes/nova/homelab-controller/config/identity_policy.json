@@ -1,0 +1,61 @@
+{
+  "version": "1.0",
+  "roles": {
+    "admin": {
+      "description": "Full control plane access",
+      "allowed_actions": ["*"]
+    },
+    "operator": {
+      "description": "Run commands, view status, trigger changes",
+      "allowed_actions": [
+        "drift:run", "drift:status",
+        "change:create", "change:list", "change:show", "change:validate",
+        "platform:status", "platform:snapshot", "platform:change",
+        "obs:status", "obs:up", "obs:down",
+        "demo:list", "demo:run",
+        "auth:whoami", "auth:audit"
+      ]
+    },
+    "viewer": {
+      "description": "Read-only access to status and reports",
+      "allowed_actions": [
+        "drift:status",
+        "change:list", "change:show",
+        "platform:status",
+        "obs:status",
+        "auth:whoami"
+      ]
+    },
+    "automation": {
+      "description": "Scheduled tasks and CI pipelines",
+      "allowed_actions": [
+        "drift:run", "drift:status",
+        "change:create", "change:validate",
+        "platform:snapshot",
+        "obs:status"
+      ]
+    }
+  },
+  "token_config": {
+    "ttl_hours": 168,
+    "max_active_tokens": 20,
+    "algorithm": "sha256-hmac",
+    "prefix": "hlab_"
+  },
+  "audit": {
+    "retention_days": 90,
+    "log_dir": "artifacts/identity/audit",
+    "format": "jsonl"
+  },
+  "trusted_subnets": [
+    "10.1.1.0/24",
+    "127.0.0.0/8"
+  ],
+  "break_glass": {
+    "enabled": true,
+    "ttl_minutes": 30,
+    "token_path": "config/break_glass.token",
+    "requires_audit": true,
+    "allowed_roles": ["admin"]
+  }
+}
