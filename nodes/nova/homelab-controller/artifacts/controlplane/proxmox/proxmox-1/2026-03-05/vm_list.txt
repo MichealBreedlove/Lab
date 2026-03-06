@@ -1,0 +1,3 @@
+      VMID NAME                 STATUS     MEM(MB)    BOOTDISK(GB) PID       
+       200 TrueNAS              running    16000             32.00 102837    
+       201 openclaw-nova        running    16000             32.00 102946    

@@ -1,0 +1,2 @@
+      VMID NAME                 STATUS     MEM(MB)    BOOTDISK(GB) PID       
+       400 openclaw-mira        running    16999             32.00 109219    

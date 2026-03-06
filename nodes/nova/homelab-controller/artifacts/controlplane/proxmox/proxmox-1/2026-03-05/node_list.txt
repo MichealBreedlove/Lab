@@ -1,0 +1,7 @@
+
+Membership information
+----------------------
+    Nodeid      Votes Name
+         1          1 PROXMOX (local)
+         2          1 PROXMOX-2
+         3          1 PROXMOX-3
