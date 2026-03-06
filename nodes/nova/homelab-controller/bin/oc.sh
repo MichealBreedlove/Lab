@@ -38,6 +38,12 @@ Commands:
   portfolio test        Run P29 portfolio tests
   changelog             Run changelog generation (P26)
   gate <action> <tier>  Evaluate gatekeeper for an action
+  drift status           Show drift detection status
+  drift run              Run full drift detection pipeline
+  obs up|down|status     Manage observability stack
+  obs export             Export Grafana dashboards
+  demo run <scenario>    Run reliability demo scenario
+  demo list              List available demo scenarios
   controlplane tick      Quick inventory tick (nodes + BIOS)
   controlplane full      Full inventory tick (all devices)
   controlplane status    Show last tick results
@@ -336,6 +342,42 @@ print(f'Site: {d.get(\"site_url\", \"N/A\")}')
                 echo "Unknown portfolio subcommand: $subcmd"
                 echo "Try: oc portfolio [status|build|publish|render|badges|tick|test|open]"
                 ;;
+        esac
+        ;;
+    drift)
+        shift
+        subcmd="${1:-status}"
+        shift 2>/dev/null || true
+        case "$subcmd" in
+            run)
+                python3 "$ROOT_DIR/scripts/drift/state_render_desired.py"
+                python3 "$ROOT_DIR/scripts/drift/state_collect_observed.py"
+                python3 "$ROOT_DIR/scripts/drift/state_drift.py"
+                ;;
+            status)
+                if [ -f "$ROOT_DIR/state/drift/drift_report.json" ]; then
+                    python3 -c "import json; d=json.load(open('$ROOT_DIR/state/drift/drift_report.json')); print(f'Drift: {d[\"status\"]} ({d[\"total_drifts\"]} drift(s)) @ {d[\"timestamp\"]}')"
+                else
+                    echo "No drift report yet. Run: oc drift run"
+                fi
+                ;;
+            *) echo "Usage: oc drift [run|status]" ;;
+        esac
+        ;;
+    obs|observability)
+        shift
+        subcmd="${1:-status}"
+        shift 2>/dev/null || true
+        bash "$ROOT_DIR/scripts/observability/obs_manage.sh" "$subcmd" "$@"
+        ;;
+    demo)
+        shift
+        subcmd="${1:-list}"
+        shift 2>/dev/null || true
+        case "$subcmd" in
+            run) bash "$ROOT_DIR/scripts/demo/demo_runner.sh" "${1:-gateway_restart_outage}" ;;
+            list) echo "Available scenarios: gateway_restart_outage, ollama_unreachable" ;;
+            *) echo "Usage: oc demo [run <scenario>|list]" ;;
         esac
         ;;
     controlplane|cp)
@@ -638,6 +680,7 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             p41|supply) bash "$ROOT_DIR/scripts/supply/test_priority41_supply.sh" ;;
             p42|freeze) bash "$ROOT_DIR/scripts/release/test_priority42_freeze.sh" ;;
             p43|controlplane|cp) bash "$ROOT_DIR/scripts/controlplane/test_controlplane.sh" ;;
+            p44|platform) bash "$ROOT_DIR/scripts/demo/test_platform_upgrades.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do

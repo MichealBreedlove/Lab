@@ -1,0 +1,63 @@
+{
+  "version": "1.0",
+  "description": "Desired state definitions for drift detection",
+  "nodes": {
+    "nova": {
+      "ip": "10.1.1.21",
+      "user": "nova",
+      "role": "controller",
+      "services": ["ssh", "cron", "systemd-timesyncd"],
+      "ports": [22],
+      "packages": ["ansible", "python3", "git", "jq"],
+      "ssh_config": {
+        "PermitRootLogin": "prohibit-password",
+        "PasswordAuthentication": "yes"
+      },
+      "firewall": {
+        "ufw_enabled": true,
+        "allowed_ports": [22, 8080]
+      }
+    },
+    "mira": {
+      "ip": "10.1.1.22",
+      "user": "mira",
+      "role": "worker",
+      "services": ["ssh", "cron", "systemd-timesyncd"],
+      "ports": [22],
+      "packages": ["python3", "git"],
+      "ssh_config": {
+        "PermitRootLogin": "prohibit-password",
+        "PasswordAuthentication": "yes"
+      }
+    },
+    "orin": {
+      "ip": "10.1.1.23",
+      "user": "orin",
+      "role": "worker",
+      "services": ["ssh", "cron", "systemd-timesyncd"],
+      "ports": [22],
+      "packages": ["python3", "git"],
+      "ssh_config": {
+        "PermitRootLogin": "prohibit-password",
+        "PasswordAuthentication": "yes"
+      }
+    }
+  },
+  "infrastructure": {
+    "opnsense": {
+      "ip": "10.1.1.1",
+      "ssh_port": 22,
+      "wan_interface": "igc4",
+      "lan_bridge": "bridge0",
+      "lan_ip": "10.1.1.1/24"
+    },
+    "proxmox": {
+      "cluster_name": "CL-1",
+      "nodes": {
+        "pve1": {"ip": "10.1.1.2", "port": 8006},
+        "pve2": {"ip": "10.1.1.4", "port": 8006},
+        "pve3": {"ip": "10.1.1.5", "port": 8006}
+      }
+    }
+  }
+}

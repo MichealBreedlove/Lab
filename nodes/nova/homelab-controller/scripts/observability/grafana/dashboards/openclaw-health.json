@@ -1,0 +1,35 @@
+{
+  "dashboard": {
+    "title": "OpenClaw Health",
+    "uid": "openclaw-health",
+    "tags": ["homelab", "openclaw"],
+    "timezone": "browser",
+    "refresh": "30s",
+    "panels": [
+      {
+        "title": "Node Targets Up",
+        "type": "stat",
+        "gridPos": {"h": 6, "w": 8, "x": 0, "y": 0},
+        "targets": [{"expr": "count(up{job=~'nova|mira|orin'} == 1)", "legendFormat": "Nodes Up"}]
+      },
+      {
+        "title": "Prometheus Targets",
+        "type": "stat",
+        "gridPos": {"h": 6, "w": 8, "x": 8, "y": 0},
+        "targets": [{"expr": "count(up)", "legendFormat": "Total Targets"}]
+      },
+      {
+        "title": "Scrape Duration",
+        "type": "timeseries",
+        "gridPos": {"h": 6, "w": 8, "x": 16, "y": 0},
+        "targets": [{"expr": "scrape_duration_seconds", "legendFormat": "{{job}}"}]
+      },
+      {
+        "title": "Uptime (hours)",
+        "type": "stat",
+        "gridPos": {"h": 6, "w": 24, "x": 0, "y": 6},
+        "targets": [{"expr": "node_time_seconds - node_boot_time_seconds", "legendFormat": "{{node}}"}]
+      }
+    ]
+  }
+}
