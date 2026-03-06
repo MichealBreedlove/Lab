@@ -1,0 +1,57 @@
+{
+  "change_id": "CHG-20260306-020814-ba00be",
+  "timestamp": "2026-03-06T02:08:14.876510+00:00",
+  "checks": [
+    {
+      "name": "nova_ssh",
+      "host": "10.1.1.21",
+      "port": 22,
+      "passed": true
+    },
+    {
+      "name": "mira_ssh",
+      "host": "10.1.1.22",
+      "port": 22,
+      "passed": true
+    },
+    {
+      "name": "orin_ssh",
+      "host": "10.1.1.23",
+      "port": 22,
+      "passed": true
+    },
+    {
+      "name": "opnsense_ssh",
+      "host": "10.1.1.1",
+      "port": 22,
+      "passed": true
+    },
+    {
+      "name": "proxmox1_webui",
+      "host": "10.1.1.2",
+      "port": 8006,
+      "passed": true
+    },
+    {
+      "name": "proxmox2_webui",
+      "host": "10.1.1.4",
+      "port": 8006,
+      "passed": true
+    },
+    {
+      "name": "proxmox3_webui",
+      "host": "10.1.1.5",
+      "port": 8006,
+      "passed": true
+    },
+    {
+      "name": "dashboard",
+      "host": "10.1.1.21",
+      "port": 8080,
+      "passed": true
+    }
+  ],
+  "passed": 8,
+  "failed": 0,
+  "all_passed": true
+}

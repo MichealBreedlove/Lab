@@ -1,0 +1,13 @@
+{
+  "timestamp": "2026-03-06T02:08:14.980500+00:00",
+  "total_changes": 1,
+  "recent": [
+    {
+      "change_id": "CHG-20260306-020814-ba00be",
+      "trigger": "chaos_experiment",
+      "summary": "Reliability demo: gateway_restart_outage",
+      "status": "rendered",
+      "created_at": "2026-03-06T02:08:14.530522+00:00"
+    }
+  ]
+}
