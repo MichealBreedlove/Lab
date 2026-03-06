@@ -1,0 +1,51 @@
+1: [36mlo: [0m<LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback [33m00:00:00:00:00:00[0m brd [33m00:00:00:00:00:00[0m
+    inet [35m127.0.0.1[0m/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 [34m::1[0m/128 scope host noprefixroute 
+       valid_lft forever preferred_lft forever
+2: [36menp2s0: [0m<BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 1500 qdisc mq master bond0 state [32mUP [0mgroup default qlen 1000
+    link/ether [33m00:e2:69:84:34:ae[0m brd [33mff:ff:ff:ff:ff:ff[0m
+    altname enx00e2698434ae
+3: [36menp3s0: [0m<BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 1500 qdisc mq master bond0 state [32mUP [0mgroup default qlen 1000
+    link/ether [33m00:e2:69:84:34:ae[0m brd [33mff:ff:ff:ff:ff:ff[0m permaddr [33m00:e2:69:84:34:af[0m
+    altname enx00e2698434af
+4: [36menp4s0: [0m<BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 1500 qdisc mq master bond0 state [32mUP [0mgroup default qlen 1000
+    link/ether [33m00:e2:69:84:34:ae[0m brd [33mff:ff:ff:ff:ff:ff[0m permaddr [33m00:e2:69:84:34:b0[0m
+    altname enx00e2698434b0
+5: [36menp5s0: [0m<NO-CARRIER,BROADCAST,MULTICAST,SLAVE,UP> mtu 1500 qdisc mq master bond0 state [31mDOWN [0mgroup default qlen 1000
+    link/ether [33m00:e2:69:84:34:ae[0m brd [33mff:ff:ff:ff:ff:ff[0m permaddr [33m00:e2:69:84:34:b1[0m
+    altname enx00e2698434b1
+6: [36menp6s0: [0m<NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc mq master vmbr1 state [31mDOWN [0mgroup default qlen 1000
+    link/ether [33mc4:62:37:0a:e5:6a[0m brd [33mff:ff:ff:ff:ff:ff[0m
+    altname enxc462370ae56a
+7: [36mbond0: [0m<BROADCAST,MULTICAST,MASTER,UP,LOWER_UP> mtu 1500 qdisc noqueue master vmbr0 state [32mUP [0mgroup default qlen 1000
+    link/ether [33m00:e2:69:84:34:ae[0m brd [33mff:ff:ff:ff:ff:ff[0m
+8: [36mvmbr0: [0m<BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state [32mUP [0mgroup default qlen 1000
+    link/ether [33m00:e2:69:84:34:ae[0m brd [33mff:ff:ff:ff:ff:ff[0m
+    inet [35m10.1.1.2[0m/24 scope global vmbr0
+       valid_lft forever preferred_lft forever
+    inet6 [34mfe80::2e2:69ff:fe84:34ae[0m/64 scope link proto kernel_ll 
+       valid_lft forever preferred_lft forever
+9: [36mvmbr1: [0m<NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state [31mDOWN [0mgroup default qlen 1000
+    link/ether [33mc4:62:37:0a:e5:6a[0m brd [33mff:ff:ff:ff:ff:ff[0m
+    inet [35m10.1.1.3[0m/24 scope global vmbr1
+       valid_lft forever preferred_lft forever
+10: [36mveth100i0@if2: [0m<BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master vmbr0 state [32mUP [0mgroup default qlen 1000
+    link/ether [33mfe:52:33:5f:74:26[0m brd [33mff:ff:ff:ff:ff:ff[0m link-netnsid 0
+11: [36mtap200i0: [0m<BROADCAST,MULTICAST,PROMISC,UP,LOWER_UP> mtu 1500 qdisc fq_codel master fwbr200i0 state UNKNOWN group default qlen 1000
+    link/ether [33m22:0d:9e:79:67:b5[0m brd [33mff:ff:ff:ff:ff:ff[0m
+12: [36mfwbr200i0: [0m<BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state [32mUP [0mgroup default qlen 1000
+    link/ether [33mbe:be:94:05:30:a0[0m brd [33mff:ff:ff:ff:ff:ff[0m
+13: [36mfwpr200p0@fwln200i0: [0m<BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master vmbr0 state [32mUP [0mgroup default qlen 1000
+    link/ether [33m0e:0b:86:13:c7:3b[0m brd [33mff:ff:ff:ff:ff:ff[0m
+14: [36mfwln200i0@fwpr200p0: [0m<BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master fwbr200i0 state [32mUP [0mgroup default qlen 1000
+    link/ether [33mbe:be:94:05:30:a0[0m brd [33mff:ff:ff:ff:ff:ff[0m
+15: [36mtap201i0: [0m<BROADCAST,MULTICAST,PROMISC,UP,LOWER_UP> mtu 1500 qdisc fq_codel master fwbr201i0 state UNKNOWN group default qlen 1000
+    link/ether [33m16:1d:05:33:25:15[0m brd [33mff:ff:ff:ff:ff:ff[0m
+16: [36mfwbr201i0: [0m<BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state [32mUP [0mgroup default qlen 1000
+    link/ether [33mda:32:75:16:69:8e[0m brd [33mff:ff:ff:ff:ff:ff[0m
+17: [36mfwpr201p0@fwln201i0: [0m<BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master vmbr0 state [32mUP [0mgroup default qlen 1000
+    link/ether [33m3a:e3:1e:75:a6:bc[0m brd [33mff:ff:ff:ff:ff:ff[0m
+18: [36mfwln201i0@fwpr201p0: [0m<BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master fwbr201i0 state [32mUP [0mgroup default qlen 1000
+    link/ether [33mda:32:75:16:69:8e[0m brd [33mff:ff:ff:ff:ff:ff[0m

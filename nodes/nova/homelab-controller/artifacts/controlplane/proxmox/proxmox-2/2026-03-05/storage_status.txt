@@ -1,0 +1,5 @@
+Name               Type     Status     Total (KiB)      Used (KiB) Available (KiB)        %
+HDD-4TB             dir   disabled               0               0               0      N/A
+HDD_VM-CT           dir   disabled               0               0               0      N/A
+Media_Drive         nfs     active     20850844672       302086144     20548758528    1.45%
+local               dir     active        98497780        35137948        58310284   35.67%

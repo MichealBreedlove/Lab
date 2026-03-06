@@ -1,0 +1,3 @@
+VMID       Status     Lock         Name                
+100        running                 unifi               
+101        stopped                 plex                
