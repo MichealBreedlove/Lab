@@ -38,6 +38,10 @@ Commands:
   portfolio test        Run P29 portfolio tests
   changelog             Run changelog generation (P26)
   gate <action> <tier>  Evaluate gatekeeper for an action
+  platform status        Platform API status
+  platform chaos         Trigger chaos via API
+  platform change        Trigger change via API
+  platform snapshot      Trigger snapshot via API
   change list            List recent changes
   change show <id>       Show a specific change
   change create <trigger> <summary>  Create new change
@@ -346,6 +350,46 @@ print(f'Site: {d.get(\"site_url\", \"N/A\")}')
                 echo "Unknown portfolio subcommand: $subcmd"
                 echo "Try: oc portfolio [status|build|publish|render|badges|tick|test|open]"
                 ;;
+        esac
+        ;;
+    platform)
+        shift
+        subcmd="${1:-status}"
+        shift 2>/dev/null || true
+        API_URL="http://localhost:8081"
+        case "$subcmd" in
+            status)
+                echo "Platform API Status"
+                if curl -sf "$API_URL/" >/dev/null 2>&1; then
+                    curl -sf "$API_URL/" | python3 -m json.tool
+                else
+                    echo "  API not running. Start with: oc platform start"
+                fi
+                ;;
+            start)
+                bash "$ROOT_DIR/platform/install_platform_api.sh"
+                ;;
+            stop)
+                systemctl --user stop homelab-platform-api.service 2>/dev/null || true
+                echo "[OK] Platform API stopped"
+                ;;
+            chaos)
+                scenario="${1:-gateway_restart_outage}"
+                curl -sf -X POST "$API_URL/chaos" -H 'Content-Type: application/json' \
+                    -d "{\"scenario\":\"$scenario\"}" | python3 -m json.tool
+                ;;
+            change)
+                trigger="${1:-manual}"
+                shift 2>/dev/null || true
+                summary="${*:-API change}"
+                curl -sf -X POST "$API_URL/change" -H 'Content-Type: application/json' \
+                    -d "{\"trigger\":\"$trigger\",\"summary\":\"$summary\"}" | python3 -m json.tool
+                ;;
+            snapshot)
+                curl -sf -X POST "$API_URL/snapshot" -H 'Content-Type: application/json' \
+                    -d '{}' | python3 -m json.tool
+                ;;
+            *) echo "Usage: oc platform [status|start|stop|chaos|change|snapshot]" ;;
         esac
         ;;
     change)
@@ -731,6 +775,7 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             p43|controlplane|cp) bash "$ROOT_DIR/scripts/controlplane/test_controlplane.sh" ;;
             p44|platform) bash "$ROOT_DIR/scripts/demo/test_platform_upgrades.sh" ;;
             p45|change) bash "$ROOT_DIR/scripts/change/test_change_system.sh" ;;
+            p46|platform) bash "$ROOT_DIR/platform/tests/test_platform_api.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do
