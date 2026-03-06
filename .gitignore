@@ -4,6 +4,8 @@
 **/*secret*
 !**/sec_secretscan.py
 !**/secretscan_latest.json
+!**/token_issuer.py
+!**/active_tokens.json
 **/auth-profiles.json
 **/auth_profiles.json
 **/auth*.json
@@ -15,6 +17,7 @@
 **/*.key
 **/cookies*
 **/session*
+!**/session_logger.py
 **/*.log
 **/node_modules/
 **/__pycache__/
