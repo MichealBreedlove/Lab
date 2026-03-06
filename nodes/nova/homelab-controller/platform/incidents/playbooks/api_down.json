@@ -1,0 +1,27 @@
+{
+  "name": "api_down",
+  "trigger_conditions": {
+    "service": "api",
+    "state": ["confirmed", "failed_recovery"]
+  },
+  "evidence_steps": [
+    "health_check",
+    "service_status",
+    "recent_audit_entries"
+  ],
+  "allowed_checks": [
+    "http_get",
+    "service_status",
+    "read_log_tail",
+    "read_file"
+  ],
+  "confidence_rules": {
+    "high": ["health_check_failed", "service_inactive"],
+    "medium": ["health_check_failed"]
+  },
+  "recommended_actions": [
+    "restart_service",
+    "rollback_config",
+    "failover_service"
+  ]
+}

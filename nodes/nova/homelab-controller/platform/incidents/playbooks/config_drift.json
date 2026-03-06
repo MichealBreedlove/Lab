@@ -1,0 +1,25 @@
+{
+  "name": "config_drift",
+  "trigger_conditions": {
+    "service": "drift",
+    "state": ["confirmed"]
+  },
+  "evidence_steps": [
+    "drift_report",
+    "recent_changes",
+    "config_diff"
+  ],
+  "allowed_checks": [
+    "read_file",
+    "http_get"
+  ],
+  "confidence_rules": {
+    "high": ["drift_detected", "no_recent_change"],
+    "medium": ["drift_detected"]
+  },
+  "recommended_actions": [
+    "rollback_config",
+    "approve_drift",
+    "update_desired_state"
+  ]
+}
