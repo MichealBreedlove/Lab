@@ -12,7 +12,7 @@ import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 BIND = os.environ.get("PLATFORM_BIND", "0.0.0.0")
