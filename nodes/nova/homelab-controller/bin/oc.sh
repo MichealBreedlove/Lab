@@ -358,6 +358,12 @@ print(f'Site: {d.get(\"site_url\", \"N/A\")}')
                 ;;
         esac
         ;;
+    recovery)
+        shift
+        subcmd="${1:-status}"
+        shift 2>/dev/null || true
+        python3 "$ROOT_DIR/platform/recovery/engine.py" "$subcmd" "$@"
+        ;;
     auth)
         shift
         subcmd="${1:-whoami}"
@@ -372,6 +378,12 @@ print(f'Site: {d.get(\"site_url\", \"N/A\")}')
                     list) python3 "$ROOT_DIR/scripts/identity/token_issuer.py" list "$@" ;;
                     *) echo "Usage: oc auth token [create|revoke|list]" ;;
                 esac
+                ;;
+            service-account|sa)
+                shift 2>/dev/null || true
+                sa_cmd="${1:-list}"
+                shift 2>/dev/null || true
+                python3 "$ROOT_DIR/scripts/identity/service_accounts.py" "$sa_cmd" "$@"
                 ;;
             audit) python3 "$ROOT_DIR/scripts/identity/audit_log.py" summary ;;
             whoami) python3 "$ROOT_DIR/scripts/identity/auth_manager.py" whoami "$@" ;;
@@ -806,6 +818,11 @@ print(f'  Result: {\"PASS ✅\" if passed else \"FAIL ❌\"}')
             p46|platform) bash "$ROOT_DIR/platform/tests/test_platform_api.sh" ;;
             p47|identity) bash "$ROOT_DIR/scripts/identity/test_priority47_identity.sh" ;;
             p48|apiauth) bash "$ROOT_DIR/platform/tests/test_priority48_api_auth.sh" ;;
+            p49|ratelimit) bash "$ROOT_DIR/platform/tests/test_priority49_rate_limit.sh" ;;
+            p50|revocation) bash "$ROOT_DIR/platform/tests/test_priority50_token_revocation.sh" ;;
+            p51|serviceaccount) bash "$ROOT_DIR/platform/tests/test_priority51_service_accounts.sh" ;;
+            p52|tls) bash "$ROOT_DIR/platform/tests/test_priority52_tls_config.sh" ;;
+            p53|selfhealing) bash "$ROOT_DIR/platform/tests/test_priority53_self_healing.sh" ;;
             all)
                 echo "Running all available tests..."
                 for t in "$ROOT_DIR"/scripts/test_priority*.sh; do
