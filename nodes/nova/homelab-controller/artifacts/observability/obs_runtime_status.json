@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-03-06T02:07:05.453277+00:00",
+  "stack": "prometheus+grafana+loki",
+  "services": [
+    {
+      "name": "grafana",
+      "port": 3000,
+      "status": "Up 44 seconds"
+    },
+    {
+      "name": "prometheus",
+      "port": 9090,
+      "status": "Up 43 seconds"
+    },
+    {
+      "name": "loki",
+      "port": 3100,
+      "status": "Up 43 seconds"
+    },
+    {
+      "name": "promtail",
+      "port": "internal",
+      "status": "Up 43 seconds"
+    },
+    {
+      "name": "node_exporter",
+      "port": 9100,
+      "status": "Up 44 seconds"
+    }
+  ]
+}

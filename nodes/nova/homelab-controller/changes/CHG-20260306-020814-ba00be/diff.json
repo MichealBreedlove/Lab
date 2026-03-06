@@ -1,0 +1,282 @@
+{
+  "change_id": "CHG-20260306-020814-ba00be",
+  "timestamp": "2026-03-06T02:08:14.775604+00:00",
+  "diff_count": 44,
+  "diffs": [
+    {
+      "path": "infrastructure.opnsense.ip",
+      "old": "10.1.1.1",
+      "new": null
+    },
+    {
+      "path": "infrastructure.opnsense.lan_bridge",
+      "old": "bridge0",
+      "new": null
+    },
+    {
+      "path": "infrastructure.opnsense.lan_ip",
+      "old": "10.1.1.1/24",
+      "new": null
+    },
+    {
+      "path": "infrastructure.opnsense.reachable",
+      "old": null,
+      "new": true
+    },
+    {
+      "path": "infrastructure.opnsense.ssh_port",
+      "old": 22,
+      "new": null
+    },
+    {
+      "path": "infrastructure.opnsense.version",
+      "old": null,
+      "new": "14.3-RELEASE-p7"
+    },
+    {
+      "path": "infrastructure.opnsense.wan_interface",
+      "old": "igc4",
+      "new": null
+    },
+    {
+      "path": "infrastructure.proxmox.cluster_name",
+      "old": "CL-1",
+      "new": null
+    },
+    {
+      "path": "infrastructure.proxmox.nodes.pve1.ip",
+      "old": "10.1.1.2",
+      "new": null
+    },
+    {
+      "path": "infrastructure.proxmox.nodes.pve1.port",
+      "old": 8006,
+      "new": null
+    },
+    {
+      "path": "infrastructure.proxmox.nodes.pve1.reachable",
+      "old": null,
+      "new": true
+    },
+    {
+      "path": "infrastructure.proxmox.nodes.pve1.version",
+      "old": null,
+      "new": "pve-manager/9.1.5/80cf92a64bef6889 (running kernel: 6.17.9-1-pve)"
+    },
+    {
+      "path": "infrastructure.proxmox.nodes.pve2.ip",
+      "old": "10.1.1.4",
+      "new": null
+    },
+    {
+      "path": "infrastructure.proxmox.nodes.pve2.port",
+      "old": 8006,
+      "new": null
+    },
+    {
+      "path": "infrastructure.proxmox.nodes.pve2.reachable",
+      "old": null,
+      "new": true
+    },
+    {
+      "path": "infrastructure.proxmox.nodes.pve2.version",
+      "old": null,
+      "new": "pve-manager/9.1.5/80cf92a64bef6889 (running kernel: 6.17.9-1-pve)"
+    },
+    {
+      "path": "infrastructure.proxmox.nodes.pve3.ip",
+      "old": "10.1.1.5",
+      "new": null
+    },
+    {
+      "path": "infrastructure.proxmox.nodes.pve3.port",
+      "old": 8006,
+      "new": null
+    },
+    {
+      "path": "infrastructure.proxmox.nodes.pve3.reachable",
+      "old": null,
+      "new": true
+    },
+    {
+      "path": "infrastructure.proxmox.nodes.pve3.version",
+      "old": null,
+      "new": "pve-manager/9.0.3/025864202ebb6109 (running kernel: 6.14.8-2-pve)"
+    },
+    {
+      "path": "infrastructure.timestamp",
+      "old": "2026-03-06T01:55:59Z",
+      "new": "2026-03-06T01:56:04Z"
+    },
+    {
+      "path": "mira.hostname",
+      "old": null,
+      "new": "mira"
+    },
+    {
+      "path": "mira.packages",
+      "old": [
+        "python3",
+        "git"
+      ],
+      "new": {
+        "python3": "installed",
+        "git": "installed"
+      }
+    },
+    {
+      "path": "mira.ports",
+      "old": [
+        22
+      ],
+      "new": {
+        "22": "open"
+      }
+    },
+    {
+      "path": "mira.reachable",
+      "old": null,
+      "new": true
+    },
+    {
+      "path": "mira.role",
+      "old": "worker",
+      "new": null
+    },
+    {
+      "path": "mira.services",
+      "old": [
+        "ssh",
+        "cron"
+      ],
+      "new": {
+        "ssh": "active",
+        "cron": "active"
+      }
+    },
+    {
+      "path": "mira.timestamp",
+      "old": "2026-03-06T01:55:59Z",
+      "new": "2026-03-06T01:56:00Z"
+    },
+    {
+      "path": "nova.firewall.allowed_ports",
+      "old": [
+        22,
+        8080
+      ],
+      "new": null
+    },
+    {
+      "path": "nova.firewall.ufw_active",
+      "old": null,
+      "new": true
+    },
+    {
+      "path": "nova.firewall.ufw_enabled",
+      "old": true,
+      "new": null
+    },
+    {
+      "path": "nova.hostname",
+      "old": null,
+      "new": "nova"
+    },
+    {
+      "path": "nova.packages",
+      "old": [
+        "ansible",
+        "python3",
+        "git",
+        "jq"
+      ],
+      "new": {
+        "ansible": "installed",
+        "python3": "installed",
+        "git": "installed",
+        "jq": "installed"
+      }
+    },
+    {
+      "path": "nova.ports",
+      "old": [
+        22
+      ],
+      "new": {
+        "22": "open"
+      }
+    },
+    {
+      "path": "nova.reachable",
+      "old": null,
+      "new": true
+    },
+    {
+      "path": "nova.role",
+      "old": "controller",
+      "new": null
+    },
+    {
+      "path": "nova.services",
+      "old": [
+        "ssh",
+        "cron"
+      ],
+      "new": {
+        "ssh": "active",
+        "cron": "active"
+      }
+    },
+    {
+      "path": "orin.hostname",
+      "old": null,
+      "new": "orin"
+    },
+    {
+      "path": "orin.packages",
+      "old": [
+        "python3",
+        "git"
+      ],
+      "new": {
+        "python3": "installed",
+        "git": "installed"
+      }
+    },
+    {
+      "path": "orin.ports",
+      "old": [
+        22
+      ],
+      "new": {
+        "22": "open"
+      }
+    },
+    {
+      "path": "orin.reachable",
+      "old": null,
+      "new": true
+    },
+    {
+      "path": "orin.role",
+      "old": "worker",
+      "new": null
+    },
+    {
+      "path": "orin.services",
+      "old": [
+        "ssh",
+        "cron"
+      ],
+      "new": {
+        "ssh": "active",
+        "cron": "active"
+      }
+    },
+    {
+      "path": "orin.timestamp",
+      "old": "2026-03-06T01:55:59Z",
+      "new": "2026-03-06T01:56:02Z"
+    }
+  ]
+}

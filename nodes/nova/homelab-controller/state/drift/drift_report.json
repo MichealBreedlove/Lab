@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-06T01:56:07Z",
+  "status": "GREEN",
+  "total_drifts": 0,
+  "nodes": {
+    "nova": {
+      "drift_count": 0,
+      "drifts": []
+    },
+    "mira": {
+      "drift_count": 0,
+      "drifts": []
+    },
+    "orin": {
+      "drift_count": 0,
+      "drifts": []
+    },
+    "infrastructure": {
+      "drift_count": 0,
+      "drifts": []
+    }
+  }
+}
