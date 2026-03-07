@@ -2,7 +2,7 @@
 
 ## Overview
 
-The DR system (P30) provides one-command restore capability with automated validation. Every restore operation requires a break-glass token and produces a full evidence pack.
+The DR system provides one-command restore capability with automated validation. Every restore operation requires a break-glass token and produces a full evidence pack.
 
 ## Components
 
