@@ -58,7 +58,7 @@ Nova owns the control plane with these subsystems:
 - **Portfolio repos:** Separate repos for SRE pipeline, GitOps backups, security toolkit, starter template
 - All pushes go through GamingPC (Nova has no GitHub credentials)
 - Secrets never committed; secret scanner runs before every push
-- Tagged releases: v1.0.0 (P1-P35), v1.1.0 (P36-P42)
+- Tagged releases: v1.0.0 (core platform), v1.1.0 (AI operations layer)
 
 ## Network Security
 

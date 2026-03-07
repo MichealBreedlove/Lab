@@ -60,9 +60,9 @@ oc infra status       # Show infrastructure health
 ### Testing
 ```bash
 oc test all           # Run all test suites
-oc test p44           # Run P44 platform upgrade tests
-oc test p45           # Run P45 change system tests
-oc test p46           # Run P46 platform API tests
+oc test upgrade        # Run platform upgrade tests
+oc test changes        # Run change system tests
+oc test api            # Run platform API tests
 ```
 
 ## Artifact Locations
