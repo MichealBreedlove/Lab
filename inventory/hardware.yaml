@@ -1,5 +1,5 @@
 # Hardware Inventory
-# Aegis Infrastructure — Breedlove AI Cluster
+# Aegis Infrastructure - Breedlove AI Cluster
 # Last updated: 2026-03-10
 
 nodes:
@@ -17,7 +17,7 @@ nodes:
     network:
       eth: 10.1.1.150
       wifi: 10.1.1.151
-      sfp40: TBD  # Mellanox ConnectX-3 Pro 40GbE — installed 2026-03-10, IP pending
+      sfp40: TBD  # Mellanox ConnectX-3 Pro 40GbE - installed 2026-03-10, IP pending
     nics:
       - interface: onboard ethernet
         speed: 1GbE
@@ -28,18 +28,18 @@ nodes:
       - interface: Mellanox ConnectX-3 Pro
         type: 40GbE (QSFP+)
         speed: 40 Gbps
-        ports: 2x QSFP+ — both connected to Nexus 3064
+        ports: 2x QSFP+ - both connected to Nexus 3064
         ip_port1: TBD (flat 10.1.1.x, pending assignment)
         ip_port2: TBD (flat 10.1.1.x, pending assignment)
-        target_vlan_port1: VLAN 50 (10.1.50.150) — AI compute
-        target_vlan_port2: VLAN 40 (10.1.40.x) — storage/NFS
-        notes: "Added 2026-03-10. Flat net first — VLAN cutover blocked on Mira 10GbE NIC install. Full fabric migration (VLAN 40/50) planned once Mira is on the fabric."
+        target_vlan_port1: VLAN 50 (10.1.50.150) - AI compute
+        target_vlan_port2: VLAN 40 (10.1.40.x) - storage/NFS
+        notes: "Added 2026-03-10. Flat net first - VLAN cutover blocked on Mira 10GbE NIC install. Full fabric migration (VLAN 40/50) planned once Mira is on the fabric."
     notes: Primary workstation + OpenClaw gateway + Ollama inference + 40GbE cluster backplane
 
   nova:
     friendly_name: Nova
     enterprise_id: hl-pve02
-    role: Primary Proxmox hypervisor — AI agents, VMs, containers
+    role: Primary Proxmox hypervisor - AI agents, VMs, containers
     os: Proxmox VE (Debian Bookworm)
     cpu: Intel i3-N305 (8 cores)
     ram: 32 GB DDR5
@@ -60,23 +60,39 @@ nodes:
   mira:
     friendly_name: Mira
     enterprise_id: hl-pve03
-    role: Secondary Proxmox hypervisor — support compute, containers
+    role: Secondary Proxmox hypervisor - support compute, containers
     os: Proxmox VE (Debian Bookworm)
     cpu: Intel Core i7-2600K @ 3.4 GHz (4 cores / 8 threads)
     ram: 16 GB
     gpu: none
     storage:
-      - sda: 931.5 GB WD Blue HDD (only drive — no SSD)
+      - sda: 931.5 GB WD Blue HDD (only drive - no SSD)
     network:
       mgmt: 10.1.1.4
+      sfp_port1: TBD  # 10GbE — pending NIC install
+      sfp_port2: TBD  # 10GbE — pending NIC install
+    nics:
+      - interface: onboard ethernet
+        speed: 1GbE
+        ip: 10.1.1.4
+      - interface: 10Gtek BCM57810S (ORDERED 2026-03-10)
+        chipset: Broadcom BCM57810S
+        type: 10GbE (SFP+)
+        ports: 2x SFP+
+        driver: bnx2x (built-in Proxmox/Linux)
+        status: not yet installed
+        target_connection: Nexus 3064
+        target_vlan_port1: VLAN 40 (10.1.40.12) — storage/NFS
+        target_vlan_port2: VLAN 50 (10.1.50.x) — AI compute
+        notes: "Install triggers VLAN 40/50 fabric cutover — all nodes will be on 10G+ at that point"
     rack: RACK-A1 (U14-U15)
     proxmox_vmid_range: VMs 400-499, CTs 300-399
-    notes: Hosts openclaw-mira VM (400), UniFi CT (300), Monitoring CT (303). Single spinning HDD — SSD upgrade pending.
+    notes: Hosts openclaw-mira VM (400), UniFi CT (300), Monitoring CT (303). Single spinning HDD - SSD upgrade pending. 10GbE NIC ordered.
 
   orin:
     friendly_name: Orin
     enterprise_id: hl-pve04
-    role: Enterprise Proxmox hypervisor — heavy compute, VMs, infrastructure
+    role: Enterprise Proxmox hypervisor - heavy compute, VMs, infrastructure
     os: Proxmox VE (Debian Bookworm)
     cpu: 2x Intel Xeon E5-2667 v4 @ 3.2 GHz (16 cores / 32 threads)
     ram: 16 GB ECC
@@ -86,7 +102,7 @@ nodes:
       - sdb: 1.8 TB HN-M201RAD
       - sdc: 3.6 TB ST4000LM024-2AN17V
       - sdd: 1.4 TB HN-M151RAD
-      - note: None in any storage pool — ZFS mirror (sda+sdb) pending approval
+      - note: None in any storage pool - ZFS mirror (sda+sdb) pending approval
     network:
       mgmt: 10.1.1.5
       sfp: 10.1.1.6
@@ -119,12 +135,12 @@ network_devices:
 
   hl-oob01:
     name: 48-Port Management Switch
-    role: Out-of-band management — IPMI, remote console
+    role: Out-of-band management - IPMI, remote console
     rack: RACK-A1-U18
 
   nicsgiga:
     name: Nicsgiga Switch
-    role: Access switch — standard network devices
+    role: Access switch - standard network devices
     rack: RACK-A1-U20
 
   hl-ap01:
@@ -151,7 +167,7 @@ storage:
     vmid: 200
     host: nova (hl-pve02)
     ip: 10.1.1.11
-    role: Primary NAS — shared storage, media, backups, AI datasets
+    role: Primary NAS - shared storage, media, backups, AI datasets
     protocols: NFS, SMB, ZFS
     pools:
       - Tank: primary data pool
