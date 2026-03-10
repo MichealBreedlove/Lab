@@ -17,7 +17,20 @@ nodes:
     network:
       eth: 10.1.1.150
       wifi: 10.1.1.151
-    notes: Primary workstation + OpenClaw gateway + Ollama inference
+      sfp40: TBD  # Mellanox ConnectX-3 Pro 40GbE — installed 2026-03-10, IP pending
+    nics:
+      - interface: onboard ethernet
+        speed: 1GbE
+        ip: 10.1.1.150
+      - interface: onboard wifi
+        speed: WiFi 6
+        ip: 10.1.1.151
+      - interface: Mellanox ConnectX-3 Pro
+        type: 40GbE (QSFP+)
+        speed: 40 Gbps
+        ip: TBD  # assign on cluster VLAN or direct 40G backplane
+        notes: Added 2026-03-10 — enables high-speed backplane for cluster storage/NFS
+    notes: Primary workstation + OpenClaw gateway + Ollama inference + 40GbE cluster backplane
 
   nova:
     friendly_name: Nova
