@@ -1,42 +1,140 @@
 # Hardware Inventory
-# Update as hardware changes
+# Aegis Infrastructure — Breedlove AI Cluster
+# Last updated: 2026-03-10
 
 nodes:
   jasper:
-    role: gateway
+    friendly_name: Jasper
+    enterprise_id: hl-ws01
+    role: AI orchestrator / GPU compute / dev workstation
     os: Windows 11 Pro (Build 26200)
     cpu: Intel Core i9-13900K (24 cores / 32 threads)
-    ram: 64 GB
-    gpu: NVIDIA GeForce RTX 4090
+    ram: 64 GB DDR5
+    gpu: NVIDIA GeForce RTX 4090 (24 GB VRAM)
     storage:
-      - C: 1.8TB (system)
+      - C: 1.8TB NVMe (system)
       - D: 7.6TB
-      - W/X/Y/Z: ~19.6TB each (storage array)
-    notes: Primary workstation + OpenClaw gateway
+    network:
+      eth: 10.1.1.150
+      wifi: 10.1.1.151
+    notes: Primary workstation + OpenClaw gateway + Ollama inference
 
   nova:
-    role: controller
-    os: Ubuntu
-    cpu: # TODO
-    ram: # TODO
-    gpu: # TODO
-    storage: # TODO
-    notes: Ansible controller + AI compute
+    friendly_name: Nova
+    enterprise_id: hl-pve02
+    role: Primary Proxmox hypervisor — AI agents, VMs, containers
+    os: Proxmox VE (Debian Bookworm)
+    cpu: Intel i3-N305 (8 cores)
+    ram: 32 GB DDR5
+    gpu: none
+    storage:
+      - local SSD: 110 GB (sdf)
+      - HDD_VM-CT: 458 GB (sdg1, Seagate 2.5")
+      - HDD-2TB: 1.8 TB (sdd1)
+      - HDD-2.7TB: 2.7 TB (sdc1)
+      - unassigned: sda 9.1TB HGST, sdb 7.3TB Seagate, sde 3.6TB WD Purple
+    network:
+      mgmt: 10.1.1.2
+      sfp: 10.1.1.3
+    rack: RACK-A1 (U11-U13)
+    proxmox_vmid_range: VMs 200-299, CTs 100-199
+    notes: Hosts TrueNAS VM (200), openclaw-nova VM (201), Plex CT (101)
 
   mira:
-    role: compute
-    os: Ubuntu
-    cpu: # TODO
-    ram: # TODO
-    gpu: # TODO
-    storage: # TODO
-    notes: AI compute node
+    friendly_name: Mira
+    enterprise_id: hl-pve03
+    role: Secondary Proxmox hypervisor — support compute, containers
+    os: Proxmox VE (Debian Bookworm)
+    cpu: Intel Core i7-2600K @ 3.4 GHz (4 cores / 8 threads)
+    ram: 16 GB
+    gpu: none
+    storage:
+      - sda: 931.5 GB WD Blue HDD (only drive — no SSD)
+    network:
+      mgmt: 10.1.1.4
+    rack: RACK-A1 (U14-U15)
+    proxmox_vmid_range: VMs 400-499, CTs 300-399
+    notes: Hosts openclaw-mira VM (400), UniFi CT (300), Monitoring CT (303). Single spinning HDD — SSD upgrade pending.
 
   orin:
-    role: compute
-    os: Ubuntu
-    cpu: # TODO
-    ram: # TODO
-    gpu: # TODO
-    storage: # TODO
-    notes: AI compute node
+    friendly_name: Orin
+    enterprise_id: hl-pve04
+    role: Enterprise Proxmox hypervisor — heavy compute, VMs, infrastructure
+    os: Proxmox VE (Debian Bookworm)
+    cpu: 2x Intel Xeon E5-2667 v4 @ 3.2 GHz (16 cores / 32 threads)
+    ram: 16 GB ECC
+    gpu: none
+    storage:
+      - sda: 1.8 TB ST2000NX0253
+      - sdb: 1.8 TB HN-M201RAD
+      - sdc: 3.6 TB ST4000LM024-2AN17V
+      - sdd: 1.4 TB HN-M151RAD
+      - note: None in any storage pool — ZFS mirror (sda+sdb) pending approval
+    network:
+      mgmt: 10.1.1.5
+      sfp: 10.1.1.6
+    rack: RACK-A1 (U16)
+    hardware: Dell PowerEdge R630
+    proxmox_vmid_range: VMs 600-699, CTs 500-599
+    notes: Hosts openclaw-orin VM (600), Immich CT (502)
+
+network_devices:
+  hl-fw01:
+    name: OPNsense
+    role: Firewall / Router / DNS / DHCP
+    ip: 10.1.1.1
+    rack: RACK-A1-U24
+
+  hl-core01:
+    name: Cisco Nexus 3064
+    model: N3K-C3064PQ-10GX
+    serial: FOC1848R1M8
+    role: Core switching fabric
+    ip: 10.1.1.200
+    nxos: 7.0(3)I7(8)
+    rack: RACK-A1-U23
+    notes: VLANs 20/30/40/50/60/70/80/90/100/999 configured
+
+  brocade-icx6610:
+    name: Brocade ICX6610
+    role: 10Gb SFP+ backbone switch
+    rack: RACK-A1-U17
+
+  hl-oob01:
+    name: 48-Port Management Switch
+    role: Out-of-band management — IPMI, remote console
+    rack: RACK-A1-U18
+
+  nicsgiga:
+    name: Nicsgiga Switch
+    role: Access switch — standard network devices
+    rack: RACK-A1-U20
+
+  hl-ap01:
+    name: UniFi U7 Pro XG
+    mac: 84:78:48:cc:7b:6c
+    ip: 10.1.1.19
+    role: Wireless AP
+    controller: 10.1.1.100 (CT 300, PROXMOX-2)
+
+ccna_lab:
+  nf-core01:
+    name: Cisco Catalyst 3850
+    role: CCNA core switch
+    rack: RACK-A1-U02
+
+  nf-access01:
+    name: Cisco Catalyst 2960X
+    role: CCNA access switch
+    rack: RACK-A1-U03
+
+storage:
+  hl-nas01:
+    name: TrueNAS
+    vmid: 200
+    host: nova (hl-pve02)
+    ip: 10.1.1.11
+    role: Primary NAS — shared storage, media, backups, AI datasets
+    protocols: NFS, SMB, ZFS
+    pools:
+      - Tank: primary data pool
