@@ -29,8 +29,8 @@ nodes:
         type: 40GbE (QSFP+)
         speed: 40 Gbps
         ports: 2x QSFP+ - both connected to Nexus 3064
-        ip_port1: TBD (flat 10.1.1.x, pending assignment)
-        ip_port2: TBD (flat 10.1.1.x, pending assignment)
+        ip_port1: 10.1.1.210
+        ip_port2: 10.1.1.211
         target_vlan_port1: VLAN 50 (10.1.50.150) - AI compute
         target_vlan_port2: VLAN 40 (10.1.40.x) - storage/NFS
         notes: "Added 2026-03-10. Flat net first - VLAN cutover blocked on Mira 10GbE NIC install. Full fabric migration (VLAN 40/50) planned once Mira is on the fabric."
