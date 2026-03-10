@@ -15,6 +15,8 @@ current:
   truenas: 10.1.1.11     # hl-nas01 (TrueNAS VM)
   jasper:  10.1.1.150    # hl-ws01 (GamingPC ethernet)
   jasper_wifi: 10.1.1.151
+  jasper_40g_p1: 10.1.1.210  # Mellanox ConnectX-3 Pro port 1 (40GbE → Nexus)
+  jasper_40g_p2: 10.1.1.211  # Mellanox ConnectX-3 Pro port 2 (40GbE → Nexus)
   plex:    10.1.1.31     # CT 101
   immich:  10.1.1.30     # CT 502
   monitoring: 10.1.1.25  # CT 303 (Prometheus + Grafana)
