@@ -17,10 +17,11 @@ nodes:
     network:
       eth: 10.1.1.150
       wifi: 10.1.1.151
-      sfp40: TBD  # Mellanox ConnectX-3 Pro 40GbE - installed 2026-03-10, IP pending
+      sfp40_p1: 10.1.1.210
+      sfp40_p2: 10.1.1.211
     nics:
       - interface: onboard ethernet
-        speed: 1GbE
+        speed: 2.5GbE
         ip: 10.1.1.150
       - interface: onboard wifi
         speed: WiFi 6
@@ -53,6 +54,14 @@ nodes:
     network:
       mgmt: 10.1.1.2
       sfp: 10.1.1.3
+    nics:
+      - interface: onboard x4 2.5GbE
+        speed: 2.5GbE (x4 ports)
+        notes: One port used for mgmt (10.1.1.2)
+      - interface: onboard SFP+
+        speed: 10GbE
+        ip: 10.1.1.3
+        notes: Connected to Nexus 3064 — explains ~2 Gbps iperf result
     rack: RACK-A1 (U11-U13)
     proxmox_vmid_range: VMs 200-299, CTs 100-199
     notes: Hosts TrueNAS VM (200), openclaw-nova VM (201), Plex CT (101)
@@ -106,10 +115,17 @@ nodes:
     network:
       mgmt: 10.1.1.5
       sfp: 10.1.1.6
+    nics:
+      - interface: onboard 10GbE RJ45 x2
+        speed: 10GbE
+        notes: Two copper 10GbE ports — one used for mgmt (10.1.1.5)
+      - interface: onboard SFP+ x2
+        speed: 10GbE
+        notes: Two SFP+ ports — one used for sfp (10.1.1.6)
     rack: RACK-A1 (U16)
     hardware: Dell PowerEdge R630
     proxmox_vmid_range: VMs 600-699, CTs 500-599
-    notes: Hosts openclaw-orin VM (600), Immich CT (502)
+    notes: Hosts openclaw-orin VM (600), Immich CT (502). 4x 10GbE total (2 RJ45 + 2 SFP+)
 
 network_devices:
   hl-fw01:
