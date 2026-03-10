@@ -1,13 +1,109 @@
-# IP Address Plan
-# Subnet: 10.1.1.0/24
+# IP Address Plan — Aegis Infrastructure
+# Current flat network: 10.1.1.0/24
+# Target segmented: 10.1.x.0/24 per VLAN (migration in progress)
 
-assignments:
-  jasper: 10.1.1.x   # TODO: confirm
-  nova:   10.1.1.21
-  mira:   10.1.1.22
-  orin:   10.1.1.23
+# ============================================================
+# CURRENT FLAT NETWORK (10.1.1.0/24) — Active
+# ============================================================
+current:
+  gateway: 10.1.1.1      # hl-fw01 (OPNsense)
+  nova:    10.1.1.2      # hl-pve02 (Proxmox node 1 — "PROXMOX")
+  nova_sfp: 10.1.1.3
+  mira:    10.1.1.4      # hl-pve03 (Proxmox node 2 — "PROXMOX-2")
+  orin:    10.1.1.5      # hl-pve04 (Proxmox node 3 — "PROXMOX-3")
+  orin_sfp: 10.1.1.6
+  truenas: 10.1.1.11     # hl-nas01 (TrueNAS VM)
+  jasper:  10.1.1.150    # hl-ws01 (GamingPC ethernet)
+  jasper_wifi: 10.1.1.151
+  plex:    10.1.1.31     # CT 101
+  immich:  10.1.1.30     # CT 502
+  monitoring: 10.1.1.25  # CT 303 (Prometheus + Grafana)
+  unifi_ap: 10.1.1.19    # UniFi U7 Pro XG
+  unifi_ctrl: 10.1.1.100 # CT 300 (UniFi controller)
+  nexus:   10.1.1.200    # hl-core01 (Cisco Nexus 3064)
 
-reserved:
-  gateway: 10.1.1.1
-  dns:     # TODO
-  dhcp_range: # TODO
+# ============================================================
+# TARGET VLAN NETWORK — Migration Pending
+# ============================================================
+vlans:
+  20_mgmt:
+    subnet: 10.1.20.0/24
+    gateway: 10.1.20.1
+    purpose: Management — hypervisors, switches, NAS mgmt interfaces
+    reservations:
+      10.1.20.1:  hl-fw01 (OPNsense)
+      10.1.20.2:  hl-core01 (Nexus 3064)
+      10.1.20.3:  hl-agg01 (future)
+      10.1.20.4:  hl-access01 (future)
+      10.1.20.5:  hl-oob01 (management switch)
+      10.1.20.10: Nova (hl-pve02)
+      10.1.20.11: (future hl-pve02 alias)
+      10.1.20.12: Mira (hl-pve03)
+      10.1.20.13: Orin (hl-pve04)
+      10.1.20.30: hl-nas01 (TrueNAS mgmt)
+      10.1.20.40-49: IPMI / iDRAC / BMC controllers
+
+  30_server:
+    subnet: 10.1.30.0/24
+    gateway: 10.1.30.1
+    purpose: VMs, containers, internal applications
+    reservations:
+      10.1.30.10: hl-mon01 (Prometheus + Grafana)
+      10.1.30.20: core-unifi01 (UniFi controller)
+      10.1.30.21: core-agent-nova (openclaw-nova)
+      10.1.30.22: core-agent-mira (openclaw-mira)
+      10.1.30.23: core-agent-orin (openclaw-orin)
+      10.1.30.30: core-photos01 (Immich)
+      10.1.30.31: core-media01 (Plex)
+
+  40_storage:
+    subnet: 10.1.40.0/24
+    gateway: 10.1.40.1
+    purpose: NFS, SMB, storage replication — isolated from clients
+    reservations:
+      10.1.40.11: hl-nas01 (TrueNAS storage interface)
+      10.1.40.10: Nova storage interface
+      10.1.40.12: Mira storage interface
+      10.1.40.13: Orin storage interface
+
+  50_ai_compute:
+    subnet: 10.1.50.0/24
+    gateway: 10.1.50.1
+    purpose: AI cluster traffic, Ollama, inter-agent communication
+    reservations:
+      10.1.50.150: Jasper (Ollama endpoint, RTX 4090)
+
+  60_lab:
+    subnet: 10.1.60.0/24
+    gateway: 10.1.60.1
+    purpose: NetForge CCNA training lab — isolated from production
+
+  70_security:
+    subnet: 10.1.70.0/24
+    gateway: 10.1.70.1
+    purpose: Sentinel security lab, SIEM, scanners, honeypots
+
+  80_client:
+    subnet: 10.1.80.0/24
+    gateway: 10.1.80.1
+    purpose: Trusted workstations and admin machines
+    reservations:
+      10.1.80.150: Jasper (GamingPC primary client)
+
+  90_iot:
+    subnet: 10.1.90.0/24
+    gateway: 10.1.90.1
+    purpose: IoT devices, cameras, smart equipment
+
+  100_guest:
+    subnet: 10.1.100.0/24
+    gateway: 10.1.100.1
+    purpose: Guest internet-only
+
+  999_blackhole:
+    subnet: none
+    purpose: Unused switch ports — no routing
+
+oob_reserved:
+  subnet: 10.1.200.0/24
+  purpose: True OOB management network (future)
