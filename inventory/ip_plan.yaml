@@ -8,10 +8,10 @@
 current:
   gateway: 10.1.1.1      # hl-fw01 (OPNsense)
   nova:    10.1.1.2      # hl-pve02 (Proxmox node 1 — "PROXMOX")
-  nova_sfp: 10.1.1.3
+  nova_sfp: 10.1.1.3      # enp6s0 — storage bridge vmbr1 (cable pending)
   mira:    10.1.1.4      # hl-pve03 (Proxmox node 2 — "PROXMOX-2")
-  orin:    10.1.1.5      # hl-pve04 (Proxmox node 3 — "PROXMOX-3")
-  orin_sfp: 10.1.1.6
+  orin:    10.1.1.5      # hl-pve04 (Proxmox node 3 — "PROXMOX-3") — vmbr0 on eno1 (10GbE, Nexus Eth1/47)
+  orin_sfp: 10.1.1.6     # eno2 — reserved/unplugged
   truenas: 10.1.1.11     # hl-nas01 (TrueNAS VM)
   jasper:  10.1.1.150    # hl-ws01 (GamingPC ethernet)
   jasper_wifi: 10.1.1.151

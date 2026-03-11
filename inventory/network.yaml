@@ -1,0 +1,91 @@
+# Network Fabric — Aegis Infrastructure
+# Last updated: 2026-03-10
+
+# ============================================================
+# CORE SWITCHING — Cisco Nexus 3064
+# ============================================================
+nexus:
+  model: Cisco Nexus 3064-T
+  ip: 10.1.1.200
+  mgmt: SSH (admin / SWITCH@mjb1)
+  firmware: NX-OS 7.0(3)I7(8)
+
+  port_channels:
+    Po1:
+      description: OPNsense-LACP
+      protocol: LACP
+      members: [Eth1/1, Eth1/2, Eth1/3, Eth1/4]
+      active_members: [Eth1/1, Eth1/2, Eth1/4]  # Eth1/3 = hot standby (FreeBSD LAGG quirk)
+      speed: 30 Gbps active (40 Gbps when Eth1/3 joins)
+      vlan: 1
+      status: UP (SU)
+
+    Po10:
+      description: Jasper-40G-LACP
+      protocol: LACP
+      members: [Eth1/49, Eth1/50]
+      speed: 2x 40 Gbps (operating as individual links — Windows 11 no LBFO)
+      vlan: 1
+      status: SD (individual ports forwarding independently)
+
+  port_map:
+    Eth1/1:  { description: OPNsense-10G-P1, device: opnsense, nic: ix1, speed: 10G, status: connected, po: Po1 }
+    Eth1/2:  { description: OPNsense-10G-P2, device: opnsense, nic: ix2, speed: 10G, status: connected, po: Po1 }
+    Eth1/3:  { description: OPNsense-10G-P3, device: opnsense, nic: ix3, speed: 10G, status: connected, po: Po1, note: hot-standby }
+    Eth1/4:  { description: OPNsense-10G-P4, device: opnsense, nic: ix0, speed: 10G, status: connected, po: Po1 }
+    Eth1/47: { description: Orin-10G, device: orin, nic: eno1, speed: 10G, status: connected, cable: SFP-H10GB-CU1M }
+    Eth1/48: { description: Nicgiga-uplink, device: nicgiga_s25, speed: 10G, status: connected }
+    Eth1/49: { description: Jasper-40G-P2, device: jasper, nic: "Ethernet 5 (ConnectX-3)", speed: 40G, status: connected, po: Po10 }
+    Eth1/50: { description: Jasper-40G-P1, device: jasper, nic: "Ethernet (ConnectX-3)", speed: 40G, status: connected, po: Po10 }
+
+# ============================================================
+# ACCESS SWITCHING — Nicgiga S25-2402P
+# ============================================================
+nicgiga:
+  model: Nicgiga S25-2402P
+  uplink: Nexus Eth1/48 (10G)
+  purpose: Management/flat-network access for all devices
+
+# ============================================================
+# FIREWALL — OPNsense
+# ============================================================
+opnsense:
+  ip: 10.1.1.1
+  mgmt: SSH root / FIREWALL@mjb1, HTTPS
+  wan_nic: igc4 (2.5GbE, inet 73.223.104.27)
+  lan_nic: igc0 (2.5GbE, inet 10.1.1.1)
+  lan_bridge: bridge0 (lagg0 + igc0 members)
+  lagg:
+    device: lagg0
+    proto: lacp
+    members: [ix0, ix1, ix2, ix3]
+    active: [ix0, ix1, ix2]  # ix3 hot standby
+    nexus_po: Po1
+    effective_speed: 30 Gbps
+
+# ============================================================
+# NODE NIC LAYOUT
+# ============================================================
+nodes:
+  jasper:
+    eth: "Ethernet 1" (Intel I226-V, 2.5GbE, 10.1.1.150)
+    wifi: Intel AX211 (10.1.1.151)
+    sfp1: "Ethernet" (Mellanox ConnectX-3 Pro, 40GbE, 10.1.1.210, Nexus Eth1/50)
+    sfp2: "Ethernet 5" (Mellanox ConnectX-3 Pro, 40GbE, 10.1.1.211, Nexus Eth1/49)
+    driver: WinOF 5.50.14740.0
+    bonding: pending (Windows 11 no LBFO; Hyper-V SET script on Desktop)
+
+  nova:
+    mgmt: bond0 (active-backup: enp2s0+enp3s0+enp4s0, 2.5GbE) → vmbr0 (10.1.1.2)
+    storage: enp6s0 (SFP+ 10GbE) → vmbr1 (10.1.1.3) — no cable yet
+    vms: [TrueNAS VM200 net1 on vmbr1 (storage, pending cable)]
+
+  orin:
+    mgmt: eno1 (Intel 82599ES, 10GbE SFP+) → vmbr0 (10.1.1.5) → Nexus Eth1/47
+    spare: eno4 (Intel I350, 1GbE) → vmbr1
+    driver_note: "options ixgbe allow_unsupported_sfp=1 in /etc/modprobe.d/ixgbe.conf"
+    speed: 10 Gbps ✅
+
+  mira:
+    mgmt: eno1 (1GbE onboard) → vmbr0 (10.1.1.4)
+    pending: BCM57810S dual 10GbE SFP+ (ordered 2026-03-10, ASIN B06XHGFD69)
