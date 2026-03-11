@@ -73,3 +73,22 @@ oc obs export    # Export current metrics snapshot
 | `scripts/observability/loki.yml` | Loki configuration |
 | `scripts/observability/promtail.yml` | Log shipping config |
 | `scripts/observability/dashboards/` | Grafana dashboard JSON |
+
+## Scrape Target Status (2026-03-10)
+
+12/12 targets UP after node_exporter installed on Immich CT 502 (Orin Proxmox).
+
+| Instance | IP | Status |
+|----------|-----|--------|
+| monitoring | 10.1.1.25 | ✅ UP |
+| PROXMOX | 10.1.1.2 | ✅ UP |
+| PROXMOX-2 | 10.1.1.4 | ✅ UP |
+| PROXMOX-3 | 10.1.1.5 | ✅ UP |
+| TrueNAS | 10.1.1.11 | ✅ UP |
+| Nova | 10.1.1.21 | ✅ UP |
+| Mira | 10.1.1.22 | ✅ UP |
+| Orin | 10.1.1.23 | ✅ UP |
+| Immich | 10.1.1.30 | ✅ UP |
+| Plex | 10.1.1.31 | ✅ UP |
+| UniFi | 10.1.1.100 | ✅ UP |
+
