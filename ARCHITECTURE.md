@@ -35,10 +35,58 @@ Compute nodes managed by Nova via SSH. Run OpenClaw worker agents. Monitored by 
 
 | Device | Role | IP |
 |--------|------|----|
-| OPNsense | Firewall / Gateway | 10.1.1.1 |
-| PROXMOX (×3) | Virtualization Cluster | 10.1.1.2, .4, .5 |
-| TrueNAS | Storage (NFS) | 10.1.1.200 |
+| OPNsense (6-port) | Firewall / Gateway / Router | 10.1.1.1 |
+| Cisco Nexus 3064 | Core 40/10GbE switch | 10.1.1.200 |
+| PROXMOX | Primary hypervisor (TrueNAS VM + Nova VM) | 10.1.1.2 |
+| PROXMOX-2 | Secondary hypervisor (Mira VM + monitoring CT) | 10.1.1.4 |
+| PROXMOX-3 | Tertiary hypervisor (Orin VM + Immich/Plex CTs) | 10.1.1.5 |
+| TrueNAS SCALE | NAS / NFS storage (VM 200 on PROXMOX) | 10.1.1.11 |
 | UniFi U7 Pro XG | Wireless AP | 10.1.1.19 |
+| Immich | Photo management (CT 502 on Orin) | 10.1.1.30 |
+| Plex | Media server (CT on Orin) | 10.1.1.31 |
+
+## Network Fabric
+
+### High-Speed Backbone (40/10GbE)
+
+```
+Jasper (RTX 4090 workstation)
+  └── Mellanox ConnectX-3 Pro (2x QSFP+)
+       └── LACP Port-Channel 10 (80 Gbps aggregate)
+            └── Cisco Nexus 3064 (Eth1/49 + Eth1/50)
+
+OPNsense firewall
+  └── 4x 10GbE SFP+ (ix0–ix3)
+       └── LACP Port-Channel 1 (30 Gbps active, 1 hot standby)
+            └── Cisco Nexus 3064 (Eth1/1–Eth1/4)
+
+Orin VM
+  └── 10GbE SFP+ (ixgbe, allow_unsupported_sfp=1)
+       └── Cisco Nexus 3064 (Eth1/47)
+
+Mira VM (pending)
+  └── BCM57810S dual SFP+ (ordered, not yet installed)
+       └── Will connect to Nexus when arrives → VLAN 40/50 cutover
+```
+
+### Standard Access (1/2.5GbE)
+- Nova, Mira (current): 1GbE via Nicgiga unmanaged switch → Nexus Eth1/48
+- Jasper management: Intel I226-V 2.5GbE → 10.1.1.150
+
+### VLAN Plan (pending Mira BCM57810S)
+| VLAN | Name | Subnet |
+|------|------|--------|
+| 10 | MGMT | 10.1.10.0/24 |
+| 20 | INFRA | 10.1.20.0/24 |
+| 30 | STORAGE | 10.1.30.0/24 |
+| 40 | AI | 10.1.40.0/24 |
+| 50 | COMPUTE | 10.1.50.0/24 |
+| 999 | BLACKHOLE | — |
+
+### Shared Storage (NFS over 1GbE, upgrading to 10GbE)
+- `10.1.1.11:/mnt/Tank/openclaw/agents` → `/mnt/openclaw` on all agent VMs
+- `10.1.1.11:/mnt/Tank/openclaw/shared` → `/mnt/openclaw-shared` on all agent VMs
+- Jasper: `Z:\` mapped to `\\TRUENAS\openclaw`
 
 ## Control Plane Architecture
 
