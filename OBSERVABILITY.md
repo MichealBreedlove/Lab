@@ -1,94 +1,51 @@
-# Observability
+# Observability Stack
 
-## Stack
+Prometheus + Grafana running on CT 303 (Mira, 10.1.1.25).
 
-The observability stack runs on Nova via Docker Compose:
+## Prometheus Targets (13 total)
 
-| Service | Port | Image | Purpose |
-|---------|------|-------|---------|
-| **Prometheus** | 9090 | `prom/prometheus:latest` | Metric collection and alerting |
-| **Grafana** | 3000 | `grafana/grafana:latest` | Dashboards and visualization |
-| **Loki** | 3100 | `grafana/loki:latest` | Log aggregation |
-| **Promtail** | — | `grafana/promtail:latest` | Log shipping to Loki |
-| **Node Exporter** | 9100 | `prom/node-exporter:latest` | Host metrics (CPU, memory, disk, network) |
-
-## Access
-
-All services are LAN-restricted (10.1.1.0/24 via UFW):
-
-- Grafana: `http://10.1.1.21:3000` (default credentials: admin/homelab)
-- Prometheus: `http://10.1.1.21:9090`
-- Loki: `http://10.1.1.21:3100` (API only)
-
-## What Is Monitored
-
-### Node Metrics (via node_exporter)
-- CPU utilization, load average
-- Memory usage and swap
-- Disk space and I/O
-- Network traffic and errors
-- System uptime
-
-### Alert Rules
-- `NodeDown` — Node exporter unreachable for >2 minutes
-- `HighCPU` — CPU usage >90% for 5 minutes
-- `DiskPressure` — Disk usage >85%
-- `HighMemory` — Memory usage >90% for 5 minutes
-
-### Scrape Targets
-- Nova (10.1.1.21:9100)
-- Mira (10.1.1.22:9100) — requires node_exporter install
-- Orin (10.1.1.23:9100) — requires node_exporter install
+| Instance | IP:Port | Status |
+|----------|---------|--------|
+| monitoring | 10.1.1.25:9100 | ✅ up |
+| PROXMOX | 10.1.1.2:9100 | ✅ up |
+| PROXMOX-2 | 10.1.1.4:9100 | ✅ up |
+| PROXMOX-3 | 10.1.1.5:9100 | ✅ up |
+| Nova | 10.1.1.21:9100 | ✅ up |
+| Mira | 10.1.1.22:9100 | ✅ up |
+| Orin | 10.1.1.23:9100 | ✅ up |
+| TrueNAS | 10.1.1.11:9100 | ✅ up |
+| Immich | 10.1.1.30:9100 | ✅ up |
+| Plex | 10.1.1.31:9100 | ✅ up |
+| UniFi | 10.1.1.100:9100 | ✅ up |
+| OPNsense | 10.1.1.1:9100 | ✅ up |
+| prometheus | localhost:9090 | ✅ up |
 
 ## Grafana Dashboards
 
-Two pre-provisioned dashboards:
+- **Node Exporter Full** — `/d/rYdddlPWk/` (per-node deep dive)
+- **Prometheus Stats** — `/d/bffnnj0jpoq9sf/`
+- **Node Exporter EN** — `/d/xfpJB9FGz/` (clean cluster overview)
 
-1. **Node Health** — Per-node CPU, memory, disk, network panels
-2. **OpenClaw Health** — Cluster-level view with node status, gateway health, inference metrics
+Access: `http://10.1.1.25:3000`
 
-Dashboards are provisioned automatically from `scripts/observability/dashboards/`.
+## Alert Rules (8)
 
-## Log Aggregation
+| Alert | Threshold |
+|-------|-----------|
+| NodeDown | >2m unreachable → critical |
+| HighCPU | >85% for 5m → warning |
+| HighMemory | >90% for 5m → warning |
+| DiskWarning | >80% for 5m → warning |
+| DiskCritical | >90% for 2m → critical |
+| NodeReboot | uptime <5min → info |
+| HighDiskIOWait | >20% for 5m → warning |
+| NetworkErrors | >10 errors/s for 5m → warning |
 
-Promtail ships logs from `/var/log/` on Nova to Loki. Queryable via Grafana's Explore view with LogQL.
+## Special Notes
 
-## Management
-
-```bash
-oc obs up        # Start all containers
-oc obs down      # Stop all containers
-oc obs status    # Show container status
-oc obs logs      # Tail recent logs
-oc obs export    # Export current metrics snapshot
-```
-
-## Configuration Files
-
-| File | Purpose |
-|------|---------|
-| `scripts/observability/docker-compose.yml` | Stack definition |
-| `scripts/observability/prometheus.yml` | Scrape config + targets |
-| `scripts/observability/alert_rules.yml` | Alerting rules |
-| `scripts/observability/loki.yml` | Loki configuration |
-| `scripts/observability/promtail.yml` | Log shipping config |
-| `scripts/observability/dashboards/` | Grafana dashboard JSON |
-
-## Scrape Target Status (2026-03-10)
-
-12/12 targets UP after node_exporter installed on Immich CT 502 (Orin Proxmox).
-
-| Instance | IP | Status |
-|----------|-----|--------|
-| monitoring | 10.1.1.25 | ✅ UP |
-| PROXMOX | 10.1.1.2 | ✅ UP |
-| PROXMOX-2 | 10.1.1.4 | ✅ UP |
-| PROXMOX-3 | 10.1.1.5 | ✅ UP |
-| TrueNAS | 10.1.1.11 | ✅ UP |
-| Nova | 10.1.1.21 | ✅ UP |
-| Mira | 10.1.1.22 | ✅ UP |
-| Orin | 10.1.1.23 | ✅ UP |
-| Immich | 10.1.1.30 | ✅ UP |
-| Plex | 10.1.1.31 | ✅ UP |
-| UniFi | 10.1.1.100 | ✅ UP |
-
+- **TrueNAS node_exporter**: `/mnt/Tank/node_exporter` (survives upgrades); systemd unit `/etc/systemd/system/node_exporter.service`
+- **OPNsense node_exporter**: FreeBSD `os-node_exporter` package; `service node_exporter start`
+- **Immich node_exporter**: CT 502 on Orin; installed 2026-03-10
+- **Prometheus config**: `/etc/prometheus/prometheus.yml` inside CT 303
+- **Alert rules**: `/etc/prometheus/alert_rules.yml` inside CT 303
+- **Reload**: `curl -X POST http://10.1.1.25:9090/-/reload`
