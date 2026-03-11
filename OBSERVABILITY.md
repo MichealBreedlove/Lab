@@ -34,12 +34,14 @@ Access: `http://10.1.1.25:3000`
 |-------|-----------|
 | NodeDown | >2m unreachable → critical |
 | HighCPU | >85% for 5m → warning |
-| HighMemory | >90% for 5m → warning |
-| DiskWarning | >80% for 5m → warning |
+| HighMemory | >95% for 5m → warning |
+| DiskWarning | >88% for 10m → warning |
 | DiskCritical | >90% for 2m → critical |
 | NodeReboot | uptime <5min → info |
 | HighDiskIOWait | >20% for 5m → warning |
 | NetworkErrors | >10 errors/s for 5m → warning |
+
+> **Threshold notes:** HighMemory raised to 95% — PROXMOX runs at design capacity with TrueNAS VM + Nova VM filling 32GB host. DiskWarning raised to 88% / 10m window — agent VMs are 32–64GB; 80% is normal operating range after log cleanup.
 
 ## Special Notes
 
@@ -49,3 +51,42 @@ Access: `http://10.1.1.25:3000`
 - **Prometheus config**: `/etc/prometheus/prometheus.yml` inside CT 303
 - **Alert rules**: `/etc/prometheus/alert_rules.yml` inside CT 303
 - **Reload**: `curl -X POST http://10.1.1.25:9090/-/reload`
+
+## Automation & Tooling
+
+### Morning Brief
+Daily cluster health summary delivered at 8 AM Pacific via OpenClaw cron job.
+
+Covers: Prometheus target health, active alerts, cluster task counts, Jasper GPU stats, disk usage, local weather.
+
+Script: `scripts/morning_brief.ps1` — delivered to TUI + Telegram automatically.
+
+### Semantic Memory Search
+Local vector search over all OpenClaw memory files.
+
+- Backend: ChromaDB + Ollama `nomic-embed-text` (fully offline, no API cost)
+- 315 chunks indexed across daily notes, SOUL.md, USER.md, AGENTS.md, TOOLS.md
+- DB: `C:\Users\mikej\.memsearch\chroma\`
+
+```bash
+python3 scripts/memory_search.py search "your question"
+python3 scripts/memory_search.py index   # re-index after new memory files
+python3 scripts/memory_search.py stats
+```
+
+### Secret Scanning
+TruffleHog v3.93.8 runs automatically on every `git push` via pre-push hook.
+
+- Binary: `C:\Users\mikej\tools\trufflehog.exe`
+- Hook: `.git/hooks/pre-push`
+- Blocks push if verified secrets detected; passes cleanly if none found
+
+### Log Rotation (Agent VMs)
+All three agent VMs (nova/mira/orin) have permanent log caps:
+
+- journald: 500MB max, 2-week retention (`/etc/systemd/journald.conf.d/size-limit.conf`)
+- Weekly cron: journal vacuum + apt clean + docker prune (`/etc/cron.weekly/clean-logs`)
+
+### Disk Sizing
+- Agent VMs: 64GB root disk (nova expanded 2026-03-11; mira/orin pending if needed)
+- Disk warning threshold: 88% — provides ~8GB headroom on 64GB disks before alert

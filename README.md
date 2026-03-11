@@ -28,7 +28,7 @@ SLO evaluation with error budgets, burn-rate alerting across 5 time windows, inc
 Ansible playbooks for provisioning and config management, systemd services, scheduled backup tasks, and CI/CD pipelines with GitHub Actions.
 
 **Security Practices**
-Secret scanning (11 regex patterns), credential sanitization on every commit, VLAN segmentation, least-privilege access, and automated restore verification.
+TruffleHog v3.93.8 pre-push secret scanning on every commit, credential sanitization, VLAN segmentation, fail2ban on all agent VMs (3-strike 24h ban), least-privilege access, and automated restore verification.
 
 **AI/ML Operations**
 Local LLM inference via Ollama (RTX 4090), multi-model orchestration through OpenClaw, distributed agent execution across all nodes.
