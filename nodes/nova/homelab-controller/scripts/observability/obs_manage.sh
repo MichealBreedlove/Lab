@@ -41,7 +41,7 @@ case "${1:-status}" in
         EXPORT_DIR="$SCRIPT_DIR/grafana/dashboards"
         mkdir -p "$EXPORT_DIR"
         for uid in node-health openclaw-health; do
-            curl -s "http://admin:homelab@localhost:3000/api/dashboards/uid/$uid" 2>/dev/null | \
+            curl -s "http://admin:${GF_ADMIN_PASSWORD:-homelab}@localhost:3000/api/dashboards/uid/$uid" 2>/dev/null | \
                 python3 -c "import sys,json; d=json.load(sys.stdin); print(json.dumps(d.get('dashboard',{}),indent=2))" \
                 > "$EXPORT_DIR/${uid}.json" 2>/dev/null || echo "[WARN] Could not export $uid"
         done
