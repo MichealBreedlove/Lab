@@ -1,6 +1,6 @@
 # Hardware Inventory
 # Aegis Infrastructure - Breedlove AI Cluster
-# Last updated: 2026-03-10
+# Last updated: 2026-04-03
 
 nodes:
   jasper:
@@ -32,10 +32,7 @@ nodes:
         ports: 2x QSFP+ - both connected to Nexus 3064
         ip_port1: 10.1.1.210
         ip_port2: 10.1.1.211
-        target_vlan_port1: VLAN 50 (10.1.50.150) - AI compute
-        target_vlan_port2: VLAN 40 (10.1.40.x) - storage/NFS
-        notes: "Added 2026-03-10. Flat net first - VLAN cutover blocked on Mira 10GbE NIC install. Full fabric migration (VLAN 40/50) planned once Mira is on the fabric."
-    notes: Primary workstation + OpenClaw gateway + Ollama inference + 40GbE cluster backplane
+    notes: Primary workstation + OpenClaw gateway + Ollama inference (RTX 4090)
 
   nova:
     friendly_name: Nova
@@ -50,7 +47,8 @@ nodes:
       - HDD_VM-CT: 458 GB (sdg1, Seagate 2.5")
       - HDD-2TB: 1.8 TB (sdd1)
       - HDD-2.7TB: 2.7 TB (sdc1)
-      - unassigned: sda 9.1TB HGST, sdb 7.3TB Seagate, sde 3.6TB WD Purple
+      - sda: 9.1TB HGST (TrueNAS Tank pool — CMR)
+      - sdb: 3.6TB WD Purple (TrueNAS Backup pool)
     network:
       mgmt: 10.1.1.2
       sfp: 10.1.1.3
@@ -61,10 +59,10 @@ nodes:
       - interface: onboard SFP+
         speed: 10GbE
         ip: 10.1.1.3
-        notes: Connected to Nexus 3064 — explains ~2 Gbps iperf result
+        notes: Connected to Nexus 3064
     rack: RACK-A1 (U11-U13)
     proxmox_vmid_range: VMs 200-299, CTs 100-199
-    notes: Hosts TrueNAS VM (200), openclaw-nova VM (201), Plex CT (101)
+    notes: "Hosts TrueNAS VM (200), openclaw-nova VM (201), Plex CT (101). NFS mounts: soft,timeo=30,retrans=3."
 
   mira:
     friendly_name: Mira
@@ -75,28 +73,16 @@ nodes:
     ram: 16 GB
     gpu: none
     storage:
-      - sda: 931.5 GB WD Blue HDD (only drive - no SSD)
+      - sda: 931.5 GB WD Blue HDD
     network:
       mgmt: 10.1.1.4
-      sfp_port1: TBD  # 10GbE — pending NIC install
-      sfp_port2: TBD  # 10GbE — pending NIC install
     nics:
       - interface: onboard ethernet
         speed: 1GbE
         ip: 10.1.1.4
-      - interface: 10Gtek BCM57810S (ORDERED 2026-03-10)
-        chipset: Broadcom BCM57810S
-        type: 10GbE (SFP+)
-        ports: 2x SFP+
-        driver: bnx2x (built-in Proxmox/Linux)
-        status: not yet installed
-        target_connection: Nexus 3064
-        target_vlan_port1: VLAN 40 (10.1.40.12) — storage/NFS
-        target_vlan_port2: VLAN 50 (10.1.50.x) — AI compute
-        notes: "Install triggers VLAN 40/50 fabric cutover — all nodes will be on 10G+ at that point"
     rack: RACK-A1 (U14-U15)
     proxmox_vmid_range: VMs 400-499, CTs 300-399
-    notes: Hosts openclaw-mira VM (400), UniFi CT (300), Monitoring CT (303). Single spinning HDD - SSD upgrade pending. 10GbE NIC ordered.
+    notes: "Hosts openclaw-mira VM (400), UniFi CT (300), Monitoring CT (303), Vaultwarden CT (110)"
 
   orin:
     friendly_name: Orin
@@ -109,30 +95,30 @@ nodes:
     storage:
       - sda: 1.8 TB ST2000NX0253
       - sdb: 1.8 TB HN-M201RAD
-      - sdc: 3.6 TB ST4000LM024-2AN17V
+      - sdc: 3.6 TB ST4000LM024 (TrueNAS Archive pool — SMR, cold-only)
       - sdd: 1.4 TB HN-M151RAD
-      - note: None in any storage pool - ZFS mirror (sda+sdb) pending approval
     network:
       mgmt: 10.1.1.5
-      sfp: 10.1.1.6
     nics:
       - interface: onboard 10GbE RJ45 x2
         speed: 10GbE
-        notes: Two copper 10GbE ports — one used for mgmt (10.1.1.5)
-      - interface: onboard SFP+ x2
-        speed: 10GbE
-        notes: Two SFP+ ports — one used for sfp (10.1.1.6)
+        notes: Two copper 10GbE ports
+      - interface: Mellanox ConnectX-3 Pro (40GbE QSFP+)
+        speed: 40 Gbps
+        notes: "Installed 2026-03-23. mlxconfig configured LINK_TYPE=ETH both ports. mst-cx3.service persists config. VLAN 40 (10.1.40.5) + VLAN 50 (10.1.50.5) active."
     rack: RACK-A1 (U16)
     hardware: Dell PowerEdge R630
     proxmox_vmid_range: VMs 600-699, CTs 500-599
-    notes: Hosts openclaw-orin VM (600), Immich CT (502). 4x 10GbE total (2 RJ45 + 2 SFP+)
+    notes: "Hosts openclaw-orin VM (600), Immich CT (502), PBS CT (508), Pentagi CT (507), qBittorrent/Radarr/Sonarr/Prowlarr (VLAN 80)"
 
 network_devices:
   hl-fw01:
     name: OPNsense
-    role: Firewall / Router / DNS / DHCP
+    version: 26.1.2_5
+    role: Firewall / Router / DNS / DHCP (Kea)
     ip: 10.1.1.1
     rack: RACK-A1-U24
+    notes: "Reinstalled 2026-04-01 after kernel panic. Suricata disabled. Kea DHCP active for all 10 VLANs."
 
   hl-core01:
     name: Cisco Nexus 3064
@@ -144,6 +130,16 @@ network_devices:
     rack: RACK-A1-U23
     notes: VLANs 20/30/40/50/60/70/80/90/100/999 configured
 
+  hl-ap01:
+    name: UniFi U7-Pro-XG-B
+    mac: 84:78:48:cc:7b:6c
+    ip: 10.1.1.19
+    role: Wireless AP — WiFi 6E (2.4/5/6 GHz)
+    ssid: Estes Home
+    controller: CT 300 on Mira (10.1.20.100, VLAN 20)
+    adopted: 2026-04-02
+    notes: "DHCP reservation set. inform_url: http://10.1.20.100:8080/inform"
+
   brocade-icx6610:
     name: Brocade ICX6610
     role: 10Gb SFP+ backbone switch
@@ -151,20 +147,13 @@ network_devices:
 
   hl-oob01:
     name: 48-Port Management Switch
-    role: Out-of-band management - IPMI, remote console
+    role: Out-of-band management
     rack: RACK-A1-U18
 
   nicsgiga:
     name: Nicsgiga Switch
-    role: Access switch - standard network devices
+    role: Access switch
     rack: RACK-A1-U20
-
-  hl-ap01:
-    name: UniFi U7 Pro XG
-    mac: 84:78:48:cc:7b:6c
-    ip: 10.1.1.19
-    role: Wireless AP
-    controller: 10.1.1.100 (CT 300, PROXMOX-2)
 
 ccna_lab:
   nf-core01:
@@ -186,4 +175,19 @@ storage:
     role: Primary NAS - shared storage, media, backups, AI datasets
     protocols: NFS, SMB, ZFS
     pools:
-      - Tank: primary data pool
+      Tank:
+        drives: 9.1TB HGST CMR (sda on Nova)
+        usage: 16% (1.54TB used)
+        type: single vdev (no redundancy — mirror expansion planned)
+        notes: Primary data pool. Rebuilt 2026-04-02 after SMR-related crash loop.
+      Backup:
+        drives: 3.62TB WD Purple (sdb on Nova)
+        type: single vdev
+        notes: Backup pool. Empty as of rebuild.
+      Archive:
+        drives: 7.27TB SMR (sdc on Orin — ST8000DM004)
+        type: single vdev
+        notes: "Cold archive only. SMR drive — sustained writes cause crashes. Replace with CMR when budget allows."
+    nfs_exports:
+      - /mnt/Tank/Media  → /mnt/media on Proxmox nodes
+      - /mnt/Tank        → /mnt/Tank on Proxmox nodes
