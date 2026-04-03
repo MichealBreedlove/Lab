@@ -1,111 +1,130 @@
 # IP Address Plan — Aegis Infrastructure
-# Current flat network: 10.1.1.0/24
-# Target segmented: 10.1.x.0/24 per VLAN (migration in progress)
+# Last updated: 2026-04-03
+# VLAN segmentation active across all 10 VLANs (Kea DHCP, OPNsense 26.1.2_5)
 
 # ============================================================
-# CURRENT FLAT NETWORK (10.1.1.0/24) — Active
+# LAN (10.1.1.0/24) — Infrastructure & Static Devices
 # ============================================================
-current:
+lan:
+  subnet: 10.1.1.0/24
   gateway: 10.1.1.1      # hl-fw01 (OPNsense)
-  nova:    10.1.1.2      # hl-pve02 (Proxmox node 1 — "PROXMOX")
-  nova_sfp: 10.1.1.3      # enp6s0 — storage bridge vmbr1 (cable pending)
-  mira:    10.1.1.4      # hl-pve03 (Proxmox node 2 — "PROXMOX-2")
-  orin:    10.1.1.5      # hl-pve04 (Proxmox node 3 — "PROXMOX-3") — vmbr0 on eno1 (10GbE, Nexus Eth1/47)
-  orin_sfp: 10.1.1.6     # eno2 — reserved/unplugged
-  truenas: 10.1.1.11     # hl-nas01 (TrueNAS VM)
-  jasper:  10.1.1.150    # hl-ws01 (GamingPC ethernet)
-  jasper_wifi: 10.1.1.151
-  jasper_40g_p1: 10.1.1.210  # Mellanox ConnectX-3 Pro port 1 (40GbE → Nexus)
-  jasper_40g_p2: 10.1.1.211  # Mellanox ConnectX-3 Pro port 2 (40GbE → Nexus)
-  plex:    10.1.1.31     # CT 101
-  immich:  10.1.1.30     # CT 502
-  monitoring: 10.1.1.25  # CT 303 (Prometheus + Grafana)
-  unifi_ap: 10.1.1.19    # UniFi U7 Pro XG
-  unifi_ctrl: 10.1.1.100 # CT 300 (UniFi controller)
-  nexus:   10.1.1.200    # hl-core01 (Cisco Nexus 3064)
+  dhcp_pool: 10.1.1.100-10.1.1.254
+
+  static:
+    10.1.1.1:   hl-fw01 (OPNsense — firewall/router/DNS/DHCP)
+    10.1.1.2:   nova (PROXMOX-1)
+    10.1.1.3:   nova-sfp (SFP+ 10GbE → Nexus)
+    10.1.1.4:   mira (PROXMOX-2)
+    10.1.1.5:   orin (PROXMOX-3)
+    10.1.1.11:  truenas (VM 200 on Nova)
+    10.1.1.19:  unifi-ap (UniFi U7-Pro-XG-B — DHCP reservation)
+    10.1.1.25:  monitoring (CT 303 — Prometheus + Grafana)
+    10.1.1.26:  wazuh (SIEM)
+    10.1.1.30:  immich (CT 502 on Orin)
+    10.1.1.31:  plex (CT 101 on Nova)
+    10.1.1.60:  npmplus (Nginx Proxy Manager Plus — reverse proxy)
+    10.1.1.150: jasper (GamingPC — ethernet)
+    10.1.1.151: jasper-wifi (GamingPC — WiFi)
+    10.1.1.198: paperless (CT 102 — document management)
+    10.1.1.200: nexus (Cisco Nexus 3064)
+    10.1.1.210: jasper-40g-p1 (ConnectX-3 Pro port 1)
+    10.1.1.211: jasper-40g-p2 (ConnectX-3 Pro port 2)
+    10.1.1.253: vaultwarden (CT 110 on Nova)
 
 # ============================================================
-# TARGET VLAN NETWORK — Migration Pending
+# VLAN 20 — MGMT (10.1.20.0/24)
+# Agent VMs, controller interfaces, management plane
 # ============================================================
-vlans:
-  20_mgmt:
-    subnet: 10.1.20.0/24
-    gateway: 10.1.20.1
-    purpose: Management — hypervisors, switches, NAS mgmt interfaces
-    reservations:
-      10.1.20.1:  hl-fw01 (OPNsense)
-      10.1.20.2:  hl-core01 (Nexus 3064)
-      10.1.20.3:  hl-agg01 (future)
-      10.1.20.4:  hl-access01 (future)
-      10.1.20.5:  hl-oob01 (management switch)
-      10.1.20.10: Nova (hl-pve02)
-      10.1.20.11: (future hl-pve02 alias)
-      10.1.20.12: Mira (hl-pve03)
-      10.1.20.13: Orin (hl-pve04)
-      10.1.20.30: hl-nas01 (TrueNAS mgmt)
-      10.1.20.40-49: IPMI / iDRAC / BMC controllers
+vlan_20_mgmt:
+  subnet: 10.1.20.0/24
+  gateway: 10.1.20.1
 
-  30_server:
-    subnet: 10.1.30.0/24
-    gateway: 10.1.30.1
-    purpose: VMs, containers, internal applications
-    reservations:
-      10.1.30.10: hl-mon01 (Prometheus + Grafana)
-      10.1.30.20: core-unifi01 (UniFi controller)
-      10.1.30.21: core-agent-nova (openclaw-nova)
-      10.1.30.22: core-agent-mira (openclaw-mira)
-      10.1.30.23: core-agent-orin (openclaw-orin)
-      10.1.30.30: core-photos01 (Immich)
-      10.1.30.31: core-media01 (Plex)
+  static:
+    10.1.20.21:  nova-agent (openclaw-nova VM 201)
+    10.1.20.22:  mira-agent (openclaw-mira VM 400)
+    10.1.20.23:  orin-agent (openclaw-orin VM 600)
+    10.1.20.57:  pentagi (CT 507 on Orin — AI pentesting)
+    10.1.20.100: unifi-ctrl (CT 300 on Mira — UniFi controller)
 
-  40_storage:
-    subnet: 10.1.40.0/24
-    gateway: 10.1.40.1
-    purpose: NFS, SMB, storage replication — isolated from clients
-    reservations:
-      10.1.40.11: hl-nas01 (TrueNAS storage interface)
-      10.1.40.10: Nova storage interface
-      10.1.40.12: Mira storage interface
-      10.1.40.13: Orin storage interface
+# ============================================================
+# VLAN 30 — SERVER (10.1.30.0/24)
+# ============================================================
+vlan_30_server:
+  subnet: 10.1.30.0/24
+  gateway: 10.1.30.1
+  purpose: VMs, containers, internal applications
 
-  50_ai_compute:
-    subnet: 10.1.50.0/24
-    gateway: 10.1.50.1
-    purpose: AI cluster traffic, Ollama, inter-agent communication
-    reservations:
-      10.1.50.150: Jasper (Ollama endpoint, RTX 4090)
+# ============================================================
+# VLAN 40 — STORAGE (10.1.40.0/24)
+# NFS/SMB traffic only — isolated from clients
+# ============================================================
+vlan_40_storage:
+  subnet: 10.1.40.0/24
+  gateway: 10.1.40.1
 
-  60_lab:
-    subnet: 10.1.60.0/24
-    gateway: 10.1.60.1
-    purpose: NetForge CCNA training lab — isolated from production
+  static:
+    10.1.40.5:  orin-storage (ConnectX-3 Pro VLAN 40 interface)
+    10.1.40.11: truenas-storage (TrueNAS storage interface)
 
-  70_security:
-    subnet: 10.1.70.0/24
-    gateway: 10.1.70.1
-    purpose: Sentinel security lab, SIEM, scanners, honeypots
+# ============================================================
+# VLAN 50 — AI-COMPUTE (10.1.50.0/24)
+# ============================================================
+vlan_50_ai_compute:
+  subnet: 10.1.50.0/24
+  gateway: 10.1.50.1
 
-  80_client:
-    subnet: 10.1.80.0/24
-    gateway: 10.1.80.1
-    purpose: Trusted workstations and admin machines
-    reservations:
-      10.1.80.150: Jasper (GamingPC primary client)
+  static:
+    10.1.50.5:   orin-ai (ConnectX-3 Pro VLAN 50 interface)
+    10.1.50.150: jasper (Ollama endpoint / RTX 4090)
 
-  90_iot:
-    subnet: 10.1.90.0/24
-    gateway: 10.1.90.1
-    purpose: IoT devices, cameras, smart equipment
+# ============================================================
+# VLAN 60 — LAB (10.1.60.0/24)
+# NetForge CCNA training — isolated
+# ============================================================
+vlan_60_lab:
+  subnet: 10.1.60.0/24
+  gateway: 10.1.60.1
 
-  100_guest:
-    subnet: 10.1.100.0/24
-    gateway: 10.1.100.1
-    purpose: Guest internet-only
+# ============================================================
+# VLAN 70 — SECURITY (10.1.70.0/24)
+# Sentinel security lab, SIEM, scanners
+# ============================================================
+vlan_70_security:
+  subnet: 10.1.70.0/24
+  gateway: 10.1.70.1
 
-  999_blackhole:
-    subnet: none
-    purpose: Unused switch ports — no routing
+  static:
+    10.1.70.25: monitoring-security (Prometheus scrape interface)
 
+# ============================================================
+# VLAN 80 — CLIENT (10.1.80.0/24)
+# Downloads VLAN — qBittorrent, Radarr, Sonarr, Prowlarr
+# ============================================================
+vlan_80_client:
+  subnet: 10.1.80.0/24
+  gateway: 10.1.80.1
+  notes: Proxied via Nginx on Orin (10.1.1.5) to avoid direct VLAN 80 access from LAN
+
+# ============================================================
+# VLAN 90 — IOT (10.1.90.0/24)
+# ============================================================
+vlan_90_iot:
+  subnet: 10.1.90.0/24
+  gateway: 10.1.90.1
+
+# ============================================================
+# VLAN 100 — GUEST (10.1.100.0/24)
+# ============================================================
+vlan_100_guest:
+  subnet: 10.1.100.0/24
+  gateway: 10.1.100.1
+  purpose: Internet-only, no LAN access
+
+# ============================================================
+# OOB (future)
+# ============================================================
 oob_reserved:
   subnet: 10.1.200.0/24
   purpose: True OOB management network (future)
+  devices:
+    10.1.1.220: orin-idrac (Dell iDRAC — PROXMOX-3)
